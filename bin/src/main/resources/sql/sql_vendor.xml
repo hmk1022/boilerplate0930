@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="vendor">
+
+	<select id="listVendor" resultType="map">
+		/* SQL_ID : vendor.listVendor */
+		SELECT
+			wv.vendor_no,
+			wv.vendor_name,
+			wv.work_cate1,
+			wv.work_cate2,
+			wv.work_cate3,
+			wv.zip_code,
+			wv.addr1,
+			wv.addr2,
+			wv.manager_name,
+			wv.vendor_email,
+			wv.vendor_hp1,
+			wv.vendor_hp2,
+			wv.fax_no,
+			wv.vendor_link,
+			wv.bank_code,
+			wv.acct,
+			wv.payer_name,
+			wv.comp_number,
+			wv.tax_email,
+			wv.acct_fin_yn,
+			wv.remarks,
+			wv.del_yn,
+			wv.create_no,
+			F_GET_ADMIN_NAME(wv.create_no) create_name,
+			wv.create_date,
+			F_GET_ADMIN_NAME(wv.update_no) update_name,
+			wv.update_date,
+			wc.code_name bank_name
+		FROM
+			w_vendor wv 
+				left join w_code wc on (wv.bank_code = wc.code_value and wc.code_gb='vacct_bank_code')
+		WHERE 1=1
+		
+		<if test="vendor_name != null and vendor_name != ''">
+			AND vendor_name LIKE concat('%', #{vendor_name}, '%')
+		</if>
+		ORDER BY 		
+			wv.vendor_name asc
+		<if test="pageFirst != null and pageFirst != ''">	
+		LIMIT #{pageFirst}, #{pageLast}
+		</if>
+		
+	</select>
+	
+	<select id="listVendorCnt" resultType="int">
+		
+		/* SQL_ID : vendor.listVendorCnt */
+		SELECT
+			count(1) as totalRecords
+		FROM
+			w_vendor wv
+		WHERE
+			1 = 1
+		<if test="vendor_name != null and vendor_name != ''">
+			AND vendor_name LIKE concat('%', #{vendor_name}, '%')
+		</if>			
+	</select>
+	
+<!-- 	<select id="getVendorId" resultType="string">
+		/* SQL_ID : vendor.getVendorId */
+		SELECT
+			concat('VEND', '-', LPAD(IFNULL(MAX(vendor_no), 0)+1, 3, '0')) vendor_id 
+		FROM
+			w_vendor wv FOR UPDATE
+	</select> -->
+		
+	<select id="selectVendor" resultType="map">
+		/* SQL_ID : vendor.listVendor */
+		SELECT
+			wv.vendor_no,
+			wv.vendor_name,
+			wv.work_cate1,
+			wv.work_cate2,
+			wv.work_cate3,
+			wv.zip_code,
+			wv.addr1,
+			wv.addr2,
+			wv.manager_name,
+			wv.vendor_email,
+			wv.vendor_hp1,
+			wv.vendor_hp2,
+			wv.fax_no,
+			wv.vendor_link,
+			wv.bank_code,
+			wv.acct,
+			wv.payer_name,
+			wv.comp_number,
+			wv.tax_email,
+			wv.acct_fin_yn,
+			wv.remarks,
+			wv.del_yn,
+			wv.create_no,
+			wv.create_date,
+			wv.update_no,
+			wv.update_date
+		FROM
+			w_vendor wv
+		WHERE 
+			wv.vendor_no = #{vendor_no }
+	</select>
+	
+			
+	<select id="selectVendorName" resultType="map">
+		/* SQL_ID : vendor.listVendor */
+		SELECT
+			wv.vendor_no,
+			wv.vendor_name,
+			wv.work_cate1,
+			wv.work_cate2,
+			wv.work_cate3,
+			wv.zip_code,
+			wv.addr1,
+			wv.addr2,
+			wv.manager_name,
+			wv.vendor_email,
+			wv.vendor_hp1,
+			wv.vendor_hp2,
+			wv.fax_no,
+			wv.vendor_link,
+			wv.bank_code,
+			wv.acct,
+			wv.payer_name,
+			wv.comp_number,
+			wv.tax_email,
+			wv.acct_fin_yn,
+			wv.remarks,
+			wv.del_yn,
+			wv.create_no,
+			wv.create_date,
+			wv.update_no,
+			wv.update_date
+		FROM
+			w_vendor wv
+		WHERE 
+			vendor_name = #{vendor_name}
+		ORDER BY vendor_no DESC
+		LIMIT 1
+	</select>
+	
+	<insert id="insertVendor" useGeneratedKeys="true" keyProperty="key_no">
+		/* SQL_ID : vendor.insertVendor */
+		INSERT INTO w_vendor (
+			vendor_name,
+			work_cate1,
+			work_cate2,
+			work_cate3,
+			zip_code,
+			addr1,
+			addr2,
+			manager_name,
+			vendor_email,
+			vendor_hp1,
+			vendor_hp2,
+			fax_no,
+			vendor_link,
+			bank_code,
+			acct,
+			payer_name,
+			comp_number,
+			tax_email,
+			acct_fin_yn,
+			remarks,
+			create_no,
+			create_date,
+			update_no,
+			update_date
+		) VALUES (
+			#{vendor_name},
+			#{work_cate1},
+			#{work_cate2},
+			#{work_cate3},
+			#{zip_code},
+			#{addr1},
+			#{addr2},
+			#{manager_name},
+			#{vendor_email},
+			#{vendor_hp1},
+			#{vendor_hp2},
+			#{fax_no},
+			#{vendor_link},
+			#{bank_code},
+			#{acct},
+			#{payer_name},
+			#{comp_number},
+			#{tax_email},
+			#{acct_fin_yn},
+			#{remarks},
+			#{create_no},
+			now(),
+			#{update_no},
+			now()
+		)	
+	</insert>
+	
+	<update id="updateVendor">
+		/* SQL_ID : vendor.updateVendor */
+		UPDATE w_vendor SET 
+			vendor_name =#{vendor_name},
+			work_cate1 =#{work_cate1},
+			work_cate2 =#{work_cate2},
+			work_cate3 =#{work_cate3},
+			zip_code =#{zip_code},
+			addr1 =#{addr1},
+			addr2 =#{addr2},
+			manager_name =#{manager_name},
+			vendor_email =#{vendor_email},
+			vendor_hp1 =#{vendor_hp1},
+			vendor_hp2 =#{vendor_hp2},
+			fax_no =#{fax_no},
+			vendor_link =#{vendor_link},
+			bank_code =#{bank_code},
+			acct =#{acct},
+			payer_name =#{payer_name},
+			comp_number =#{comp_number},
+			tax_email =#{tax_email},
+			acct_fin_yn =#{acct_fin_yn},
+			remarks =#{remarks},
+			del_yn =#{del_yn},
+			update_no =#{update_no},
+			update_date = now()
+		WHERE
+			vendor_no = #{vendor_no}
+	</update>
+		
+	<update id="deleteVendor">
+		/* SQL_ID : vendor.deleteVendor */
+		UPDATE w_vendor SET 
+		    del_yn = #{del_yn},
+		    update_no = #{update_no},
+		    update_date = now()
+		WHERE
+			vendor_no = #{vendor_no}
+	</update>
+			
+</mapper>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="material_bound_inout">
+
+	<select id="listMaterialBoundInout" resultType="map">
+		
+		/* SQL_ID : material_bound_inout.listMaterialBoundInout */
+		SELECT
+			wmi.material_inout_no,
+			wmi.material_bound_no,
+			wmi.material_no,
+			wmi.inout_cnt,
+			wmi.inout_stat,
+			wmi.del_yn,
+			wmi.create_no,
+			wmi.create_date,
+			wmi.update_no,
+			wmi.update_date,
+			wm.material_id,
+			wm.material_name,
+			wm.unit_cd,
+			wm.purchased_price,
+			wm.workerman_price,
+			wm.brand_no,
+			F_GET_BRAND_NAME(wm.brand_no) brand_name,
+			(wmi.inout_cnt * wm.purchased_price) total_purchased_price,
+			ifnull(wm.house_cnt, 0) house_cnt,
+			ifnull(wm.sba_cnt, 0) sba_cnt,
+			ifnull(wm.vehicle_cnt, 0) vehicle_cnt,
+			wmb.bound_type,
+			wmb.income_type,
+			wmb.bound_date,
+			wmb.material_bound_id,
+			wmb.bound_locate,
+			wmb.out_type,
+			wmb.out_admin_no,
+			wmb.etc_remarks,
+			(CASE WHEN wmb.bound_locate='01' THEN wmi.inout_cnt ELSE 0 END) house_bound_cnt, 
+			(CASE WHEN wmb.bound_locate='02' THEN wmi.inout_cnt ELSE 0 END) sba_bound_cnt 
+		FROM
+			w_material_bound_inout wmi 
+				inner join w_material wm on (wmi.material_no = wm.material_no)
+				inner join w_material_bound wmb on (wmi.material_bound_no = wmb.material_bound_no)
+		WHERE 1=1
+		<if test="material_bound_no != null and material_bound_no != ''">
+		AND wmi.material_bound_no = #{material_bound_no}
+		</if>
+		<if test="material_no != null and material_no != ''">
+		AND wmi.material_no = #{material_no}
+		</if>
+		ORDER BY 
+			wmi.material_inout_no 
+		
+	</select>
+	
+	
+	<insert id="insertMaterialBoundInout" useGeneratedKeys="true" keyProperty="key_no">
+		
+		/* SQL_ID : material_bound_inout.insertMaterialBoundInout */
+		INSERT INTO w_material_bound_inout (
+			material_bound_no,
+			material_no,
+			inout_cnt,
+			inout_stat,
+			create_no,
+			create_date,
+			update_no,
+			update_date
+		) VALUES (
+			#{material_bound_no},
+			#{material_no},
+			#{inout_cnt},
+			#{inout_stat},
+			#{create_no},
+			now(),
+			#{update_no},
+			now()
+		)
+	</insert>
+	
+	<update id="deleteMaterialBoundInout">
+		/* SQL_ID : material_bound_inout.deleteMaterialBoundInout */
+		DELETE FROM w_material_bound_inout 
+		WHERE
+			material_inout_no = #{material_inout_no}
+	</update>
+
+	<update id="updateMaterialBoundInoutStat">
+		/* SQL_ID : material_bound_inout.updateMaterialBoundInoutStat */
+		update w_material_bound_inout
+			SET inout_stat =#{req_stat},
+			update_no = #{update_no},
+			update_date = now()
+		WHERE
+			material_inout_no = #{material_inout_no}
+	</update>
+			
+</mapper>

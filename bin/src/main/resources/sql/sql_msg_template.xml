@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="msgTemplate">
+
+	<!-- 메시지템플릿조회 -->
+	<select id="selectMsgTmplInfo" resultType="map" parameterType="map">
+		<![CDATA[ /* SQL_ID : msgTemplate.selectMsgTmplInfo */ ]]>
+		select 
+			t.*
+		from
+			w_msg_template t
+		where
+			t.tmpl_gb = #{tmpl_gb}
+			and t.tmpl_type = #{tmpl_type}
+	</select>
+	
+</mapper>
+
+

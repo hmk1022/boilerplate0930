@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="memberDevice">
+
+	<!-- 디바이스 등록 -->
+	<insert id="insertMemberDevice" parameterType="map">
+		<![CDATA[ /* SQL_ID : memberDevice.insertMemberDevice */ ]]>
+		insert into w_member_device(
+			member_no,
+			os_type,
+			device_id,
+			push_token,
+			stat,
+			create_date
+		)values(
+			#{member_no},
+			#{os_type},
+			#{device_id},
+			#{push_token},
+			'00',
+			now()
+		)
+	</insert>
+	
+	<!-- 모든 디바이스 상태 업데이트 -->
+	<update id="updateDeviceStatAll" parameterType="map">
+		<![CDATA[ /* SQL_ID : memberDevice.updateDeviceStatAll */ ]]>
+		update w_member_device
+		set
+			stat = #{stat},
+			update_date = now()
+		where 
+			member_no = #{member_no}
+	</update>
+	
+	<!-- 푸쉬 토큰 업데이트 -->
+	<update id="updatePushtoken" parameterType="map">
+		<![CDATA[ /* SQL_ID : memberDevice.updatePushtoken */ ]]>
+		update w_member_device 
+		set
+			stat = #{stat},
+			push_token = #{push_token},
+			update_date = now()			
+		where 
+			os_type = #{os_type}
+			and device_id = #{device_id}
+			and member_no = #{member_no}
+	</update>
+	
+	<!--  디비이스 수 조회 -->
+	<select id="selectDeviceCnt" resultType="int" parameterType="map">
+		<![CDATA[ /* SQL_ID : memberDevice.selectDeviceCnt */ ]]>
+		select 
+			count(1)
+		from 
+			w_member_device
+		where 
+			member_no = #{member_no}
+		and os_type = #{os_type}
+		and device_id = #{device_id}
+	</select>
+	
+</mapper>
+
+

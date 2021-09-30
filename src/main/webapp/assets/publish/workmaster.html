@@ -1,0 +1,2337 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>워커맨 Admin</title>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+    <meta content="" name="description">
+    <meta content="" name="author">
+    <link href="/assets/css/vendor.min.css" rel="stylesheet">
+    <link href="/assets/css/workman_admin.css" rel="stylesheet">
+    <link href="/assets/css/datepicker.css" rel="stylesheet">
+    <link href="/assets/css/jquery.gritter.css" rel="stylesheet">
+    <script src="/assets/js/vendor.min.js" type="text/javascript"></script>
+    <script src="/assets/js/app.min.js" type="text/javascript"></script>
+    <script src="/assets/js/moment.min.js" type="text/javascript"></script>
+    <script src="/assets/js/datepicker.js" type="text/javascript"></script>
+    <script src="/assets/js/ui.js" type="text/javascript"></script>
+    <script>
+        $(document).ready(function() {
+            $('#reg_date_from,#reg_date_to').val(moment().format('YYYY. MM. DD'));
+            $('#reg_date_from,#reg_date_to').datepicker({
+                format: 'YYYY. MM. DD',
+                autoHide: true,
+            });
+            $('#tab1btn').on('click', function() {
+                if ($('#tab1btn').hasClass('btn-gray')) {
+                    $('#tab1textarea').attr('disabled', false);
+                    $('#tab1btn').removeClass('btn-gray');
+                    $('#tab1btn').addClass('btn-primary');
+                    $('#tab1btn').text('저장');
+                    $('#tab1textarea').focus();
+                } else {
+                    $('#tab1textarea').attr('disabled', true);
+                    $('#tab1btn').removeClass('btn-primary');
+                    $('#tab1btn').addClass('btn-gray');
+                    $('#tab1btn').text('수정');
+                }
+            });
+            $('#endDayBtn').on('click', function() {
+                $('#endDayBtn').hide();
+                $('#endDay').show();
+            });
+            $('#checkbox1').on('click', function() {
+                if ($('#checkbox1').is(':checked')) $('#inputbox1').attr('disabled', false);
+                else $('#inputbox1').attr('disabled', true);
+            });
+            $('#checkbox2').on('click', function() {
+                if ($('#checkbox2').is(':checked')) $('#inputbox2').attr('disabled', false);
+                else $('#inputbox2').attr('disabled', true);
+            });
+            $('#checkbox3').on('click', function() {
+                if ($('#checkbox3').is(':checked')) $('#inputbox3').attr('disabled', false);
+                else $('#inputbox3').attr('disabled', true);
+            });
+        });
+
+        function pop_OPEN(url) {
+            var popup = window.open('./' + url + '.html', '워커맨', 'width=700px,height=800px,scrollbars=yes');
+        }
+
+    </script>
+</head>
+
+<div class="pop-wrap" id="inputJob">
+    <div class="pop-in middle">
+        <div class="pop-cont">
+            <div class="pop-header flex2">
+                <span>하위작업 등록
+                    <p class="small mb-0 text-muted">등록된 하위작업은 견적서, 예상실행가, 지출결의, 비용, 자재요청 등에 활용됩니다.</p>
+                </span>
+                <i class="close ic-close"></i>
+            </div>
+            <div class="pop-body">
+                <div class="form-group">
+                    <label class="form-label">작업명 <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control is-invalid" placeholder="100자 이내">
+                    <div class="invalid-feedback">유효성체크 문구자리</div>
+                </div>
+                <div class="form-group mt-3">
+                    <label class="form-label">작업내용 <span class="text-danger">*</span></label>
+                    <input type="text" class="form-control is-invalid" placeholder="200자 이내">
+                    <div class="invalid-feedback">유효성체크 문구자리</div>
+                </div>
+                <div class="btn-box mt-24">
+                    <button type="button" class="btn-basic full bg-main"><span>등록</span></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="pop-wrap" id="jobEnd">
+    <div class="pop-in middle">
+        <div class="pop-cont">
+            <div class="pop-header flex2">
+                <span>관리자 작업종료
+                    <p class="small mb-0 text-muted">사진첨부 및 특이사항 입력 후 등록하면 작업종료 처리됩니다.</p>
+                </span>
+                <i class="close ic-close"></i>
+            </div>
+            <div class="pop-body">
+                <div class="form-group">
+                    <label class="form-label">현장사진</label>
+                    <ul class="registered-users-list clearfix">
+                        <li>
+                            <a href="javascript:;"><img src="./assets/images/user-5.jpg" alt=""></a>
+                        </li>
+                        <li>
+                            <a href="javascript:;"><img src="./assets/images/user-3.jpg" alt=""></a>
+                        </li>
+                        <li>
+                            <a href="javascript:;"><img src="./assets/images/user-1.jpg" alt=""></a>
+                        </li>
+                        <li>
+                            <a href="javascript:;"><img src="./assets/images/user-8.jpg" alt=""></a>
+                        </li>
+                        <li>
+                            <a href="javascript:;"><img src="./assets/images/user-2.jpg" alt=""></a>
+                        </li>
+                        <li>
+                            <a href="javascript:;"><img src="./assets/images/user-6.jpg" alt=""></a>
+                        </li>
+                        <li>
+                            <a href="javascript:;"><img src="./assets/images/user-4.jpg" alt=""></a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="form-group mt-3">
+                    <label class="form-label">특이사항</label>
+                    <textarea class="form-control is-invalid" rows="5" placeholder="작업 시 발생한 특이사항을 입력하세요"></textarea>
+                    <div class="invalid-feedback">유효성체크 문구자리</div>
+                </div>
+                <div class="btn-box mt-24">
+                    <button type="button" class="btn-basic full bg-main"><span>등록</span></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="pop-wrap" id="inputSchedule">
+    <div class="pop-in middle">
+        <div class="pop-cont">
+            <div class="pop-header flex2">
+                <span>일정 등록
+                    <p class="small mb-0 text-muted">각 하위작업에는 여러개의 일정이 등록될 수 있으며, 등록된 일정대로 작업일지를 생성할 수 있습니다.</p>
+                </span>
+                <i class="close ic-close"></i>
+            </div>
+            <div class="pop-body">
+                <div class="form-group">
+                    <label class="form-label">작업선택 <span class="text-danger">*</span></label>
+                    <select class="form-select">
+                        <option value="">B2B_2105250001</option>
+                    </select>
+                </div>
+                <div class="form-group mt-3">
+                    <label class="form-label">타입 <span class="text-danger">*</span></label>
+                    <div class="">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="inlineRadio1" name="inlineRadio" selected>
+                            <label class="form-check-label" for="inlineRadio1">작업</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="inlineRadio2" name="inlineRadio">
+                            <label class="form-check-label" for="inlineRadio2">답사</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-4">
+                        <label class="form-label">시작일 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="reg_date_from" placeholder="연도. 월. 일.">
+                    </div>
+                    <div class="col-4">
+                        <label class="form-label">시작시간 <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <select class="form-select">
+                                <option value="">09시</option>
+                            </select>
+                            <select class="form-select">
+                                <option value="">00분</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <label class="form-label">종료시간 <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <select class="form-select">
+                                <option value="">09시</option>
+                            </select>
+                            <select class="form-select">
+                                <option value="">00분</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="endDayBtn">
+                    <div class="d-flex align-items-center justify-content-between my-3">
+                        <button class="btn btn-outline-primary">
+                            <i class="fas fa-lg fa-fw me-10px fa-plus"></i>
+                            <span>종료일 추가</span>
+                        </button>
+                        <p class="mb-0">종료일 추가 시 시작일로부터 종료일까지 같은 시간에 일정이 등록됩니다.</p>
+                    </div>
+                </div>
+
+                <div class="row mt-3" id="endDay" style="display: none">
+                    <div class="col-4">
+                        <label class="form-label">종료일 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="reg_date_to" placeholder="연도. 월. 일.">
+                    </div>
+                    <div class="col-4">
+                        <label class="form-label">시작시간 <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <select class="form-select">
+                                <option value="">09시</option>
+                            </select>
+                            <select class="form-select">
+                                <option value="">00분</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <label class="form-label">종료시간 <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <select class="form-select">
+                                <option value="">09시</option>
+                            </select>
+                            <select class="form-select">
+                                <option value="">00분</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group mt-3">
+                    <label class="form-label">담당자지정 <span class="text-danger">*</span></label>
+                    <div class="input-group align-items-center justify-content-between">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="checkbox1" name="checkbox">
+                            <label class="form-check-label" for="checkbox1">워커맨</label>
+                        </div>
+                        <div class="w-75">
+                            <input type="text" class="form-control" id="inputbox1" placeholder="선택 (복수선택 가능)" disabled>
+                            <div class="valid-feedback">유효성체크 문구 자리</div>
+                        </div>
+                    </div>
+
+                    <div class="input-group align-items-center justify-content-between my-2">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="checkbox2" name="checkbox">
+                            <label class="form-check-label" for="checkbox2">외주용역</label>
+                        </div>
+                        <div class="w-75">
+                            <input type="text" class="form-control" id="inputbox2" placeholder="선택 (복수선택 가능)" disabled>
+                            <div class="valid-feedback">유효성체크 문구 자리</div>
+                        </div>
+                    </div>
+
+                    <div class="input-group align-items-center justify-content-between">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="checkbox" id="checkbox3" name="checkbox">
+                            <label class="form-check-label" for="checkbox3">외주업체</label>
+                        </div>
+                        <div class="w-75">
+                            <input type="text" class="form-control" id="inputbox3" placeholder="선택 (복수선택 가능)" disabled>
+                            <div class="valid-feedback">유효성체크 문구 자리</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-box mt-24">
+                    <button type="button" class="btn-basic full bg-main"><span>등록</span></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<body>
+    <div id="app" class="app app-header-fixed app-sidebar-fixed">
+
+        <div class="app-header">
+            <div class="navbar-header">
+                <a href="#" class="navbar-brand"><b>워크맨</b> Admin</a>
+                <button type="button" class="navbar-mobile-toggler" data-toggle="app-sidebar-mobile">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+            <div class="navbar-nav">
+                <div class="navbar-item dropdown">
+                    <a href="https://seantheme.com/color-admin/admin/html/index.html#" data-bs-toggle="dropdown" class="navbar-link dropdown-toggle icon">
+                        <i class="fa fa-bell"></i>
+                        <span class="badge">5</span>
+                    </a>
+                    <div class="dropdown-menu media-list dropdown-menu-end">
+                        <div class="dropdown-header">NOTIFICATIONS (5)</div>
+                        <a href="javascript:;" class="dropdown-item media">
+                            <div class="media-left">
+                                <i class="fa fa-bug media-object bg-gray-500"></i>
+                            </div>
+                            <div class="media-body">
+                                <h6 class="media-heading">Server Error Reports <i class="fa fa-exclamation-circle text-danger"></i></h6>
+                                <div class="text-muted fs-10px">3 minutes ago</div>
+                            </div>
+                        </a>
+                        <a href="javascript:;" class="dropdown-item media">
+                            <div class="media-left">
+                                <img src="./assets/images/user-1.jpg" class="media-object" alt="">
+                                <i class="fab fa-facebook-messenger text-blue media-object-icon"></i>
+                            </div>
+                            <div class="media-body">
+                                <h6 class="media-heading">John Smith</h6>
+                                <p>Quisque pulvinar tellus sit amet sem scelerisque tincidunt.</p>
+                                <div class="text-muted fs-10px">25 minutes ago</div>
+                            </div>
+                        </a>
+                        <a href="javascript:;" class="dropdown-item media">
+                            <div class="media-left">
+                                <img src="./assets/images/user-2.jpg" class="media-object" alt="">
+                                <i class="fab fa-facebook-messenger text-blue media-object-icon"></i>
+                            </div>
+                            <div class="media-body">
+                                <h6 class="media-heading">Olivia</h6>
+                                <p>Quisque pulvinar tellus sit amet sem scelerisque tincidunt.</p>
+                                <div class="text-muted fs-10px">35 minutes ago</div>
+                            </div>
+                        </a>
+                        <a href="javascript:;" class="dropdown-item media">
+                            <div class="media-left">
+                                <i class="fa fa-plus media-object bg-gray-500"></i>
+                            </div>
+                            <div class="media-body">
+                                <h6 class="media-heading"> New User Registered</h6>
+                                <div class="text-muted fs-10px">1 hour ago</div>
+                            </div>
+                        </a>
+                        <a href="javascript:;" class="dropdown-item media">
+                            <div class="media-left">
+                                <i class="fa fa-envelope media-object bg-gray-500"></i>
+                                <i class="fab fa-google text-warning media-object-icon fs-14px"></i>
+                            </div>
+                            <div class="media-body">
+                                <h6 class="media-heading"> New Email From John</h6>
+                                <div class="text-muted fs-10px">2 hour ago</div>
+                            </div>
+                        </a>
+                        <div class="dropdown-footer text-center">
+                            <a href="javascript:;" class="text-decoration-none">View more</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="navbar-item navbar-user dropdown">
+                    <a href="https://seantheme.com/color-admin/admin/html/index.html#" class="navbar-link dropdown-toggle d-flex align-items-center" data-bs-toggle="dropdown">
+                        <span>
+                            Adam Schwartz
+                            <b class="caret"></b>
+                        </span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end me-1">
+                        <a href="javascript:;" class="dropdown-item">Edit Profile</a>
+                        <a href="javascript:;" class="dropdown-item"><span class="badge bg-danger float-end rounded-pill">2</span> Inbox</a>
+                        <a href="javascript:;" class="dropdown-item">Calendar</a>
+                        <a href="javascript:;" class="dropdown-item">Setting</a>
+                        <div class="dropdown-divider"></div>
+                        <a href="javascript:;" class="dropdown-item">Log Out</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="sidebar" class="app-sidebar">
+
+            <div class="app-sidebar-content ps ps--active-y" data-scrollbar="true" data-height="100%" data-init="true" style="height: 100%;">
+
+                <div class="menu">
+                    <div id="appSidebarProfileMenu" class="collapse">
+                        <div class="menu-item pt-5px">
+                            <a href="javascript:;" class="menu-link">
+                                <div class="menu-icon"><i class="fa fa-cog"></i></div>
+                                <div class="menu-text">Settings</div>
+                            </a>
+                        </div>
+                        <div class="menu-item">
+                            <a href="javascript:;" class="menu-link">
+                                <div class="menu-icon"><i class="fa fa-pencil-alt"></i></div>
+                                <div class="menu-text"> Send Feedback</div>
+                            </a>
+                        </div>
+                        <div class="menu-item pb-5px">
+                            <a href="javascript:;" class="menu-link">
+                                <div class="menu-icon"><i class="fa fa-question-circle"></i></div>
+                                <div class="menu-text"> Helps</div>
+                            </a>
+                        </div>
+                        <div class="menu-divider m-0"></div>
+                    </div>
+                    <div class="menu-header">Navigation</div>
+                    <div class="menu-item has-sub active">
+                        <a href="javascript:;" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fa fa-th-large"></i>
+                            </div>
+                            <div class="menu-text">Dashboard</div>
+                            <div class="menu-caret"></div>
+                        </a>
+                        <div class="menu-submenu">
+                            <div class="menu-item active">
+                                <a href="index.html" class="menu-link">
+                                    <div class="menu-text">Dashboard v1</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="index_v2.html" class="menu-link">
+                                    <div class="menu-text">Dashboard v2</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="index_v3.html" class="menu-link">
+                                    <div class="menu-text">Dashboard v3</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu-item has-sub">
+                        <a href="javascript:;" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fa fa-hdd"></i>
+                            </div>
+                            <div class="menu-text">Email</div>
+                            <div class="menu-badge">10</div>
+                        </a>
+                        <div class="menu-submenu">
+                            <div class="menu-item">
+                                <a href="email_inbox.html" class="menu-link">
+                                    <div class="menu-text">Inbox</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="email_compose.html" class="menu-link">
+                                    <div class="menu-text">Compose</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="email_detail.html" class="menu-link">
+                                    <div class="menu-text">Detail</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu-item">
+                        <a href="widget.html" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fab fa-simplybuilt"></i>
+                            </div>
+                            <div class="menu-text">Widgets <span class="menu-label">NEW</span></div>
+                        </a>
+                    </div>
+                    <div class="menu-item has-sub">
+                        <a href="javascript:;" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fa fa-gem"></i>
+                            </div>
+                            <div class="menu-text">UI Elements <span class="menu-label">NEW</span></div>
+                            <div class="menu-caret"></div>
+                        </a>
+                        <div class="menu-submenu">
+                            <div class="menu-item">
+                                <a href="ui_general.html" class="menu-link">
+                                    <div class="menu-text">General <i class="fa fa-paper-plane text-theme"></i></div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="ui_typography.html" class="menu-link">
+                                    <div class="menu-text">Typography</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="ui_tabs_accordions.html" class="menu-link">
+                                    <div class="menu-text">Tabs &amp; Accordions</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="ui_unlimited_tabs.html" class="menu-link">
+                                    <div class="menu-text">Unlimited Nav Tabs</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="ui_modal_notification.html" class="menu-link">
+                                    <div class="menu-text">Modal &amp; Notification <i class="fa fa-paper-plane text-theme"></i></div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="ui_widget_boxes.html" class="menu-link">
+                                    <div class="menu-text">Widget Boxes</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="ui_media_object.html" class="menu-link">
+                                    <div class="menu-text">Media Object</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="ui_buttons.html" class="menu-link">
+                                    <div class="menu-text">Buttons <i class="fa fa-paper-plane text-theme"></i></div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="ui_icons.html" class="menu-link">
+                                    <div class="menu-text">Icons</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="ui_simple_line_icons.html" class="menu-link">
+                                    <div class="menu-text">Simple Line Icons</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="ui_ionicons.html" class="menu-link">
+                                    <div class="menu-text">Ionicons</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="ui_tree.html" class="menu-link">
+                                    <div class="menu-text">Tree View</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="ui_language_bar_icon.html" class="menu-link">
+                                    <div class="menu-text">Language Bar &amp; Icon</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="ui_social_buttons.html" class="menu-link">
+                                    <div class="menu-text">Social Buttons</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="ui_tour.html" class="menu-link">
+                                    <div class="menu-text">Intro JS</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="ui_offcanvas_toasts.html" class="menu-link">
+                                    <div class="menu-text">Offcanvas &amp; Toasts <i class="fa fa-paper-plane text-theme"></i></div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu-item ">
+                        <a href="bootstrap_5.html" class="menu-link">
+                            <div class="menu-icon-img">
+                                <img src="../assets/img/logo/logo-bs5.png" alt="">
+                            </div>
+                            <div class="menu-text">Bootstrap 5 <span class="menu-label">NEW</span></div>
+                        </a>
+                    </div>
+                    <div class="menu-item has-sub">
+                        <a href="javascript:;" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fa fa-list-ol"></i>
+                            </div>
+                            <div class="menu-text">Form Stuff <span class="menu-label">NEW</span></div>
+                            <div class="menu-caret"></div>
+                        </a>
+                        <div class="menu-submenu">
+                            <div class="menu-item">
+                                <a href="form_elements.html" class="menu-link">
+                                    <div class="menu-text">Form Elements <i class="fa fa-paper-plane text-theme"></i></div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="form_plugins.html" class="menu-link">
+                                    <div class="menu-text">Form Plugins <i class="fa fa-paper-plane text-theme"></i></div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="form_slider_switcher.html" class="menu-link">
+                                    <div class="menu-text">Form Slider + Switcher</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="form_validation.html" class="menu-link">
+                                    <div class="menu-text">Form Validation</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="form_wizards.html" class="menu-link">
+                                    <div class="menu-text">Wizards <i class="fa fa-paper-plane text-theme"></i></div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="form_wysiwyg.html" class="menu-link">
+                                    <div class="menu-text">WYSIWYG</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="form_editable.html" class="menu-link">
+                                    <div class="menu-text">X-Editable</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="form_multiple_upload.html" class="menu-link">
+                                    <div class="menu-text">Multiple File Upload</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="form_summernote.html" class="menu-link">
+                                    <div class="menu-text">Summernote</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="form_dropzone.html" class="menu-link">
+                                    <div class="menu-text">Dropzone</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu-item has-sub">
+                        <a href="javascript:;" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fa fa-table"></i>
+                            </div>
+                            <div class="menu-text">Tables</div>
+                            <div class="menu-caret"></div>
+                        </a>
+                        <div class="menu-submenu">
+                            <div class="menu-item">
+                                <a href="table_basic.html" class="menu-link">
+                                    <div class="menu-text">Basic Tables</div>
+                                </a>
+                            </div>
+                            <div class="menu-item has-sub">
+                                <a href="javascript:;" class="menu-link">
+                                    <div class="menu-text">Managed Tables</div>
+                                    <div class="menu-caret"></div>
+                                </a>
+                                <div class="menu-submenu">
+                                    <div class="menu-item">
+                                        <a href="table_manage.html" class="menu-link">
+                                            <div class="menu-text">Default</div>
+                                        </a>
+                                    </div>
+                                    <div class="menu-item">
+                                        <a href="table_manage_buttons.html" class="menu-link">
+                                            <div class="menu-text">Buttons</div>
+                                        </a>
+                                    </div>
+                                    <div class="menu-item">
+                                        <a href="table_manage_colreorder.html" class="menu-link">
+                                            <div class="menu-text">ColReorder</div>
+                                        </a>
+                                    </div>
+                                    <div class="menu-item">
+                                        <a href="table_manage_fixed_columns.html" class="menu-link">
+                                            <div class="menu-text">Fixed Column</div>
+                                        </a>
+                                    </div>
+                                    <div class="menu-item">
+                                        <a href="table_manage_fixed_header.html" class="menu-link">
+                                            <div class="menu-text">Fixed Header</div>
+                                        </a>
+                                    </div>
+                                    <div class="menu-item">
+                                        <a href="table_manage_keytable.html" class="menu-link">
+                                            <div class="menu-text">KeyTable</div>
+                                        </a>
+                                    </div>
+                                    <div class="menu-item">
+                                        <a href="table_manage_responsive.html" class="menu-link">
+                                            <div class="menu-text">Responsive</div>
+                                        </a>
+                                    </div>
+                                    <div class="menu-item">
+                                        <a href="table_manage_rowreorder.html" class="menu-link">
+                                            <div class="menu-text">RowReorder</div>
+                                        </a>
+                                    </div>
+                                    <div class="menu-item">
+                                        <a href="table_manage_scroller.html" class="menu-link">
+                                            <div class="menu-text">Scroller</div>
+                                        </a>
+                                    </div>
+                                    <div class="menu-item">
+                                        <a href="table_manage_select.html" class="menu-link">
+                                            <div class="menu-text">Select</div>
+                                        </a>
+                                    </div>
+                                    <div class="menu-item">
+                                        <a href="table_manage_combine.html" class="menu-link">
+                                            <div class="menu-text">Extension Combination</div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu-item has-sub">
+                        <a href="javascript:;" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fa fa-cash-register"></i>
+                            </div>
+                            <div class="menu-text">POS System <span class="menu-label">NEW</span></div>
+                            <div class="menu-caret"></div>
+                        </a>
+                        <div class="menu-submenu">
+                            <div class="menu-item">
+                                <a href="pos_customer_order.html" target="_blank" class="menu-link">
+                                    <div class="menu-text">Customer Order</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="pos_kitchen_order.html" target="_blank" class="menu-link">
+                                    <div class="menu-text">Kitchen Order</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="pos_counter_checkout.html" target="_blank" class="menu-link">
+                                    <div class="menu-text">Counter Checkout</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="pos_table_booking.html" target="_blank" class="menu-link">
+                                    <div class="menu-text">Table Booking</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="pos_menu_stock.html" target="_blank" class="menu-link">
+                                    <div class="menu-text">Menu Stock</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu-item has-sub">
+                        <a href="javascript:;" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fa fa-star"></i>
+                            </div>
+                            <div class="menu-text">Front End <span class="menu-label">NEW</span></div>
+                            <div class="menu-caret"></div>
+                        </a>
+                        <div class="menu-submenu">
+                            <div class="menu-item">
+                                <a href="../../frontend/one-page-parallax/index.html" target="_blank" class="menu-link">
+                                    <div class="menu-text">One Page Parallax</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="../../frontend/blog/index.html" target="_blank" class="menu-link">
+                                    <div class="menu-text">Blog</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="../../frontend/forum/index.html" target="_blank" class="menu-link">
+                                    <div class="menu-text">Forum</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="../../frontend/e-commerce/index.html" target="_blank" class="menu-link">
+                                    <div class="menu-text">E-Commerce</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="../../frontend/corporate/index.html" target="_blank" class="menu-link">
+                                    <div class="menu-text">Corporate <i class="fa fa-paper-plane text-theme"></i></div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu-item has-sub">
+                        <a href="javascript:;" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fa fa-envelope"></i>
+                            </div>
+                            <div class="menu-text">Email Template</div>
+                            <div class="menu-caret"></div>
+                        </a>
+                        <div class="menu-submenu">
+                            <div class="menu-item">
+                                <a href="email_system.html" class="menu-link">
+                                    <div class="menu-text">System Template</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="email_newsletter.html" class="menu-link">
+                                    <div class="menu-text">Newsletter Template</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu-item has-sub">
+                        <a href="javascript:;" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fa fa-chart-pie"></i>
+                            </div>
+                            <div class="menu-text">Chart</div>
+                            <div class="menu-caret"></div>
+                        </a>
+                        <div class="menu-submenu">
+                            <div class="menu-item">
+                                <a href="chart-flot.html" class="menu-link">
+                                    <div class="menu-text">Flot Chart</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="chart-js.html" class="menu-link">
+                                    <div class="menu-text">Chart JS</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="chart-d3.html" class="menu-link">
+                                    <div class="menu-text">d3 Chart</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="chart-apex.html" class="menu-link">
+                                    <div class="menu-text">Apex Chart</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu-item">
+                        <a href="calendar.html" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            <div class="menu-text">Calendar</div>
+                        </a>
+                    </div>
+                    <div class="menu-item has-sub">
+                        <a href="javascript:;" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fa fa-map"></i>
+                            </div>
+                            <div class="menu-text">Map</div>
+                            <div class="menu-caret"></div>
+                        </a>
+                        <div class="menu-submenu">
+                            <div class="menu-item">
+                                <a href="map_vector.html" class="menu-link">
+                                    <div class="menu-text">Vector Map</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="map_google.html" class="menu-link">
+                                    <div class="menu-text">Google Map</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu-item has-sub">
+                        <a href="javascript:;" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fa fa-image"></i>
+                            </div>
+                            <div class="menu-text">Gallery</div>
+                            <div class="menu-caret"></div>
+                        </a>
+                        <div class="menu-submenu">
+                            <div class="menu-item">
+                                <a href="gallery.html" class="menu-link">
+                                    <div class="menu-text">Gallery v1</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="gallery_v2.html" class="menu-link">
+                                    <div class="menu-text">Gallery v2</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu-item has-sub">
+                        <a href="javascript:;" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fa fa-cogs"></i>
+                            </div>
+                            <div class="menu-text">Page Options <span class="menu-label">NEW</span></div>
+                            <div class="menu-caret"></div>
+                        </a>
+                        <div class="menu-submenu">
+                            <div class="menu-item">
+                                <a href="page_blank.html" class="menu-link">
+                                    <div class="menu-text">Blank Page</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="page_with_footer.html" class="menu-link">
+                                    <div class="menu-text">Page with Footer</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="page_with_fixed_footer.html" class="menu-link">
+                                    <div class="menu-text">Page with Fixed Footer <i class="fa fa-paper-plane text-theme"></i></div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="page_without_sidebar.html" class="menu-link">
+                                    <div class="menu-text">Page without Sidebar</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="page_with_right_sidebar.html" class="menu-link">
+                                    <div class="menu-text">Page with Right Sidebar</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="page_with_minified_sidebar.html" class="menu-link">
+                                    <div class="menu-text">Page with Minified Sidebar</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="page_with_two_sidebar.html" class="menu-link">
+                                    <div class="menu-text">Page with Two Sidebar</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="page_with_line_icons.html" class="menu-link">
+                                    <div class="menu-text">Page with Line Icons</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="page_with_ionicons.html" class="menu-link">
+                                    <div class="menu-text">Page with Ionicons</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="page_full_height.html" class="menu-link">
+                                    <div class="menu-text">Full Height Content</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="page_with_wide_sidebar.html" class="menu-link">
+                                    <div class="menu-text">Page with Wide Sidebar</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="page_with_light_sidebar.html" class="menu-link">
+                                    <div class="menu-text">Page with Light Sidebar</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="page_with_mega_menu.html" class="menu-link">
+                                    <div class="menu-text">Page with Mega Menu</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="page_with_top_menu.html" class="menu-link">
+                                    <div class="menu-text">Page with Top Menu</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="page_with_boxed_layout.html" class="menu-link">
+                                    <div class="menu-text">Page with Boxed Layout</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="page_with_mixed_menu.html" class="menu-link">
+                                    <div class="menu-text">Page with Mixed Menu</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="page_boxed_layout_with_mixed_menu.html" class="menu-link">
+                                    <div class="menu-text">Boxed Layout with Mixed Menu</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="page_with_transparent_sidebar.html" class="menu-link">
+                                    <div class="menu-text">Page with Transparent Sidebar</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="page_with_search_sidebar.html" class="menu-link">
+                                    <div class="menu-text">Page with Search Sidebar <i class="fa fa-paper-plane text-theme"></i></div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu-item has-sub">
+                        <a href="javascript:;" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fa fa-gift"></i>
+                            </div>
+                            <div class="menu-text">Extra <span class="menu-label">NEW</span></div>
+                            <div class="menu-caret"></div>
+                        </a>
+                        <div class="menu-submenu">
+                            <div class="menu-item">
+                                <a href="extra_timeline.html" class="menu-link">
+                                    <div class="menu-text">Timeline</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="extra_coming_soon.html" class="menu-link">
+                                    <div class="menu-text">Coming Soon Page</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="extra_search_results.html" class="menu-link">
+                                    <div class="menu-text">Search Results</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="extra_invoice.html" class="menu-link">
+                                    <div class="menu-text">Invoice</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="extra_404_error.html" class="menu-link">
+                                    <div class="menu-text">404 Error Page</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="extra_profile.html" class="menu-link">
+                                    <div class="menu-text">Profile Page</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="extra_scrum_board.html" class="menu-link">
+                                    <div class="menu-text">Scrum Board <i class="fa fa-paper-plane text-theme"></i></div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="extra_cookie_acceptance_banner.html" class="menu-link">
+                                    <div class="menu-text">Cookie Acceptance Banner <i class="fa fa-paper-plane text-theme"></i></div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu-item has-sub">
+                        <a href="javascript:;" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fa fa-key"></i>
+                            </div>
+                            <div class="menu-text">Login &amp; Register</div>
+                            <div class="menu-caret"></div>
+                        </a>
+                        <div class="menu-submenu">
+                            <div class="menu-item">
+                                <a href="login.html" class="menu-link">
+                                    <div class="menu-text">Login</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="login_v2.html" class="menu-link">
+                                    <div class="menu-text">Login v2</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="login_v3.html" class="menu-link">
+                                    <div class="menu-text">Login v3</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="register_v3.html" class="menu-link">
+                                    <div class="menu-text">Register v3</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu-item has-sub">
+                        <a href="javascript:;" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fa fa-cubes"></i>
+                            </div>
+                            <div class="menu-text">Version <span class="menu-label">NEW</span></div>
+                            <div class="menu-caret"></div>
+                        </a>
+                        <div class="menu-submenu">
+                            <div class="menu-item">
+                                <a href="../html/index_v3.html" class="menu-link">
+                                    <div class="menu-text">HTML</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="../ajax/" class="menu-link">
+                                    <div class="menu-text">AJAX</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="../angularjs/" class="menu-link">
+                                    <div class="menu-text">ANGULAR JS</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="../angularjs11/" class="menu-link">
+                                    <div class="menu-text">ANGULAR JS 11</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="javascript:alert('Laravel Version only available in downloaded version.');" class="menu-link">
+                                    <div class="menu-text">LARAVEL</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="../vuejs/" class="menu-link">
+                                    <div class="menu-text">VUE JS</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="../reactjs/" class="menu-link">
+                                    <div class="menu-text">REACT JS</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="javascript:alert('.NET Core 5.0 MVC Version only available in downloaded version.');" class="menu-link">
+                                    <div class="menu-text">ASP.NET <i class="fa fa-paper-plane text-theme"></i></div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="../material/index_v3.html" class="menu-link">
+                                    <div class="menu-text">MATERIAL DESIGN</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="../apple/index_v3.html" class="menu-link">
+                                    <div class="menu-text">APPLE DESIGN</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="../transparent/index_v3.html" class="menu-link">
+                                    <div class="menu-text">TRANSPARENT DESIGN <i class="fa fa-paper-plane text-theme"></i></div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="../facebook/index_v3.html" class="menu-link">
+                                    <div class="menu-text">FACEBOOK DESIGN <i class="fa fa-paper-plane text-theme"></i></div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="../google/index_v3.html" class="menu-link">
+                                    <div class="menu-text">GOOGLE DESIGN <i class="fa fa-paper-plane text-theme"></i></div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu-item has-sub">
+                        <a href="javascript:;" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fa fa-medkit"></i>
+                            </div>
+                            <div class="menu-text">Helper</div>
+                            <div class="menu-caret"></div>
+                        </a>
+                        <div class="menu-submenu">
+                            <div class="menu-item">
+                                <a href="helper_css.html" class="menu-link">
+                                    <div class="menu-text">Predefined CSS Classes</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu-item has-sub">
+                        <a href="javascript:;" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fa fa-align-left"></i>
+                            </div>
+                            <div class="menu-text">Menu Level</div>
+                            <div class="menu-caret"></div>
+                        </a>
+                        <div class="menu-submenu">
+                            <div class="menu-item has-sub">
+                                <a href="javascript:;" class="menu-link">
+                                    <div class="menu-text">Menu 1.1</div>
+                                    <div class="menu-caret"></div>
+                                </a>
+                                <div class="menu-submenu">
+                                    <div class="menu-item has-sub">
+                                        <a href="javascript:;" class="menu-link">
+                                            <div class="menu-text">Menu 2.1</div>
+                                            <div class="menu-caret"></div>
+                                        </a>
+                                        <div class="menu-submenu">
+                                            <div class="menu-item"><a href="javascript:;" class="menu-link">
+                                                    <div class="menu-text">Menu 3.1</div>
+                                                </a></div>
+                                            <div class="menu-item"><a href="javascript:;" class="menu-link">
+                                                    <div class="menu-text">Menu 3.2</div>
+                                                </a></div>
+                                        </div>
+                                    </div>
+                                    <div class="menu-item"><a href="javascript:;" class="menu-link">
+                                            <div class="menu-text">Menu 2.2</div>
+                                        </a></div>
+                                    <div class="menu-item"><a href="javascript:;" class="menu-link">
+                                            <div class="menu-text">Menu 2.3</div>
+                                        </a></div>
+                                </div>
+                            </div>
+                            <div class="menu-item"><a href="javascript:;" class="menu-link">
+                                    <div class="menu-text">Menu 1.2</div>
+                                </a></div>
+                            <div class="menu-item"><a href="javascript:;" class="menu-link">
+                                    <div class="menu-text">Menu 1.3</div>
+                                </a></div>
+                        </div>
+                    </div>
+
+                    <div class="menu-item d-flex">
+                        <a href="javascript:;" class="app-sidebar-minify-btn ms-auto" data-toggle="app-sidebar-minify"><i class="fa fa-angle-double-left"></i></a>
+                    </div>
+
+                </div>
+
+                <div class="ps__rail-x" style="left: 0px; bottom: 0px;">
+                    <div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div>
+                </div>
+                <div class="ps__rail-y" style="top: 0px; height: 894px; right: 0px;">
+                    <div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 823px;"></div>
+                </div>
+            </div>
+
+        </div>
+        <div class="app-sidebar-bg"></div>
+        <div class="app-sidebar-mobile-backdrop"><a href="#" data-dismiss="app-sidebar-mobile" class="stretched-link"></a></div>
+        
+        
+        <div class="app-content">
+            <h1 class="page-header">작업마스터<span class="ms-3 fw-bold">B2B_2105250001</span></h1>
+
+            <div class="row">
+                <div class="col-12 mb-3">
+                    <div class="card">
+                        <div class="card-body border border-primary">
+                            <div class="row">
+                                <div class="col-md-8 col-12">
+                                    <label class="form-label text-muted">공사명</label>
+                                    <h5>PO-00419025 - 14-110호(13인실) 인테리어 공사</h5>
+                                </div>
+                                <div class="col-md-4 col-6 mt-md-0 mt-3">
+                                    <label class="form-label text-muted">작업상태</label>
+                                    <h5 class="text-danger">요청취소</h5>
+                                </div>
+                                <div class="col-md-3 col-6 mt-3">
+                                    <label class="form-label text-muted">취소사유</label>
+                                    <h5 class="text-danger">고객요청</h5>
+                                </div>
+                                <div class="col-md-9 col-12 mt-3">
+                                    <label class="form-label text-muted">취소상세사유</label>
+                                    <h5 class="text-danger">일정과 견적이 맞지 않아 입주사에서 작업 거절</h5>
+                                </div>
+                                <hr>
+                                <div class="col-md-3 col-6">
+                                    <label class="form-label text-muted">고객구분</label>
+                                    <h5>법인</h5>
+                                </div>
+                                <div class="col-md-3 col-6">
+                                    <label class="form-label text-muted">고객(사)명</label>
+                                    <h5>WeWork / 광화문점</h5>
+                                </div>
+                                <div class="col-md-3 col-12 mt-md-0 mt-3">
+                                    <label class="form-label text-muted">담당자정보</label>
+                                    <h5>이영은 매니저 / 010-1111-1111</h5>
+                                </div>
+                                <div class="col-md-3 col-12 mt-md-0 mt-3">
+                                    <label class="form-label text-muted">현장주소</label>
+                                    <h5>서울 서초구 식유촌길 51-3 (이안리타워) 2층</h5>
+                                </div>
+                                <div class="col-md-3 col-12 mt-3">
+                                    <label class="form-label text-muted">작업기간</label>
+                                    <h5>2021-05-14 ~ 2021-05-16</h5>
+                                </div>
+                                <div class="col-md-3 col-12 mt-3">
+                                    <label class="form-label text-muted">공무</label>
+                                    <h5>이창주</h5>
+                                </div>
+                                <div class="col-md-3 col-12 mt-3">
+                                    <label class="form-label text-muted">감리</label>
+                                    <h5>양호익</h5>
+                                </div>
+                                <div class="col-md-3 col-12 mt-3">
+                                    <label class="form-label text-muted">워커맨</label>
+                                    <h5>민병욱, 박은성</h5>
+                                </div>
+                                <hr>
+                                <div class="col-md-3 col-12">
+                                    <label class="form-label text-muted">총 견적금액</label>
+                                    <h5><a href="#" class="text-danger">12,345,600 원</a><span class="small ms-2 text-dark">(2021-05-10 / 버전2)</span></h5>
+                                </div>
+                                <div class="col-md-3 col-12 mt-md-0 mt-3">
+                                    <label class="form-label text-muted">예상실행가 및 마진율</label>
+                                    <h5>10,100,000 원<span class="small ms-2 text-primary">(18.2%)</span></h5>
+                                </div>
+                                <div class="col-md-3 col-12 mt-md-0 mt-3">
+                                    <label class="form-label text-muted">실 실행가 합계</label>
+                                    <h5>5,123,000원</h5>
+                                    <div class="progress">
+                                        <div class="progress-bar fs-10px fw-bold" style="width: 41.5%">41.5%</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-12 mt-md-0 mt-3">
+                                    <label class="form-label text-muted">결제완료금액</label>
+                                    <h5>2,000,000 원<span class="small ms-2 text-primary">(18.2%)</span></h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-4">
+                        <div class="card-body table-responsive">
+                            <ul class="nav nav-pills">
+                                <li class="nav-item">
+                                    <a href="#default-tab-1" data-bs-toggle="tab" class="nav-link active">요청사항 메모</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="#default-tab-2" data-bs-toggle="tab" class="nav-link">작업일정</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="#default-tab-3" data-bs-toggle="tab" class="nav-link">견적서</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="#default-tab-4" data-bs-toggle="tab" class="nav-link">작업일지</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="#default-tab-5" data-bs-toggle="tab" class="nav-link">실행가</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="#default-tab-6" data-bs-toggle="tab" class="nav-link">자재요청</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="#default-tab-7" data-bs-toggle="tab" class="nav-link">결제</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="#default-tab-8" data-bs-toggle="tab" class="nav-link">완료보고서</a>
+                                </li>
+                            </ul>
+                            <div class="tab-content bg-white p-3">
+
+                                <div class="tab-pane fade active show" id="default-tab-1">
+                                    <div class="mb-5">
+                                        <div class="d-flex align-items-center justify-content-between mb-3">
+                                            <h4 class="mb-0">고객 요청사항</h4>
+                                            <button class="btn btn-gray" id="tab1btn">수정</button>
+                                        </div>
+                                        <textarea rows="4" class="form-control" disabled id="tab1textarea"></textarea>
+                                    </div>
+                                    <div class="mb-5">
+                                        <h4 class="mb-3">관리자 메모</h4>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control  is-invalid">
+                                            <a href="#" class="btn btn-primary">등록</a>
+                                            <div class="invalid-feedback">메모를 입력하세요.</div>
+                                        </div>
+                                        <div class="border p-2 rounded mt-3 bg-default">등록된 메모가 없습니다.</div>
+                                    </div>
+                                    <div class="">
+                                        <h4 class="mb-3">워커맨 메모</h4>
+                                        <div class="border p-2 rounded my-3 bg-default">등록된 메모가 없습니다.</div>
+                                        <div class="border p-2 rounded my-3 bg-default">
+                                            <p>2021-06-21 13:59 | 민병욱</p>
+                                            <h6>자재 준비 해야함</h6>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="tab-pane fade" id="default-tab-2">
+                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                        <h4 class="mb-0">하위작업 및 일정 관리</h4>
+                                        <button class="btn btn-primary" onclick="Layer_OPEN('#inputJob');">하위작업등록</button>
+                                    </div>
+
+                                    <div class="card mb-2">
+                                        <div class="card-body">
+                                            <div class="w-100 d-flex align-items-center justify-content-between mb-2">
+                                                <div class="">
+                                                    <h5 class="mb-0">B2B_2105250001 <span class="ms-2 text-primary">PO-00419025 - 14-110호(13인실) 인테리어 공사</span></h5>
+                                                </div>
+                                                <div class="d-flex ">
+                                                    <button class="btn btn-gray">수정</button>
+                                                    <button class="btn btn-success ms-2" onclick="Layer_OPEN('#inputSchedule');">일정등록</button>
+                                                </div>
+                                            </div>
+                                            <div class="accordion">
+                                                <div class="accordion-item border-0">
+                                                    <div class="accordion-header" id="headingOne">
+                                                        <div class="accordion-button px-3 py-10px pointer-cursor collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false">
+                                                            <div class="row w-100">
+                                                                <div class="col-md-3 col-6">
+                                                                    <label class="form-label text-muted">타입</label>
+                                                                    <h5>답사</h5>
+                                                                </div>
+                                                                <div class="col-md-3 col-6">
+                                                                    <label class="form-label text-muted">일정</label>
+                                                                    <h5>2021-05-09 (토) 09:00 - 12:00</h5>
+                                                                </div>
+                                                                <div class="col-md-3 col-6 mt-md-0 mt-3">
+                                                                    <label class="form-label text-muted">감리</label>
+                                                                    <h5>양호익</h5>
+                                                                </div>
+                                                                <div class="col-md-3 col-6 mt-md-0 mt-3">
+                                                                    <label class="form-label text-muted">상태</label>
+                                                                    <h5>답사배정</h5>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div id="collapseOne" class="accordion-collapse collapse " style="">
+                                                        <div class="accordion-body">
+                                                            <div class="row">
+                                                                <div class="col-3">
+                                                                    <label class="form-label text-muted">답사종료</label>
+                                                                    <button class="btn btn-danger">답사종료</button>
+                                                                </div>
+                                                            </div>
+                                                            <hr>
+                                                            <div class="text-end">
+                                                                <button class="btn btn-danger">삭제</button>
+                                                                <button class="btn btn-primary ms-1">수정</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="card mb-2">
+                                        <div class="card-body">
+                                            <div class="w-100 d-flex align-items-center justify-content-between mb-2">
+                                                <div class="">
+                                                    <h5 class="mb-0">B2B_2105250001 <span class="ms-2 text-primary">홀 바닥 공사</span><span class="ms-2 small text-dark">지정 카펫 타일</span></h5>
+                                                </div>
+                                                <div class="d-flex ">
+                                                    <button class="btn btn-gray">수정</button>
+                                                    <button class="btn btn-success ms-2" onclick="Layer_OPEN('#inputSchedule');">일정등록</button>
+                                                </div>
+                                            </div>
+                                            <div class="accordion">
+                                                <div class="accordion-item border-0">
+                                                    <div class="accordion-header" id="headingOne">
+                                                        <div class="accordion-button px-3 py-10px pointer-cursor collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2" aria-expanded="false">
+                                                            <div class="row w-100">
+                                                                <div class="col-md-2 col-6">
+                                                                    <label class="form-label text-muted">타입</label>
+                                                                    <h5>작업</h5>
+                                                                </div>
+                                                                <div class="col-md-2 col-6">
+                                                                    <label class="form-label text-muted">일정</label>
+                                                                    <h5>2021-05-09 (토) 09:00 - 12:00</h5>
+                                                                </div>
+                                                                <div class="col-md-2 col-6 mt-md-0 mt-3">
+                                                                    <label class="form-label text-muted">워커맨</label>
+                                                                    <h5>이경진, 민병욱, 박은성</h5>
+                                                                </div>
+                                                                <div class="col-md-2 col-6 mt-md-0 mt-3">
+                                                                    <label class="form-label text-muted">외주용역</label>
+                                                                    <h5>-</h5>
+                                                                </div>
+                                                                <div class="col-md-2 col-6 mt-md-0 mt-3">
+                                                                    <label class="form-label text-muted">외주업체</label>
+                                                                    <h5>-</h5>
+                                                                </div>
+                                                                <div class="col-md-2 col-6 mt-md-0 mt-3">
+                                                                    <label class="form-label text-muted">상태</label>
+                                                                    <h5>일정등록</h5>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div id="collapse2" class="accordion-collapse collapse " style="">
+                                                        <div class="accordion-body">
+                                                            <div class="row">
+                                                                <div class="col-3">
+                                                                    <label class="form-label text-muted">작업종료</label>
+                                                                    <button class="btn btn-danger" onclick="Layer_OPEN('#jobEnd');">작업종료</button>
+                                                                </div>
+                                                            </div>
+                                                            <hr>
+                                                            <div class="text-end">
+                                                                <button class="btn btn-danger">삭제</button>
+                                                                <button class="btn btn-primary ms-1">수정</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="card mb-2">
+                                        <div class="card-body">
+                                            <div class="w-100 d-flex align-items-center justify-content-between mb-2">
+                                                <div class="">
+                                                    <h5>B2B_2105250001 <span class="ms-2 text-primary">위워크 선릉점 14-110호 인테리어 공사 하위작업 제목 블라블라블라</span></h5>
+                                                    <p class="mb-0">위워크 선릉점 14-110호 인테리어 공사 하위작업위워크 선릉점 14-110호 인테리어 공사 하위작업위워크 선릉점 14-110호 인테리어 공사 하위작업</p>
+                                                </div>
+                                                <div class="d-flex ">
+                                                    <button class="btn btn-gray">수정</button>
+                                                    <button class="btn btn-success ms-2" onclick="Layer_OPEN('#inputSchedule');">일정등록</button>
+                                                </div>
+                                            </div>
+                                            <div class="p-2 rounded border border-light">등록된 일정이 없습니다.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <hr>
+                                    <h5>
+                                        <i class="fas fa-lg fa-fw fa-info-circle"></i>
+                                        사용 가이드</h5>
+                                    <ul class="mb-0">
+                                        <li>하위작업 생성 후 견적서를 작성하세요.</li>
+                                        <li>하나의 하위작업에 여러개의 일정을 등록할 수 있습니다. </li>
+                                        <li>일정등록 시 워커맨, 외주용역, 외주업체를 등록하세요.</li>
+                                        <li>이 작업의 감리로 등록되었을 경우, 감리 담당자에게 등록한 모든 일정이 함께 배정됩니다.</li>
+                                        <li>일정이 등록되지 않은 날짜는 비용등록 및 자재요청에 사용할 수 없습니다.</li>
+                                    </ul>
+
+                                </div>
+
+
+                                <div class="tab-pane fade" id="default-tab-3">
+                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                        <h4 class="mb-0">견적서 및 예상실행가</h4>
+                                        <button class="btn btn-primary" onclick="pop_OPEN('workmaster_popup1');">견적서등록</button>
+                                    </div>
+
+                                    <div class="card mb-2">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-2 col-6">
+                                                    <label class="form-label text-muted">문서번호</label>
+                                                    <h5>1234</h5>
+                                                </div>
+                                                <div class="col-md-2 col-6">
+                                                    <label class="form-label text-muted">버전</label>
+                                                    <h5>버전 3</h5>
+                                                </div>
+                                                <div class="col-md-2 col-6">
+                                                    <label class="form-label text-muted">총 견적금액</label>
+                                                    <h5>12,543,200 원</h5>
+                                                </div>
+                                                <div class="col-md-2 col-6">
+                                                    <label class="form-label text-muted">작성자</label>
+                                                    <h5>이창주</h5>
+                                                </div>
+                                                <div class="col-md-2 col-6">
+                                                    <label class="form-label text-muted">작성일</label>
+                                                    <h5>2021-05-12(목)</h5>
+                                                </div>
+                                                <div class="col-md-2 col-6">
+                                                    <label class="form-label text-muted">승인날짜</label>
+                                                    <h5>승인완료 / 2021-05-13(금)</h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-footer d-flex justify-content-end">
+                                            <button class="btn btn-success">출력</button>
+                                            <button class="btn btn-gray ms-2">수정</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="card mb-2">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-2 col-6">
+                                                    <label class="form-label text-muted">문서번호</label>
+                                                    <h5>1234</h5>
+                                                </div>
+                                                <div class="col-md-2 col-6">
+                                                    <label class="form-label text-muted">버전</label>
+                                                    <h5>버전 3</h5>
+                                                </div>
+                                                <div class="col-md-2 col-6">
+                                                    <label class="form-label text-muted">총 견적금액</label>
+                                                    <h5>12,543,200 원</h5>
+                                                </div>
+                                                <div class="col-md-2 col-6">
+                                                    <label class="form-label text-muted">작성자</label>
+                                                    <h5>이창주</h5>
+                                                </div>
+                                                <div class="col-md-2 col-6">
+                                                    <label class="form-label text-muted">작성일</label>
+                                                    <h5>2021-05-12(목)</h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-footer d-flex justify-content-end">
+                                            <button class="btn btn-primary" onclick="Layer_OPEN('#inputSchedule');">견적승인</button>
+                                            <button class="btn btn-success ms-2">출력</button>
+                                            <button class="btn btn-gray ms-2">수정</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="card mb-2">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-2 col-6">
+                                                    <label class="form-label text-muted">문서번호</label>
+                                                    <h5>1234</h5>
+                                                </div>
+                                                <div class="col-md-2 col-6">
+                                                    <label class="form-label text-muted">버전</label>
+                                                    <h5>버전 3</h5>
+                                                </div>
+                                                <div class="col-md-2 col-6">
+                                                    <label class="form-label text-muted">총 견적금액</label>
+                                                    <h5>12,543,200 원</h5>
+                                                </div>
+                                                <div class="col-md-2 col-6">
+                                                    <label class="form-label text-muted">작성자</label>
+                                                    <h5>이창주</h5>
+                                                </div>
+                                                <div class="col-md-2 col-6">
+                                                    <label class="form-label text-muted">작성일</label>
+                                                    <h5>2021-05-12(목)</h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-footer d-flex justify-content-end">
+                                            <button class="btn btn-primary" onclick="Layer_OPEN('#inputSchedule');">견적승인</button>
+                                            <button class="btn btn-success ms-2">출력</button>
+                                            <button class="btn btn-gray ms-2">수정</button>
+                                        </div>
+                                    </div>
+
+                                    <hr>
+                                    <h5>
+                                        <i class="fas fa-lg fa-fw fa-info-circle"></i>
+                                        사용 가이드</h5>
+                                    <ul class="mb-0">
+                                        <li>승인 상태의 견적서의 총 견적금액이 이 작업의 최종 결제금액으로 설정됩니다.</li>
+                                        <li>최종 결제금액을 바꿔야하는 경우 견적서를 새로운 버전으로 작성하여 승인처리 하세요.</li>
+                                        <li>견적작성 시 예상실행가를 함께 입력하여 예상차액 및 마진율을 보며 작성할 수 있습니다.</li>
+                                    </ul>
+                                </div>
+
+
+                                <div class="tab-pane fade" id="default-tab-4">
+                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                        <h4 class="mb-0">작업일지</h4>
+                                    </div>
+
+                                    <div class="card mb-2">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label text-muted">날짜</label>
+                                                    <h5>2021-05-20 (수)</h5>
+                                                </div>
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label text-muted">일정</label>
+                                                    <h5>홀 바닥 공사</h5>
+                                                </div>
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label text-muted">집행비용</label>
+                                                    <h5>12,543,200 원</h5>
+                                                </div>
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label text-muted">작성자</label>
+                                                    <h5>이창주</h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-footer d-flex justify-content-end">
+                                            <button class="btn btn-gray" onclick="pop_OPEN('workmaster_popup2');">작성</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="card mb-2">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label text-muted">날짜</label>
+                                                    <h5>2021-05-20 (수)</h5>
+                                                </div>
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label text-muted">일정</label>
+                                                    <h5>홀 바닥 공사</h5>
+                                                </div>
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label text-muted">집행비용</label>
+                                                    <h5>12,543,200 원</h5>
+                                                </div>
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label text-muted">작성자</label>
+                                                    <h5>이창주</h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-footer d-flex justify-content-end">
+                                            <button class="btn btn-gray" onclick="pop_OPEN('workmaster_popup2');">작성</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="card mb-2">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label text-muted">날짜</label>
+                                                    <h5>2021-05-20 (수)</h5>
+                                                </div>
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label text-muted">일정</label>
+                                                    <h5>홀 바닥 공사</h5>
+                                                </div>
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label text-muted">집행비용</label>
+                                                    <h5>12,543,200 원</h5>
+                                                </div>
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label text-muted">작성자</label>
+                                                    <h5>이창주</h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-footer d-flex justify-content-end">
+                                            <button class="btn btn-gray" onclick="pop_OPEN('workmaster_popup2');">작성</button>
+                                        </div>
+                                    </div>
+
+                                    <hr>
+                                    <h5>
+                                        <i class="fas fa-lg fa-fw fa-info-circle"></i>
+                                        사용 가이드</h5>
+                                    <ul class="mb-0">
+                                        <li>[하위작업 및 일정관리] 탭에서 일정을 등록한 날짜만 작업일지를 작성 및 수정할 수 있습니다.</li>
+                                        <li>비용등록, 자재요청서, 지출결의서 등록 시 입력한 일정에 자동으로 집행 비용이 산정됩니다.</li>
+                                        <li>각 날짜별로 누락된 금액이 있을 경우 [비용등록] 또는 [지출결의서] 등록을 통해 비용을 추가하세요.</li>
+                                    </ul>
+                                </div>
+
+
+                                <div class="tab-pane fade" id="default-tab-5">
+                                    <div class="mb-5">
+                                        <h4 class="mb-3">실행가 요약</h4>
+                                        <div class="card mb-2">
+                                            <div class="card-body card-primary">
+                                                <div class="row">
+                                                    <div class="col-md-3 col-6">
+                                                        <label class="form-label text-muted">문서번호</label>
+                                                        <h5>1234</h5>
+                                                    </div>
+                                                    <div class="col-md-3 col-6">
+                                                        <label class="form-label text-muted">총 사용 금액</label>
+                                                        <h5>1,635,070 원</h5>
+                                                    </div>
+                                                    <div class="col-md-3 col-6">
+                                                        <label class="form-label text-muted">잔액</label>
+                                                        <h5 class="text-primary">10,710,350 원</h5>
+                                                    </div>
+                                                    <div class="col-md-3 col-6">
+                                                        <label class="form-label text-muted">인건비</label>
+                                                        <h5>550,000 원</h5>
+                                                    </div>
+                                                    <div class="col-md-3 col-6">
+                                                        <label class="form-label text-muted">외주업체비용</label>
+                                                        <h5>0 원</h5>
+                                                    </div>
+                                                    <div class="col-md-3 col-6">
+                                                        <label class="form-label text-muted">자재비</label>
+                                                        <h5>849,070 원</h5>
+                                                    </div>
+                                                    <div class="col-md-3 col-6">
+                                                        <label class="form-label text-muted">공과잡비</label>
+                                                        <h5>236,000 원</h5>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="table-responsive">
+                                            <table class="table table-striped ">
+                                                <thead>
+                                                    <tr>
+                                                        <th>작업일</th>
+                                                        <th>인건비</th>
+                                                        <th>외주업체비</th>
+                                                        <th>자재비</th>
+                                                        <th>공과잡비</th>
+                                                        <th>합계</th>
+                                                        <th>잔액</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>2021-04-16 (금)</td>
+                                                        <td class="text-end">550,000</td>
+                                                        <td class="text-end">-</td>
+                                                        <td class="text-end">1,297,920</td>
+                                                        <td class="text-end">20,500</td>
+                                                        <td class="text-end text-success">1,868,420</td>
+                                                        <td class="text-end">3,351,580</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>2021-04-16 (금)</td>
+                                                        <td class="text-end">550,000</td>
+                                                        <td class="text-end">-</td>
+                                                        <td class="text-end">1,297,920</td>
+                                                        <td class="text-end">20,500</td>
+                                                        <td class="text-end text-success">1,868,420</td>
+                                                        <td class="text-end">3,351,580</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="">
+                                        <div class="d-flex align-items-center justify-content-between mb-3">
+                                            <h4 class="mb-0">실행가 목록</h4>
+                                            <button class="btn btn-outline-primary" onclick="pop_OPEN('workmaster_popup3');">비용등록</button>
+                                        </div>
+                                        <div class="table-responsive">
+                                            <table class="table table-striped ">
+                                                <thead>
+                                                    <tr>
+                                                        <th>No.</th>
+                                                        <th>문서구분</th>
+                                                        <th>문서번호</th>
+                                                        <th>비용구분</th>
+                                                        <th>용도</th>
+                                                        <th>사용일</th>
+                                                        <th>금액</th>
+                                                        <th>결제일</th>
+                                                        <th>등록일</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>4</td>
+                                                        <td>비용등록</td>
+                                                        <td><a href="javascript:pop_OPEN('workmaster_popup3')">1412</a></td>
+                                                        <td>인건비</td>
+                                                        <td class="text-start">자재 운반 용역 / 홍길동</td>
+                                                        <td>2021-05-12 ~ 2021-05-13</td>
+                                                        <td>35,000 원</td>
+                                                        <td>2021-05-14<br>결제대기</td>
+                                                        <td>2021-05-12<br>이창주</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>3</td>
+                                                        <td>자재요청</td>
+                                                        <td><a href="#">1412</a></td>
+                                                        <td>인건비</td>
+                                                        <td class="text-start">자재 운반 용역 / 홍길동</td>
+                                                        <td>2021-05-12 ~ 2021-05-13</td>
+                                                        <td>35,000 원</td>
+                                                        <td>2021-05-14<br>결제대기</td>
+                                                        <td>2021-05-12<br>이창주</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>2</td>
+                                                        <td>지출결의</td>
+                                                        <td><a href="#">1412</a></td>
+                                                        <td>인건비</td>
+                                                        <td class="text-start">자재 운반 용역 / 홍길동</td>
+                                                        <td>2021-05-12 ~ 2021-05-13</td>
+                                                        <td>35,000 원</td>
+                                                        <td>2021-05-14<br>결제대기</td>
+                                                        <td>2021-05-12<br>이창주</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td>1</td>
+                                                        <td>비용등록</td>
+                                                        <td><a href="#">1412</a></td>
+                                                        <td>인건비</td>
+                                                        <td class="text-start">자재 운반 용역 / 홍길동</td>
+                                                        <td>2021-05-12 ~ 2021-05-13</td>
+                                                        <td>35,000 원</td>
+                                                        <td>2021-05-14<br>결제대기</td>
+                                                        <td>2021-05-12<br>이창주</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+
+                                <div class="tab-pane fade" id="default-tab-6">
+                                    <div class="mb-5">
+                                        <div class="d-flex align-items-center justify-content-between mb-3">
+                                            <h4 class="mb-0">자재요청내역</h4>
+                                            <button class="btn btn-primary" onclick="pop_OPEN('workmaster_popup4');">자재요청</button>
+                                        </div>
+
+                                        <div class="card mb-2">
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-2 col-6">
+                                                        <label class="form-label text-muted">문서번호</label>
+                                                        <h5>1234</h5>
+                                                    </div>
+                                                    <div class="col-md-2 col-6">
+                                                        <label class="form-label text-muted">사용일</label>
+                                                        <h5>2021-05-15(월)</h5>
+                                                    </div>
+                                                    <div class="col-md-2 col-6">
+                                                        <label class="form-label text-muted">요청자재</label>
+                                                        <h5>셔터식 환풍기 / 20cm … 외 1건</h5>
+                                                    </div>
+                                                    <div class="col-md-2 col-6">
+                                                        <label class="form-label text-muted">요청자</label>
+                                                        <h5>이창주</h5>
+                                                    </div>
+                                                    <div class="col-md-2 col-6">
+                                                        <label class="form-label text-muted">수령방법</label>
+                                                        <h5>현장배송</h5>
+                                                    </div>
+                                                    <div class="col-md-2 col-6">
+                                                        <label class="form-label text-muted">작성일</label>
+                                                        <h5>2021-05-13(금)</h5>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="card-footer d-flex align-items-center justify-content-between">
+                                                <h5 class="mb-0 text-muted">요청</h5>
+                                                <button class="btn btn-gray ms-2">상세</button>
+                                            </div>
+                                        </div>
+
+                                        <div class="card mb-2">
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-2 col-6">
+                                                        <label class="form-label text-muted">문서번호</label>
+                                                        <h5>1234</h5>
+                                                    </div>
+                                                    <div class="col-md-2 col-6">
+                                                        <label class="form-label text-muted">사용일</label>
+                                                        <h5>2021-05-15(월)</h5>
+                                                    </div>
+                                                    <div class="col-md-2 col-6">
+                                                        <label class="form-label text-muted">요청자재</label>
+                                                        <h5>셔터식 환풍기 / 20cm … 외 1건</h5>
+                                                    </div>
+                                                    <div class="col-md-2 col-6">
+                                                        <label class="form-label text-muted">요청자</label>
+                                                        <h5>이창주</h5>
+                                                    </div>
+                                                    <div class="col-md-2 col-6">
+                                                        <label class="form-label text-muted">수령방법</label>
+                                                        <h5>현장배송</h5>
+                                                    </div>
+                                                    <div class="col-md-2 col-6">
+                                                        <label class="form-label text-muted">작성일</label>
+                                                        <h5>2021-05-13(금)</h5>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="card-footer d-flex align-items-center justify-content-between">
+                                                <h5 class="mb-0 text-success">준비중</h5>
+                                                <button class="btn btn-gray ms-2">상세</button>
+                                            </div>
+                                        </div>
+
+                                        <div class="card mb-2">
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-2 col-6">
+                                                        <label class="form-label text-muted">문서번호</label>
+                                                        <h5>1234</h5>
+                                                    </div>
+                                                    <div class="col-md-2 col-6">
+                                                        <label class="form-label text-muted">사용일</label>
+                                                        <h5>2021-05-15(월)</h5>
+                                                    </div>
+                                                    <div class="col-md-2 col-6">
+                                                        <label class="form-label text-muted">요청자재</label>
+                                                        <h5>셔터식 환풍기 / 20cm … 외 1건</h5>
+                                                    </div>
+                                                    <div class="col-md-2 col-6">
+                                                        <label class="form-label text-muted">요청자</label>
+                                                        <h5>이창주</h5>
+                                                    </div>
+                                                    <div class="col-md-2 col-6">
+                                                        <label class="form-label text-muted">수령방법</label>
+                                                        <h5>현장배송</h5>
+                                                    </div>
+                                                    <div class="col-md-2 col-6">
+                                                        <label class="form-label text-muted">작성일</label>
+                                                        <h5>2021-05-13(금)</h5>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="card-footer d-flex align-items-center justify-content-between">
+                                                <h5 class="mb-0 text-primary">수령가능</h5>
+                                                <button class="btn btn-gray ms-2">상세</button>
+                                            </div>
+                                        </div>
+
+                                        <div class="card mb-2">
+                                            <div class="card-body">
+                                                <div class="row">
+                                                    <div class="col-md-2 col-6">
+                                                        <label class="form-label text-muted">문서번호</label>
+                                                        <h5>1234</h5>
+                                                    </div>
+                                                    <div class="col-md-2 col-6">
+                                                        <label class="form-label text-muted">사용일</label>
+                                                        <h5>2021-05-15(월)</h5>
+                                                    </div>
+                                                    <div class="col-md-2 col-6">
+                                                        <label class="form-label text-muted">요청자재</label>
+                                                        <h5>셔터식 환풍기 / 20cm … 외 1건</h5>
+                                                    </div>
+                                                    <div class="col-md-2 col-6">
+                                                        <label class="form-label text-muted">요청자</label>
+                                                        <h5>이창주</h5>
+                                                    </div>
+                                                    <div class="col-md-2 col-6">
+                                                        <label class="form-label text-muted">수령방법</label>
+                                                        <h5>현장배송</h5>
+                                                    </div>
+                                                    <div class="col-md-2 col-6">
+                                                        <label class="form-label text-muted">작성일</label>
+                                                        <h5>2021-05-13(금)</h5>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="card-footer d-flex align-items-center justify-content-between">
+                                                <h5 class="mb-0 text-dark">수령완료</h5>
+                                                <button class="btn btn-gray ms-2">상세</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="">
+                                        <h4 class="mb-3">사용자재목록</h4>
+
+                                        <div class="table-responsive">
+                                            <table class="table table-striped ">
+                                                <thead>
+                                                    <tr>
+                                                        <th>요청번호</th>
+                                                        <th>품번</th>
+                                                        <th>품명</th>
+                                                        <th>수량</th>
+                                                        <th>단가</th>
+                                                        <th>금액</th>
+                                                        <th>사용일</th>
+                                                        <th>상태</th>
+                                                        <th>등록일</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td><a href="#">1235</a></td>
+                                                        <td>E사144</td>
+                                                        <td class="text-start">셔터식 환풍기 / 20cm / KS-20</td>
+                                                        <td>1</td>
+                                                        <td class="text-end">35,000 원</td>
+                                                        <td class="text-end fw-bold">35,000 원</td>
+                                                        <td>2021-05-16</td>
+                                                        <td>대기</td>
+                                                        <td>2021-05-13<br>양호익</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><a href="#">1235</a></td>
+                                                        <td>E사144</td>
+                                                        <td class="text-start">셔터식 환풍기 / 20cm / KS-20</td>
+                                                        <td>1</td>
+                                                        <td class="text-end">35,000 원</td>
+                                                        <td class="text-end fw-bold">35,000 원</td>
+                                                        <td>2021-05-16</td>
+                                                        <td>대기</td>
+                                                        <td>2021-05-13<br>양호익</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="tab-pane fade" id="default-tab-7">
+
+                                    <div class="d-flex align-items-center justify-content-between mb-3">
+                                        <h4 class="mb-0">결제</h4>
+                                        <button class="btn btn-primary" onclick="pop_OPEN('workmaster_popup5');">결제생성</button>
+                                    </div>
+
+                                    <div class="card mb-2">
+                                        <div class="card-body card-primary">
+                                            <div class="row">
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label text-muted">총 견적금액</label>
+                                                    <h5>12,345,600 원</h5>
+                                                </div>
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label text-muted">결제 생성 금액</label>
+                                                    <h5>12,345,600 원</h5>
+                                                </div>
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label text-muted">미수금액</label>
+                                                    <h5 class="text-primary">849,070 원</h5>
+                                                </div>
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label text-muted">결제완료</label>
+                                                    <h5>236,000 원</h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="card mb-2">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-2 col-6">
+                                                    <label class="form-label text-muted">결제종류</label>
+                                                    <h5>선금</h5>
+                                                </div>
+                                                <div class="col-md-2 col-6">
+                                                    <label class="form-label text-muted">결제예정일</label>
+                                                    <h5>2021-05-15(월)</h5>
+                                                </div>
+                                                <div class="col-md-2 col-6">
+                                                    <label class="form-label text-muted">결제대상금액</label>
+                                                    <h5>6,000,000 원</h5>
+                                                </div>
+                                                <div class="col-md-2 col-6">
+                                                    <label class="form-label text-muted">결제방식</label>
+                                                    <h5>무통장 / 세금계산서</h5>
+                                                </div>
+                                                <div class="col-md-2 col-6">
+                                                    <label class="form-label text-muted">결제완료일</label>
+                                                    <h5>2021-05-16(화)</h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-footer">
+                                            <h5 class="mb-0 text-primary">결제완료</h5>
+                                        </div>
+                                    </div>
+
+                                    <div class="card mb-2">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-2 col-6">
+                                                    <label class="form-label text-muted">결제종류</label>
+                                                    <h5>선금</h5>
+                                                </div>
+                                                <div class="col-md-2 col-6">
+                                                    <label class="form-label text-muted">결제예정일</label>
+                                                    <h5>2021-05-15(월)</h5>
+                                                </div>
+                                                <div class="col-md-2 col-6">
+                                                    <label class="form-label text-muted">결제대상금액</label>
+                                                    <h5>6,000,000 원</h5>
+                                                </div>
+                                                <div class="col-md-2 col-6">
+                                                    <label class="form-label text-muted">결제방식</label>
+                                                    <h5>카드</h5>
+                                                </div>
+                                                <div class="col-md-2 col-6">
+                                                    <label class="form-label text-muted">결제완료일</label>
+                                                    <h5>-</h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-footer">
+                                            <h5 class="mb-0 text-muted">결제전</h5>
+                                        </div>
+                                    </div>
+
+                                    <hr>
+                                    <h5>
+                                        <i class="fas fa-lg fa-fw fa-info-circle"></i>
+                                        사용 가이드</h5>
+                                    <ul class="mb-0">
+                                        <li>결제는 최종 승인된 견적서의 총 견적금액 이하로 생성할 수 있습니다. 총 견적금액을 초과하여 결제를 생성하고자 할 경우, 새 버전의 견적서를 작성하여 견적금액을 변경한 후 결제를 생성하세요.</li>
+                                    </ul>
+                                </div>
+
+
+                                <div class="tab-pane fade" id="default-tab-8">
+                                    <h4 class="mb-3">완료보고서</h4>
+
+                                    <div class="card mb-2">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label text-muted">문서번호</label>
+                                                    <h5>-</h5>
+                                                </div>
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label text-muted">버전</label>
+                                                    <h5>고객사 전송용</h5>
+                                                </div>
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label text-muted">작성자</label>
+                                                    <h5>-</h5>
+                                                </div>
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label text-muted">작성일</label>
+                                                    <h5>작성 전</h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-footer d-flex justify-content-end">
+                                            <button class="btn btn-success" onclick="pop_OPEN('workmaster_popup6');">작성</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="card mb-2">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label text-muted">문서번호</label>
+                                                    <h5>-</h5>
+                                                </div>
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label text-muted">버전</label>
+                                                    <h5>고객사 전송용</h5>
+                                                </div>
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label text-muted">작성자</label>
+                                                    <h5>-</h5>
+                                                </div>
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label text-muted">작성일</label>
+                                                    <h5>작성 전</h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-footer d-flex justify-content-end">
+                                            <button class="btn btn-success" onclick="pop_OPEN('workmaster_popup6');">작성</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="card mb-2">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label text-muted">문서번호</label>
+                                                    <h5>-</h5>
+                                                </div>
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label text-muted">버전</label>
+                                                    <h5>내부 보고용</h5>
+                                                </div>
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label text-muted">작성자</label>
+                                                    <h5>-</h5>
+                                                </div>
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label text-muted">작성일</label>
+                                                    <h5>작성 전</h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-footer d-flex justify-content-end">
+                                            <button class="btn btn-success" onclick="pop_OPEN('workmaster_popup6');">작성</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="card mb-2">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label text-muted">문서번호</label>
+                                                    <h5>4312</h5>
+                                                </div>
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label text-muted">버전</label>
+                                                    <h5>고객사 전송용</h5>
+                                                </div>
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label text-muted">작성자</label>
+                                                    <h5>-</h5>
+                                                </div>
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label text-muted">작성일</label>
+                                                    <h5>2021-06-21 (월)</h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-footer d-flex justify-content-end">
+                                            <button class="btn btn-primary">보기</button>
+                                            <button class="btn btn-gray ms-2" onclick="pop_OPEN('workmaster_popup6');">수정</button>
+                                        </div>
+                                    </div>
+
+                                    <div class="card mb-2">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label text-muted">문서번호</label>
+                                                    <h5>4312</h5>
+                                                </div>
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label text-muted">버전</label>
+                                                    <h5>내부 보고용</h5>
+                                                </div>
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label text-muted">작성자</label>
+                                                    <h5>-</h5>
+                                                </div>
+                                                <div class="col-md-3 col-6">
+                                                    <label class="form-label text-muted">작성일</label>
+                                                    <h5>2021-06-21 (월)</h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="card-footer d-flex justify-content-end">
+                                            <button class="btn btn-primary">보기</button>
+                                            <button class="btn btn-gray ms-2" onclick="pop_OPEN('workmaster_popup6');">수정</button>
+                                        </div>
+                                    </div>
+
+                                    <hr>
+                                    <h5>
+                                        <i class="fas fa-lg fa-fw fa-info-circle"></i>
+                                        사용 가이드</h5>
+                                    <ul class="mb-0">
+                                        <li>완료보고서는 고객전송용, 내부보고용 두가지 버전으로 제공됩니다.</li>
+                                        <li>[작성] 버튼을 눌러 세부 내용을 작성 완료해야 전송용 버전의 문서가 제공됩니다.</li>
+                                    </ul>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+
+
+            <a href="javascript:;" class="btn btn-icon btn-circle btn-success btn-scroll-to-top" data-toggle="scroll-to-top"><i class="fa fa-angle-up"></i></a>
+
+        </div>
+    </div>
+
+</body>
+
+</html>

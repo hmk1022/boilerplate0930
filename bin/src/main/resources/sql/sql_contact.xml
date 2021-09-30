@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="contact">
+
+	<!-- 문의등록 -->
+	<insert id="insertContact" parameterType="map">
+		<![CDATA[ /* SQL_ID : contact.insertContact */ ]]>
+	     insert into w_contact 
+	        ( 
+	        	name,
+	        	hp,
+	        	email,
+	        	content,
+	        	create_date
+	       ) 
+	     values 
+	      (
+	         #{name},
+	         #{hp},
+	         #{email},
+	         #{content},
+	       	 now()
+	      )
+   </insert>
+	
+</mapper>
+
+

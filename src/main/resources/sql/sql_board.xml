@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="board">
+
+	<!-- 공지사항목록 -->
+	<select id="selectBoardList" resultType="BoardListDataVo">
+		<![CDATA[ /* SQL_ID : board.selectBoardList */ ]]>
+		select
+			b.board_no, 
+			b.title,
+			b.content,
+			date_format(b.create_date,'%Y.%m.%d') as create_date
+		from
+			w_board b
+		where
+			b.board_type ='02'
+			and b.board_gb ='02'
+			and b.os_type in (${os_type})
+		order by
+			b.notice_yn desc,b.board_no desc
+	</select>
+
+</mapper>
+
+

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="work_category">
+
+	<!-- 작업 요청 리스트 조회 -->
+	<select id="selectCategoryList" parameterType="map" resultType="map">
+		<![CDATA[ /* SQL_ID : work_category.selectCategoryList */ ]]>
+		
+		SELECT 
+			wwc.category_no,
+			wwc.category_id,
+			wwc.p_category_id,
+			wwc.category_level,
+			wwc.name,
+			wwc.disp_order,
+			wwc.tag,
+			wwc.image_url,
+			wwc.disp_yn,
+			wwc.del_yn,
+			wwc.create_no,
+			wwc.create_date,
+			wwc.update_no,
+			wwc.update_date
+		FROM 
+			w_work_category wwc
+		WHERE
+			wwc.category_level =#{category_level} 
+		<if test="p_category_id != null and p_category_id != ''">
+			AND wwc.p_category_id = #{p_category_id}
+		</if>	 
+		ORDER BY category_id 
+		
+	</select>
+
+
+</mapper>
+
+

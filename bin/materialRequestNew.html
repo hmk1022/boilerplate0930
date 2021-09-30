@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>워커맨 Admin</title>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+    <meta content="" name="description">
+    <meta content="" name="author">
+    <link href="./assets/css/vendor.min.css" rel="stylesheet">
+    <link href="./assets/css/workman_admin.css" rel="stylesheet">
+    <link href="./assets/css/datepicker.css" rel="stylesheet">
+    <link href="./assets/css/jquery.gritter.css" rel="stylesheet">
+    <link href="./assets/css/select2.min.css" rel="stylesheet">
+    <script src="./assets/js/vendor.min.js" type="text/javascript"></script>
+    <script src="./assets/js/app.min.js" type="text/javascript"></script>
+    <script src="./assets/js/moment.min.js" type="text/javascript"></script>
+    <script src="./assets/js/datepicker.js" type="text/javascript"></script>
+    <script src="./assets/js/ui.js" type="text/javascript"></script>
+    <script src="./assets/js/select2.min.js" type="text/javascript"></script>
+    <script>
+    $(document).ready(function() {
+        $('#reg_date_from,#reg_date_to').val(moment().format('YYYY. MM. DD'));
+        $('#reg_date_from,#reg_date_to').datepicker({
+           format: 'YYYY. MM. DD',
+           autoHide: true,
+        }); 
+        $("#selectSearch").select2({ placeholder: "검색어를 입력하거나 목록에서 선택" });
+        $('.btn-number').click(function(e){
+            e.preventDefault();
+
+            fieldName = $(this).attr('data-field');
+            type      = $(this).attr('data-type');
+            var input = $("input[name='"+fieldName+"']");
+            var currentVal = parseInt(input.val());
+            if (!isNaN(currentVal)) {
+                if(type == 'minus') {
+                    if(currentVal > input.attr('min')) {
+                        input.val(currentVal - 1).change();
+                    } 
+                    if(parseInt(input.val()) == input.attr('min')) {
+                        $(this).attr('disabled', true);
+                    }
+
+                } else if(type == 'plus') {
+
+                    if(currentVal < input.attr('max')) {
+                        input.val(currentVal + 1).change();
+                    }
+                    if(parseInt(input.val()) == input.attr('max')) {
+                        $(this).attr('disabled', true);
+                    }
+                }
+            } else {
+                input.val(0);
+            }
+        });
+        $('.input-number').focusin(function(){
+           $(this).data('oldValue', $(this).val());
+        });
+        $('.input-number').change(function() {
+            minValue =  parseInt($(this).attr('min'));
+            maxValue =  parseInt($(this).attr('max'));
+            valueCurrent = parseInt($(this).val());
+
+            name = $(this).attr('name');
+            if(valueCurrent >= minValue) {
+                $(".btn-number[data-type='minus'][data-field='"+name+"']").removeAttr('disabled')
+            } else {
+                alert('Sorry, the minimum value was reached');
+                $(this).val($(this).data('oldValue'));
+            }
+            if(valueCurrent <= maxValue) {
+                $(".btn-number[data-type='plus'][data-field='"+name+"']").removeAttr('disabled')
+            } else {
+                alert('Sorry, the maximum value was reached');
+                $(this).val($(this).data('oldValue'));
+            }
+        });
+        $(".input-number").keydown(function (e) {
+            // Allow: backspace, delete, tab, escape, enter and .
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 190]) !== -1 ||
+                 // Allow: Ctrl+A
+                (e.keyCode == 65 && e.ctrlKey === true) || 
+                 // Allow: home, end, left, right
+                (e.keyCode >= 35 && e.keyCode <= 39)) {
+                     // let it happen, don't do anything
+                     return;
+            }
+            // Ensure that it is a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+    }); 
+    function pop_OPEN(url) {
+        var popup = window.open('./'+ url +'.html', '워커맨', 'width=1400px,height=max,scrollbars=yes');
+    }
+    function addTable() {
+        $('#searchText').hide();
+        $('#searchTable').show();
+    }
+    </script>
+</head>
+
+<div class="pop-wrap" id="inputMeterial">
+    <div class="pop-in middle">
+        <div class="pop-cont">
+            <div class="pop-header flex2">
+                <span>자재 추가하기
+                    <p class="small mb-0 text-muted">자재DB에서 검색하거나 신규로 등록해 자재를 요청할 수 있습니다.</p>
+                </span>
+                <i class="close ic-close"></i>
+            </div>
+            <div class="pop-body">
+                <ul class="nav nav-pills mb-4">
+                    <li class="nav-item">
+                        <a href="#default-tab-1" data-bs-toggle="tab" class="nav-link active">자재 DB에서 검색</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#default-tab-2" data-bs-toggle="tab" class="nav-link">신규자재등록</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                
+                    <div class="tab-pane fade active show" id="default-tab-1">
+                        <div class="row">
+                            <div class="col-4">
+                                <label class="form-label">대분류 <span class="text-danger">*</span></label>
+                                <select class="form-select">
+                                    <option value="">선택</option>
+                                </select>
+                                <div class="invalid-feedback">유효성체크 문구자리</div>
+                            </div>
+                            <div class="col-4">
+                                <label class="form-label">중분류 <span class="text-danger">*</span></label>
+                                <select class="form-select">
+                                    <option value="">선택</option>
+                                </select>
+                                <div class="invalid-feedback">유효성체크 문구자리</div>
+                            </div>
+                            <div class="col-4">
+                                <label class="form-label">소분류 <span class="text-danger">*</span></label>
+                                <select class="form-select">
+                                    <option value="">선택</option>
+                                </select>
+                                <div class="invalid-feedback">유효성체크 문구자리</div>
+                            </div>
+                            <div class="col-12 mt-3">
+                                <label class="form-label">자재명 <span class="text-danger">*</span></label>
+                                <select class="default-select2 form-control" id="selectSearch">
+                                    <option value="전기>배선기구>콘센트 | 콘센트 2구 / 노출 (나노) | 1,000">전기>배선기구>콘센트 | 콘센트 2구 / 노출 (나노) | 1,000</option>
+                                    <option value="전기>배선기구>콘센트 | 콘센트 2구 / 노출 (나노) | 2,000">전기>배선기구>콘센트 | 콘센트 2구 / 노출 (나노) | 2,000</option>
+                                </select>
+                                <div class="invalid-feedback">유효성체크 문구자리</div>
+                            </div>
+                            <div class="col-3 mt-3">
+                                <label class="form-label">브랜드 <span class="text-danger">*</span></label>
+                                <select class="form-select">
+                                    <option value="">나노</option>
+                                </select>
+                                <div class="invalid-feedback">유효성체크 문구자리</div>
+                            </div>
+                            <div class="col-3 mt-3">
+                                <label class="form-label">모델명</label>
+                                <input type="text" class="form-control" value="A1235">
+                                <div class="invalid-feedback">유효성체크 문구자리</div>
+                            </div>
+                            <div class="col-3 mt-3">
+                                <label class="form-label">단위 <span class="text-danger">*</span></label>
+                                <select class="form-select">
+                                    <option value="">ea</option>
+                                </select>
+                                <div class="invalid-feedback">유효성체크 문구자리</div>
+                            </div>
+                            <div class="col-3 mt-3">
+                                <label class="form-label">공급가 <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control">
+                                <div class="invalid-feedback">유효성체크 문구자리</div>
+                            </div>
+                            <hr>
+                            <div class="col-6">
+                                <label class="form-label">수량</label>
+                                <div class="input-group align-items-center">
+                                  <span class="input-group-btn">
+                                      <button type="button" class="btn btn-default btn-number" disabled="disabled" data-type="minus" data-field="quant[1]">
+                                          <i class="fas fa-minus"></i>
+                                      </button>
+                                  </span>
+                                  <input type="text" name="quant[1]" class="form-control text-center input-number" value="1" min="1" max="10">
+                                  <span class="input-group-btn">
+                                      <button type="button" class="btn btn-default btn-number" data-type="plus" data-field="quant[1]">
+                                          <i class="fas fa-plus"></i>
+                                      </button>
+                                  </span>
+                              </div>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">금액</label>
+                                <input type="text" class="form-control text-end text-primary" value="15,000원">
+                                <div class="invalid-feedback">유효성체크 문구자리</div>
+                            </div>
+                        </div>
+                        <div class="btn-box mt-24">
+                            <button type="button" class="btn-basic full bg-main close" onclick="addTable()"><span>추가</span></button>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="default-tab-2">
+                        <div class="row">
+                            <div class="col-12">
+                                <label class="form-label">자재명 <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" placeholder="신규로 구매하고자 하는 자재명 입력">
+                                <div class="invalid-feedback">유효성체크 문구자리</div>
+                            </div>
+                            <div class="col-3 mt-3">
+                                <label class="form-label">브랜드</label>
+                                <select class="form-select">
+                                    <option value="">선택</option>
+                                </select>
+                                <div class="invalid-feedback">유효성체크 문구자리</div>
+                            </div>
+                            <div class="col-3 mt-3">
+                                <label class="form-label">모델명</label>
+                                <input type="text" class="form-control" placeholder="제품 모델명 입력">
+                                <div class="invalid-feedback">유효성체크 문구자리</div>
+                            </div>
+                            <div class="col-3 mt-3">
+                                <label class="form-label">단위</label>
+                                <select class="form-select">
+                                    <option value="">선택</option>
+                                </select>
+                                <div class="invalid-feedback">유효성체크 문구자리</div>
+                            </div>
+                            <div class="col-3 mt-3">
+                                <label class="form-label">예상단가 <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control">
+                                <div class="invalid-feedback">유효성체크 문구자리</div>
+                            </div>
+                            <div class="col-6 mt-3">
+                                <label class="form-label">구매 URL</label>
+                                <input type="text" class="form-control" placeholder="구매팀에서 구매 시 참고할 URL이 있다면 입력">
+                                <div class="invalid-feedback">유효성체크 문구자리</div>
+                            </div>
+                            <div class="col-6 mt-3">
+                                <label class="form-label">사진등록</label>
+                                <form id="fileupload" action="#" method="POST" enctype="multipart/form-data" class="">
+                                    <div class="row fileupload-buttonbar">
+                                        <div class="col-12">
+                                            <span class="btn btn-success fileinput-button">
+                                                <i class="fa fa-plus"></i>
+                                                <span>사진첨부</span>
+                                                <input type="file" name="files[]" >
+                                            </span>
+                                        </div>
+                                    </div>
+                                </form>
+                                <a href="#" class="d-flex align-items-center text-decoration-none justify-content-between border p-2 mt-2">
+                                    <span class="d-block text-dark">
+                                        <i class="fas fa-file fa-fw"></i>
+                                        <span>사진.png</span>
+                                    </span>
+                                    <i class="fa fa-lg fa-fw fa-times-circle text-dark"></i>
+                                </a>
+                            </div>
+                            <hr>
+                            <div class="col-6">
+                                <label class="form-label">수량</label>
+                                <div class="input-group align-items-center">
+                                  <span class="input-group-btn">
+                                      <button type="button" class="btn btn-default btn-number" disabled="disabled" data-type="minus" data-field="quant[1]">
+                                          <i class="fas fa-minus"></i>
+                                      </button>
+                                  </span>
+                                  <input type="text" name="quant[1]" class="form-control text-center input-number" value="1" min="1" max="10">
+                                  <span class="input-group-btn">
+                                      <button type="button" class="btn btn-default btn-number" data-type="plus" data-field="quant[1]">
+                                          <i class="fas fa-plus"></i>
+                                      </button>
+                                  </span>
+                              </div>
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">금액</label>
+                                <input type="text" class="form-control text-end text-primary" value="15,000원">
+                                <div class="invalid-feedback">유효성체크 문구자리</div>
+                            </div>
+                            <div class="btn-box mt-24">
+                                <button type="button" class="btn-basic full bg-main close" onclick="addTable()"><span>추가</span></button>
+                            </div>
+                        </div>
+                    </div>
+                
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<body>
+    <div id="app" class="app app-header-fixed app-sidebar-fixed">
+
+        <div class="app-header">
+            <div class="navbar-header">
+                <a href="#" class="navbar-brand"><b>워크맨</b> Admin</a>
+                <button type="button" class="navbar-mobile-toggler" data-toggle="app-sidebar-mobile">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+            <div class="navbar-nav">
+                <div class="navbar-item dropdown">
+                    <a href="https://seantheme.com/color-admin/admin/html/index.html#" data-bs-toggle="dropdown" class="navbar-link dropdown-toggle icon">
+                        <i class="fa fa-bell"></i>
+                        <span class="badge">5</span>
+                    </a>
+                    <div class="dropdown-menu media-list dropdown-menu-end">
+                        <div class="dropdown-header">NOTIFICATIONS (5)</div>
+                        <a href="javascript:;" class="dropdown-item media">
+                            <div class="media-left">
+                                <i class="fa fa-bug media-object bg-gray-500"></i>
+                            </div>
+                            <div class="media-body">
+                                <h6 class="media-heading">Server Error Reports <i class="fa fa-exclamation-circle text-danger"></i></h6>
+                                <div class="text-muted fs-10px">3 minutes ago</div>
+                            </div>
+                        </a>
+                        <a href="javascript:;" class="dropdown-item media">
+                            <div class="media-left">
+                                <img src="./assets/images/user-1.jpg" class="media-object" alt="">
+                                <i class="fab fa-facebook-messenger text-blue media-object-icon"></i>
+                            </div>
+                            <div class="media-body">
+                                <h6 class="media-heading">John Smith</h6>
+                                <p>Quisque pulvinar tellus sit amet sem scelerisque tincidunt.</p>
+                                <div class="text-muted fs-10px">25 minutes ago</div>
+                            </div>
+                        </a>
+                        <a href="javascript:;" class="dropdown-item media">
+                            <div class="media-left">
+                                <img src="./assets/images/user-2.jpg" class="media-object" alt="">
+                                <i class="fab fa-facebook-messenger text-blue media-object-icon"></i>
+                            </div>
+                            <div class="media-body">
+                                <h6 class="media-heading">Olivia</h6>
+                                <p>Quisque pulvinar tellus sit amet sem scelerisque tincidunt.</p>
+                                <div class="text-muted fs-10px">35 minutes ago</div>
+                            </div>
+                        </a>
+                        <a href="javascript:;" class="dropdown-item media">
+                            <div class="media-left">
+                                <i class="fa fa-plus media-object bg-gray-500"></i>
+                            </div>
+                            <div class="media-body">
+                                <h6 class="media-heading"> New User Registered</h6>
+                                <div class="text-muted fs-10px">1 hour ago</div>
+                            </div>
+                        </a>
+                        <a href="javascript:;" class="dropdown-item media">
+                            <div class="media-left">
+                                <i class="fa fa-envelope media-object bg-gray-500"></i>
+                                <i class="fab fa-google text-warning media-object-icon fs-14px"></i>
+                            </div>
+                            <div class="media-body">
+                                <h6 class="media-heading"> New Email From John</h6>
+                                <div class="text-muted fs-10px">2 hour ago</div>
+                            </div>
+                        </a>
+                        <div class="dropdown-footer text-center">
+                            <a href="javascript:;" class="text-decoration-none">View more</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="navbar-item navbar-user dropdown">
+                    <a href="https://seantheme.com/color-admin/admin/html/index.html#" class="navbar-link dropdown-toggle d-flex align-items-center" data-bs-toggle="dropdown">
+                        <span>
+                            Adam Schwartz
+                            <b class="caret"></b>
+                        </span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end me-1">
+                        <a href="javascript:;" class="dropdown-item">Edit Profile</a>
+                        <a href="javascript:;" class="dropdown-item"><span class="badge bg-danger float-end rounded-pill">2</span> Inbox</a>
+                        <a href="javascript:;" class="dropdown-item">Calendar</a>
+                        <a href="javascript:;" class="dropdown-item">Setting</a>
+                        <div class="dropdown-divider"></div>
+                        <a href="javascript:;" class="dropdown-item">Log Out</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="sidebar" class="app-sidebar">
+
+            <div class="app-sidebar-content ps ps--active-y" data-scrollbar="true" data-height="100%" data-init="true" style="height: 100%;">
+
+                <div class="menu">
+                    <div id="appSidebarProfileMenu" class="collapse">
+                        <div class="menu-item pt-5px">
+                            <a href="javascript:;" class="menu-link">
+                                <div class="menu-icon"><i class="fa fa-cog"></i></div>
+                                <div class="menu-text">Settings</div>
+                            </a>
+                        </div>
+                        <div class="menu-item">
+                            <a href="javascript:;" class="menu-link">
+                                <div class="menu-icon"><i class="fa fa-pencil-alt"></i></div>
+                                <div class="menu-text"> Send Feedback</div>
+                            </a>
+                        </div>
+                        <div class="menu-item pb-5px">
+                            <a href="javascript:;" class="menu-link">
+                                <div class="menu-icon"><i class="fa fa-question-circle"></i></div>
+                                <div class="menu-text"> Helps</div>
+                            </a>
+                        </div>
+                        <div class="menu-divider m-0"></div>
+                    </div>
+                    <div class="menu-header">Navigation</div>
+                    <div class="menu-item has-sub active">
+                        <a href="javascript:;" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fa fa-th-large"></i>
+                            </div>
+                            <div class="menu-text">Dashboard</div>
+                            <div class="menu-caret"></div>
+                        </a>
+                        <div class="menu-submenu">
+                            <div class="menu-item active">
+                                <a href="index.html" class="menu-link">
+                                    <div class="menu-text">Dashboard v1</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="index_v2.html" class="menu-link">
+                                    <div class="menu-text">Dashboard v2</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="index_v3.html" class="menu-link">
+                                    <div class="menu-text">Dashboard v3</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu-item has-sub">
+                        <a href="javascript:;" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fa fa-hdd"></i>
+                            </div>
+                            <div class="menu-text">Email</div>
+                            <div class="menu-badge">10</div>
+                        </a>
+                        <div class="menu-submenu">
+                            <div class="menu-item">
+                                <a href="email_inbox.html" class="menu-link">
+                                    <div class="menu-text">Inbox</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="email_compose.html" class="menu-link">
+                                    <div class="menu-text">Compose</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="email_detail.html" class="menu-link">
+                                    <div class="menu-text">Detail</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu-item">
+                        <a href="widget.html" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fab fa-simplybuilt"></i>
+                            </div>
+                            <div class="menu-text">Widgets <span class="menu-label">NEW</span></div>
+                        </a>
+                    </div>
+                    <div class="menu-item has-sub">
+                        <a href="javascript:;" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fa fa-gem"></i>
+                            </div>
+                            <div class="menu-text">UI Elements <span class="menu-label">NEW</span></div>
+                            <div class="menu-caret"></div>
+                        </a>
+                        <div class="menu-submenu">
+                            <div class="menu-item">
+                                <a href="ui_general.html" class="menu-link">
+                                    <div class="menu-text">General <i class="fa fa-paper-plane text-theme"></i></div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="ui_typography.html" class="menu-link">
+                                    <div class="menu-text">Typography</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="ui_tabs_accordions.html" class="menu-link">
+                                    <div class="menu-text">Tabs &amp; Accordions</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="ui_unlimited_tabs.html" class="menu-link">
+                                    <div class="menu-text">Unlimited Nav Tabs</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="ui_modal_notification.html" class="menu-link">
+                                    <div class="menu-text">Modal &amp; Notification <i class="fa fa-paper-plane text-theme"></i></div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="ui_widget_boxes.html" class="menu-link">
+                                    <div class="menu-text">Widget Boxes</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="ui_media_object.html" class="menu-link">
+                                    <div class="menu-text">Media Object</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="ui_buttons.html" class="menu-link">
+                                    <div class="menu-text">Buttons <i class="fa fa-paper-plane text-theme"></i></div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="ui_icons.html" class="menu-link">
+                                    <div class="menu-text">Icons</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="ui_simple_line_icons.html" class="menu-link">
+                                    <div class="menu-text">Simple Line Icons</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="ui_ionicons.html" class="menu-link">
+                                    <div class="menu-text">Ionicons</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="ui_tree.html" class="menu-link">
+                                    <div class="menu-text">Tree View</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="ui_language_bar_icon.html" class="menu-link">
+                                    <div class="menu-text">Language Bar &amp; Icon</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="ui_social_buttons.html" class="menu-link">
+                                    <div class="menu-text">Social Buttons</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="ui_tour.html" class="menu-link">
+                                    <div class="menu-text">Intro JS</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="ui_offcanvas_toasts.html" class="menu-link">
+                                    <div class="menu-text">Offcanvas &amp; Toasts <i class="fa fa-paper-plane text-theme"></i></div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu-item ">
+                        <a href="bootstrap_5.html" class="menu-link">
+                            <div class="menu-icon-img">
+                                <img src="../assets/img/logo/logo-bs5.png" alt="">
+                            </div>
+                            <div class="menu-text">Bootstrap 5 <span class="menu-label">NEW</span></div>
+                        </a>
+                    </div>
+                    <div class="menu-item has-sub">
+                        <a href="javascript:;" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fa fa-list-ol"></i>
+                            </div>
+                            <div class="menu-text">Form Stuff <span class="menu-label">NEW</span></div>
+                            <div class="menu-caret"></div>
+                        </a>
+                        <div class="menu-submenu">
+                            <div class="menu-item">
+                                <a href="form_elements.html" class="menu-link">
+                                    <div class="menu-text">Form Elements <i class="fa fa-paper-plane text-theme"></i></div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="form_plugins.html" class="menu-link">
+                                    <div class="menu-text">Form Plugins <i class="fa fa-paper-plane text-theme"></i></div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="form_slider_switcher.html" class="menu-link">
+                                    <div class="menu-text">Form Slider + Switcher</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="form_validation.html" class="menu-link">
+                                    <div class="menu-text">Form Validation</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="form_wizards.html" class="menu-link">
+                                    <div class="menu-text">Wizards <i class="fa fa-paper-plane text-theme"></i></div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="form_wysiwyg.html" class="menu-link">
+                                    <div class="menu-text">WYSIWYG</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="form_editable.html" class="menu-link">
+                                    <div class="menu-text">X-Editable</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="form_multiple_upload.html" class="menu-link">
+                                    <div class="menu-text">Multiple File Upload</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="form_summernote.html" class="menu-link">
+                                    <div class="menu-text">Summernote</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="form_dropzone.html" class="menu-link">
+                                    <div class="menu-text">Dropzone</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu-item has-sub">
+                        <a href="javascript:;" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fa fa-table"></i>
+                            </div>
+                            <div class="menu-text">Tables</div>
+                            <div class="menu-caret"></div>
+                        </a>
+                        <div class="menu-submenu">
+                            <div class="menu-item">
+                                <a href="table_basic.html" class="menu-link">
+                                    <div class="menu-text">Basic Tables</div>
+                                </a>
+                            </div>
+                            <div class="menu-item has-sub">
+                                <a href="javascript:;" class="menu-link">
+                                    <div class="menu-text">Managed Tables</div>
+                                    <div class="menu-caret"></div>
+                                </a>
+                                <div class="menu-submenu">
+                                    <div class="menu-item">
+                                        <a href="table_manage.html" class="menu-link">
+                                            <div class="menu-text">Default</div>
+                                        </a>
+                                    </div>
+                                    <div class="menu-item">
+                                        <a href="table_manage_buttons.html" class="menu-link">
+                                            <div class="menu-text">Buttons</div>
+                                        </a>
+                                    </div>
+                                    <div class="menu-item">
+                                        <a href="table_manage_colreorder.html" class="menu-link">
+                                            <div class="menu-text">ColReorder</div>
+                                        </a>
+                                    </div>
+                                    <div class="menu-item">
+                                        <a href="table_manage_fixed_columns.html" class="menu-link">
+                                            <div class="menu-text">Fixed Column</div>
+                                        </a>
+                                    </div>
+                                    <div class="menu-item">
+                                        <a href="table_manage_fixed_header.html" class="menu-link">
+                                            <div class="menu-text">Fixed Header</div>
+                                        </a>
+                                    </div>
+                                    <div class="menu-item">
+                                        <a href="table_manage_keytable.html" class="menu-link">
+                                            <div class="menu-text">KeyTable</div>
+                                        </a>
+                                    </div>
+                                    <div class="menu-item">
+                                        <a href="table_manage_responsive.html" class="menu-link">
+                                            <div class="menu-text">Responsive</div>
+                                        </a>
+                                    </div>
+                                    <div class="menu-item">
+                                        <a href="table_manage_rowreorder.html" class="menu-link">
+                                            <div class="menu-text">RowReorder</div>
+                                        </a>
+                                    </div>
+                                    <div class="menu-item">
+                                        <a href="table_manage_scroller.html" class="menu-link">
+                                            <div class="menu-text">Scroller</div>
+                                        </a>
+                                    </div>
+                                    <div class="menu-item">
+                                        <a href="table_manage_select.html" class="menu-link">
+                                            <div class="menu-text">Select</div>
+                                        </a>
+                                    </div>
+                                    <div class="menu-item">
+                                        <a href="table_manage_combine.html" class="menu-link">
+                                            <div class="menu-text">Extension Combination</div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu-item has-sub">
+                        <a href="javascript:;" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fa fa-cash-register"></i>
+                            </div>
+                            <div class="menu-text">POS System <span class="menu-label">NEW</span></div>
+                            <div class="menu-caret"></div>
+                        </a>
+                        <div class="menu-submenu">
+                            <div class="menu-item">
+                                <a href="pos_customer_order.html" target="_blank" class="menu-link">
+                                    <div class="menu-text">Customer Order</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="pos_kitchen_order.html" target="_blank" class="menu-link">
+                                    <div class="menu-text">Kitchen Order</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="pos_counter_checkout.html" target="_blank" class="menu-link">
+                                    <div class="menu-text">Counter Checkout</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="pos_table_booking.html" target="_blank" class="menu-link">
+                                    <div class="menu-text">Table Booking</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="pos_menu_stock.html" target="_blank" class="menu-link">
+                                    <div class="menu-text">Menu Stock</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu-item has-sub">
+                        <a href="javascript:;" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fa fa-star"></i>
+                            </div>
+                            <div class="menu-text">Front End <span class="menu-label">NEW</span></div>
+                            <div class="menu-caret"></div>
+                        </a>
+                        <div class="menu-submenu">
+                            <div class="menu-item">
+                                <a href="../../frontend/one-page-parallax/index.html" target="_blank" class="menu-link">
+                                    <div class="menu-text">One Page Parallax</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="../../frontend/blog/index.html" target="_blank" class="menu-link">
+                                    <div class="menu-text">Blog</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="../../frontend/forum/index.html" target="_blank" class="menu-link">
+                                    <div class="menu-text">Forum</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="../../frontend/e-commerce/index.html" target="_blank" class="menu-link">
+                                    <div class="menu-text">E-Commerce</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="../../frontend/corporate/index.html" target="_blank" class="menu-link">
+                                    <div class="menu-text">Corporate <i class="fa fa-paper-plane text-theme"></i></div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu-item has-sub">
+                        <a href="javascript:;" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fa fa-envelope"></i>
+                            </div>
+                            <div class="menu-text">Email Template</div>
+                            <div class="menu-caret"></div>
+                        </a>
+                        <div class="menu-submenu">
+                            <div class="menu-item">
+                                <a href="email_system.html" class="menu-link">
+                                    <div class="menu-text">System Template</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="email_newsletter.html" class="menu-link">
+                                    <div class="menu-text">Newsletter Template</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu-item has-sub">
+                        <a href="javascript:;" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fa fa-chart-pie"></i>
+                            </div>
+                            <div class="menu-text">Chart</div>
+                            <div class="menu-caret"></div>
+                        </a>
+                        <div class="menu-submenu">
+                            <div class="menu-item">
+                                <a href="chart-flot.html" class="menu-link">
+                                    <div class="menu-text">Flot Chart</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="chart-js.html" class="menu-link">
+                                    <div class="menu-text">Chart JS</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="chart-d3.html" class="menu-link">
+                                    <div class="menu-text">d3 Chart</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="chart-apex.html" class="menu-link">
+                                    <div class="menu-text">Apex Chart</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu-item">
+                        <a href="calendar.html" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fa fa-calendar"></i>
+                            </div>
+                            <div class="menu-text">Calendar</div>
+                        </a>
+                    </div>
+                    <div class="menu-item has-sub">
+                        <a href="javascript:;" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fa fa-map"></i>
+                            </div>
+                            <div class="menu-text">Map</div>
+                            <div class="menu-caret"></div>
+                        </a>
+                        <div class="menu-submenu">
+                            <div class="menu-item">
+                                <a href="map_vector.html" class="menu-link">
+                                    <div class="menu-text">Vector Map</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="map_google.html" class="menu-link">
+                                    <div class="menu-text">Google Map</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu-item has-sub">
+                        <a href="javascript:;" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fa fa-image"></i>
+                            </div>
+                            <div class="menu-text">Gallery</div>
+                            <div class="menu-caret"></div>
+                        </a>
+                        <div class="menu-submenu">
+                            <div class="menu-item">
+                                <a href="gallery.html" class="menu-link">
+                                    <div class="menu-text">Gallery v1</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="gallery_v2.html" class="menu-link">
+                                    <div class="menu-text">Gallery v2</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu-item has-sub">
+                        <a href="javascript:;" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fa fa-cogs"></i>
+                            </div>
+                            <div class="menu-text">Page Options <span class="menu-label">NEW</span></div>
+                            <div class="menu-caret"></div>
+                        </a>
+                        <div class="menu-submenu">
+                            <div class="menu-item">
+                                <a href="page_blank.html" class="menu-link">
+                                    <div class="menu-text">Blank Page</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="page_with_footer.html" class="menu-link">
+                                    <div class="menu-text">Page with Footer</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="page_with_fixed_footer.html" class="menu-link">
+                                    <div class="menu-text">Page with Fixed Footer <i class="fa fa-paper-plane text-theme"></i></div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="page_without_sidebar.html" class="menu-link">
+                                    <div class="menu-text">Page without Sidebar</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="page_with_right_sidebar.html" class="menu-link">
+                                    <div class="menu-text">Page with Right Sidebar</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="page_with_minified_sidebar.html" class="menu-link">
+                                    <div class="menu-text">Page with Minified Sidebar</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="page_with_two_sidebar.html" class="menu-link">
+                                    <div class="menu-text">Page with Two Sidebar</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="page_with_line_icons.html" class="menu-link">
+                                    <div class="menu-text">Page with Line Icons</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="page_with_ionicons.html" class="menu-link">
+                                    <div class="menu-text">Page with Ionicons</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="page_full_height.html" class="menu-link">
+                                    <div class="menu-text">Full Height Content</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="page_with_wide_sidebar.html" class="menu-link">
+                                    <div class="menu-text">Page with Wide Sidebar</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="page_with_light_sidebar.html" class="menu-link">
+                                    <div class="menu-text">Page with Light Sidebar</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="page_with_mega_menu.html" class="menu-link">
+                                    <div class="menu-text">Page with Mega Menu</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="page_with_top_menu.html" class="menu-link">
+                                    <div class="menu-text">Page with Top Menu</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="page_with_boxed_layout.html" class="menu-link">
+                                    <div class="menu-text">Page with Boxed Layout</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="page_with_mixed_menu.html" class="menu-link">
+                                    <div class="menu-text">Page with Mixed Menu</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="page_boxed_layout_with_mixed_menu.html" class="menu-link">
+                                    <div class="menu-text">Boxed Layout with Mixed Menu</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="page_with_transparent_sidebar.html" class="menu-link">
+                                    <div class="menu-text">Page with Transparent Sidebar</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="page_with_search_sidebar.html" class="menu-link">
+                                    <div class="menu-text">Page with Search Sidebar <i class="fa fa-paper-plane text-theme"></i></div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu-item has-sub">
+                        <a href="javascript:;" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fa fa-gift"></i>
+                            </div>
+                            <div class="menu-text">Extra <span class="menu-label">NEW</span></div>
+                            <div class="menu-caret"></div>
+                        </a>
+                        <div class="menu-submenu">
+                            <div class="menu-item">
+                                <a href="extra_timeline.html" class="menu-link">
+                                    <div class="menu-text">Timeline</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="extra_coming_soon.html" class="menu-link">
+                                    <div class="menu-text">Coming Soon Page</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="extra_search_results.html" class="menu-link">
+                                    <div class="menu-text">Search Results</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="extra_invoice.html" class="menu-link">
+                                    <div class="menu-text">Invoice</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="extra_404_error.html" class="menu-link">
+                                    <div class="menu-text">404 Error Page</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="extra_profile.html" class="menu-link">
+                                    <div class="menu-text">Profile Page</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="extra_scrum_board.html" class="menu-link">
+                                    <div class="menu-text">Scrum Board <i class="fa fa-paper-plane text-theme"></i></div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="extra_cookie_acceptance_banner.html" class="menu-link">
+                                    <div class="menu-text">Cookie Acceptance Banner <i class="fa fa-paper-plane text-theme"></i></div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu-item has-sub">
+                        <a href="javascript:;" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fa fa-key"></i>
+                            </div>
+                            <div class="menu-text">Login &amp; Register</div>
+                            <div class="menu-caret"></div>
+                        </a>
+                        <div class="menu-submenu">
+                            <div class="menu-item">
+                                <a href="login.html" class="menu-link">
+                                    <div class="menu-text">Login</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="login_v2.html" class="menu-link">
+                                    <div class="menu-text">Login v2</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="login_v3.html" class="menu-link">
+                                    <div class="menu-text">Login v3</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="register_v3.html" class="menu-link">
+                                    <div class="menu-text">Register v3</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu-item has-sub">
+                        <a href="javascript:;" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fa fa-cubes"></i>
+                            </div>
+                            <div class="menu-text">Version <span class="menu-label">NEW</span></div>
+                            <div class="menu-caret"></div>
+                        </a>
+                        <div class="menu-submenu">
+                            <div class="menu-item">
+                                <a href="../html/index_v3.html" class="menu-link">
+                                    <div class="menu-text">HTML</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="../ajax/" class="menu-link">
+                                    <div class="menu-text">AJAX</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="../angularjs/" class="menu-link">
+                                    <div class="menu-text">ANGULAR JS</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="../angularjs11/" class="menu-link">
+                                    <div class="menu-text">ANGULAR JS 11</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="javascript:alert('Laravel Version only available in downloaded version.');" class="menu-link">
+                                    <div class="menu-text">LARAVEL</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="../vuejs/" class="menu-link">
+                                    <div class="menu-text">VUE JS</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="../reactjs/" class="menu-link">
+                                    <div class="menu-text">REACT JS</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="javascript:alert('.NET Core 5.0 MVC Version only available in downloaded version.');" class="menu-link">
+                                    <div class="menu-text">ASP.NET <i class="fa fa-paper-plane text-theme"></i></div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="../material/index_v3.html" class="menu-link">
+                                    <div class="menu-text">MATERIAL DESIGN</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="../apple/index_v3.html" class="menu-link">
+                                    <div class="menu-text">APPLE DESIGN</div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="../transparent/index_v3.html" class="menu-link">
+                                    <div class="menu-text">TRANSPARENT DESIGN <i class="fa fa-paper-plane text-theme"></i></div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="../facebook/index_v3.html" class="menu-link">
+                                    <div class="menu-text">FACEBOOK DESIGN <i class="fa fa-paper-plane text-theme"></i></div>
+                                </a>
+                            </div>
+                            <div class="menu-item">
+                                <a href="../google/index_v3.html" class="menu-link">
+                                    <div class="menu-text">GOOGLE DESIGN <i class="fa fa-paper-plane text-theme"></i></div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu-item has-sub">
+                        <a href="javascript:;" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fa fa-medkit"></i>
+                            </div>
+                            <div class="menu-text">Helper</div>
+                            <div class="menu-caret"></div>
+                        </a>
+                        <div class="menu-submenu">
+                            <div class="menu-item">
+                                <a href="helper_css.html" class="menu-link">
+                                    <div class="menu-text">Predefined CSS Classes</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="menu-item has-sub">
+                        <a href="javascript:;" class="menu-link">
+                            <div class="menu-icon">
+                                <i class="fa fa-align-left"></i>
+                            </div>
+                            <div class="menu-text">Menu Level</div>
+                            <div class="menu-caret"></div>
+                        </a>
+                        <div class="menu-submenu">
+                            <div class="menu-item has-sub">
+                                <a href="javascript:;" class="menu-link">
+                                    <div class="menu-text">Menu 1.1</div>
+                                    <div class="menu-caret"></div>
+                                </a>
+                                <div class="menu-submenu">
+                                    <div class="menu-item has-sub">
+                                        <a href="javascript:;" class="menu-link">
+                                            <div class="menu-text">Menu 2.1</div>
+                                            <div class="menu-caret"></div>
+                                        </a>
+                                        <div class="menu-submenu">
+                                            <div class="menu-item"><a href="javascript:;" class="menu-link">
+                                                    <div class="menu-text">Menu 3.1</div>
+                                                </a></div>
+                                            <div class="menu-item"><a href="javascript:;" class="menu-link">
+                                                    <div class="menu-text">Menu 3.2</div>
+                                                </a></div>
+                                        </div>
+                                    </div>
+                                    <div class="menu-item"><a href="javascript:;" class="menu-link">
+                                            <div class="menu-text">Menu 2.2</div>
+                                        </a></div>
+                                    <div class="menu-item"><a href="javascript:;" class="menu-link">
+                                            <div class="menu-text">Menu 2.3</div>
+                                        </a></div>
+                                </div>
+                            </div>
+                            <div class="menu-item"><a href="javascript:;" class="menu-link">
+                                    <div class="menu-text">Menu 1.2</div>
+                                </a></div>
+                            <div class="menu-item"><a href="javascript:;" class="menu-link">
+                                    <div class="menu-text">Menu 1.3</div>
+                                </a></div>
+                        </div>
+                    </div>
+
+                    <div class="menu-item d-flex">
+                        <a href="javascript:;" class="app-sidebar-minify-btn ms-auto" data-toggle="app-sidebar-minify"><i class="fa fa-angle-double-left"></i></a>
+                    </div>
+
+                </div>
+
+                <div class="ps__rail-x" style="left: 0px; bottom: 0px;">
+                    <div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div>
+                </div>
+                <div class="ps__rail-y" style="top: 0px; height: 894px; right: 0px;">
+                    <div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 823px;"></div>
+                </div>
+            </div>
+
+        </div>
+        <div class="app-sidebar-bg"></div>
+        <div class="app-sidebar-mobile-backdrop"><a href="#" data-dismiss="app-sidebar-mobile" class="stretched-link"></a></div>
+        
+        
+        <div class="app-content">
+            <div class="float-xl-end">2021-06-12 15:32 이창주</div>
+            <h1 class="page-header">자재요청서<span class="ms-3 text-primary">#123456</span><span class="d-block small text-muted">각 일정별로 필요한 자재들을 요청할 수 있습니다.</span></h1>
+
+            <div class="row">
+                <div class="col-12 mb-3">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>기본 정보 입력</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label class="form-label">작업선택 <span class="text-danger">*</span></label>
+                                        <select class="form-select">
+                                            <option value="">B2B_2105250001</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="form-group">
+                                        <label class="form-label">사용일(수령일) <span class="text-danger">*</span></label>
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" id="reg_date_from" placeholder="연도. 월. 일.">
+                                            <select class="form-select">
+                                                <option value="">09시</option>
+                                            </select>
+                                            <select class="form-select">
+                                                <option value="">00분</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6 mt-3">
+                                    <div class="form-group">
+                                        <label class="form-label">고객(사)명</label>
+                                        <input type="text" class="form-control" placeholder="100자 이내">
+                                    </div>
+                                </div>
+                                <div class="col-6 mt-3">
+                                    <div class="form-group">
+                                        <label class="form-label">현장주소</label>
+                                        <input type="text" class="form-control" placeholder="100자 이내">
+                                    </div>
+                                </div>
+                                <div class="col-6 mt-3">
+                                    <div class="form-group">
+                                        <label class="form-label">담당자 <span class="text-danger">*</span></label>
+                                        <select class="form-select">
+                                            <option value="">선택</option>
+                                            <option value="">option1</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-6 mt-3">
+                                    <label class="form-label mb-2">수령방법 <span class="text-danger">*</span></label>
+                                    <!--<div class="is-invalid">-->
+                                    <div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" id="inlineRadio1" name="inlineRadio">
+                                            <label class="form-check-label" for="inlineRadio1">물류센터 픽업</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" id="inlineRadio2" name="inlineRadio">
+                                            <label class="form-check-label" for="inlineRadio2">우면동 사옥</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" id="inlineRadio3" name="inlineRadio">
+                                            <label class="form-check-label" for="inlineRadio3">성수동 SBA</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" id="inlineRadio4" name="inlineRadio">
+                                            <label class="form-check-label" for="inlineRadio4">현장배송</label>
+                                        </div>
+                                    </div>
+                                    <div class="invalid-feedback">유효성체크 문구 자리</div>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <button class="btn btn-primary btn-block">등록</button>
+                        </div>
+                    </div>
+
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <h3 class="m-0">자재 요청 목록</h3>
+                                <button class="btn btn-success" onclick="Layer_OPEN('#inputMeterial');">추가하기</button>
+                            </div>
+                        </div>
+                        <div class="card-body" id="searchText">
+                            <div class="border rounded p-3">등록된 자재가 없습니다. [추가하기] 버튼을 눌러 자재를 추가해보세요.</div>
+                        </div>
+                        <div class="card-body" id="searchTable" style="display: none">
+                            <div class="table-responsive">
+                                <table class="table table-striped ">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>품번</th>
+                                            <th>품명</th>
+                                            <th>브랜드</th>
+                                            <th>수량</th>
+                                            <th>공급가</th>
+                                            <th>총 금액</th>
+                                            <th>상태</th>
+                                            <th>수정</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input m-0" type="checkbox" id="checkbox1" name="checkbox">
+                                                    <label class="form-check-label" for="checkbox1"></label>
+                                                </div>
+                                            </td>
+                                            <td>ELES123f</td>
+                                            <td class="text-start">욕실용 환풍기 / 싸이클론 / JV-201C</td>
+                                            <td>힘펠</td>
+                                            <td>1 ea</td>
+                                            <td class="text-end">28,000 원</td>
+                                            <td class="text-end fw-bold">28,000 원</td>
+                                            <td class="text-success">준비완료</td>
+                                            <td><a href="#" class="btn btn-outline-danger btn-xs">수정</a></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input m-0" type="checkbox" id="checkbox2" name="checkbox">
+                                                    <label class="form-check-label" for="checkbox2"></label>
+                                                </div>
+                                            </td>
+                                            <td>ELE1234s</td>
+                                            <td class="text-start">다운라이트 / 6인치 / 15W / 전구색</td>
+                                            <td>동성</td>
+                                            <td>3 ea</td>
+                                            <td class="text-end">4,300 원</td>
+                                            <td class="text-end fw-bold">28,000 원</td>
+                                            <td>준비중</td>
+                                            <td><a href="#" class="btn btn-outline-danger btn-xs">수정</a></td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="form-check form-check-inline">
+                                                    <input class="form-check-input m-0" type="checkbox" id="checkbox3" name="checkbox">
+                                                    <label class="form-check-label" for="checkbox3"></label>
+                                                </div>
+                                            </td>
+                                            <td>신규</td>
+                                            <td class="text-start">페인트 에코형</td>
+                                            <td>-</td>
+                                            <td>1 ea</td>
+                                            <td class="text-end">28,000 원</td>
+                                            <td class="text-end fw-bold">28,000 원</td>
+                                            <td>준비중</td>
+                                            <td><a href="#" class="btn btn-outline-danger btn-xs">수정</a></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                    </div>                    
+                </div>
+            </div>
+
+            <a href="javascript:;" class="btn btn-icon btn-circle btn-success btn-scroll-to-top" data-toggle="scroll-to-top"><i class="fa fa-angle-up"></i></a>
+
+        </div>
+    </div>
+
+</body>
+
+</html>

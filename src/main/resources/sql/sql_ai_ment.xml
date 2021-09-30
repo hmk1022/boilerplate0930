@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="aiMent">
+
+	<!-- 신규알림수조회 -->
+	<select id="selectAiMent" parameterType="map" resultType="ChatMsgDataVo">
+		<![CDATA[ /* SQL_ID : aiMent.selectAiMent */ ]]>
+		<![CDATA[
+		    select v.ment_no, v.title, v.msg from (
+			  select 
+			  mt.ment_no,
+			  mt.title,
+			  mt.res_cnt,
+			  concat(
+			  SPLIT_STR(mt.res,',',GET_RANDOM(1, COUNT_STR(mt.res,','))),
+			  SPLIT_STR(mt.sub,',',GET_RANDOM(1, COUNT_STR(mt.sub,',')))
+			  ) as msg,
+			  (
+			    select count(*) from w_ai_ment ami join w_ai_chat_hist ama on(ama.ment_no = ami.ment_no) where ama.member_no = #{member_no} and ama.ment_no = mt.ment_no
+			  ) as ask_cnt
+			  from 
+			  w_ai_ment mt 
+			  join w_member mm on(mm.member_no = #{member_no})
+			  where mt.ment_no in(
+			    select v.ment_no from(
+			    SELECT t.ment_no, t.title, INSTR(#{msg}, SUBSTRING_INDEX(SUBSTRING_INDEX(t.req, ',', n.n), ',', -1)) value
+			      FROM w_ai_ment t CROSS JOIN 
+			    (
+			       SELECT a.N + b.N * 10 + 1 n
+			         FROM 
+			        (SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) a
+			       ,(SELECT 0 AS N UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8 UNION ALL SELECT 9) b
+			        ORDER BY n
+			    ) n
+			     WHERE n.n <= 1 + (LENGTH(t.req) - LENGTH(REPLACE(t.req, ',', '')))
+			     ORDER by t.create_date asc
+			    ) v
+			    where value > 0
+			  )
+			  
+			  ) v
+			where v.res_cnt > ask_cnt limit 1
+		]]>
+	</select>
+	
+</mapper>
+
+

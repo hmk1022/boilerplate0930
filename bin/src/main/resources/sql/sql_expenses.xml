@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="expenses">
+
+	<!-- 고객사 목록 -->
+	<select id="listExpenses" resultType="map">
+		/* SQL_ID : expenses.listExpenses */
+		SELECT
+			T.*,
+			(T.total_price - ifnull(T.paid_amt,0)) unsett_amt,
+			F_GET_ADMIN_NAME(T.doc_admin_no) doc_admin_name,
+			F_GET_ADMIN_NAME(T.confirm_admin_no) refuse_admin_name
+		FROM (
+		SELECT
+			we.exp_no,
+			we.work_no,
+			we.material_pcs_no,
+			we.material_pcs_item_no,
+			we.exp_type,
+			we.exp_usage,
+			we.exp_id,
+			we.st_date,
+			we.ed_date,
+			we.exp_unit_cd,
+			we.exp_cnt,
+			we.exp_price,
+			(we.exp_cnt * we.exp_price) pay_req_amt,
+			we.exp_target,
+			we.exp_stat,
+			we.exp_reject,
+			we.bank_code,
+			we.acct,
+			we.partner_no,
+			we.vendor_no,
+			we.pay_type,
+			we.pay_card,
+			we.pay_card_no,
+			we.pay_req_date,
+			we.evidence,
+			we.del_yn,
+			we.create_no,
+			we.create_date,
+			we.update_no,
+			we.update_date,
+			F_GET_ADMIN_NAME(we.create_no) admin_name,
+			we.confirm_admin_no,
+			ww.work_id,
+			ww.work_target,
+			wp.partner_name,
+			wv.vendor_name,
+			(we.exp_cnt * we.exp_price) total_price,
+			(select sum(pay_price) from w_work_expenses_confirm where exp_no = we.exp_no) paid_amt,
+			ifnull((select F_GET_ADMIN_NAME(confirm_admin_no) from w_work_expenses_confirm where exp_no = we.exp_no order by confirm_no desc limit 1),'') confirm_admin_name,
+			(SELECT confirm_date FROM w_work_expenses_confirm a WHERE a.exp_no = we.exp_no ORDER BY confirm_no DESC limit 1) confirm_date,
+			ww.location_name,
+			ww.req_name,
+			wc.customer_name,
+			wcb.branch_name,
+			wcb.manager_name,
+			wmp.pcs_reason,
+			(SELECT MAX(date_format(confirm_date,'%Y%m%d')) FROM w_work_expenses_confirm a WHERE a.exp_no = we.exp_no ) paid_date,
+			we.remarks,
+			(SELECT doc_admin_no FROM w_material_doc WHERE material_doc_no=wmp.material_doc_no limit 1 ) doc_admin_no,
+			wa.jandi_id
+		FROM
+			w_work_expenses we
+				left join w_work ww on(we.work_no = ww.work_no AND ww.delete_yn != 'Y')
+				left join w_partner wp on (we.partner_no = wp.partner_no)
+				left join w_vendor wv on (we.vendor_no = wv.vendor_no)
+				left join w_customer_branch wcb on(wcb.branch_no = ww.branch_no)
+				left join w_customer wc on(wc.customer_no = wcb.customer_no)
+				left join w_material_pcs wmp on(wmp.material_pcs_no = we.material_pcs_no)
+				left join w_admin wa on(we.create_no = wa.admin_no)
+		WHERE 1=1
+		AND we.del_yn='N'
+		<if test="req_date_yn != null and req_date_yn != '' and req_date_yn == 'REQ'">
+			<if test="start_dt != null and start_dt != ''">
+				<if test="end_dt != null and end_dt != ''">
+			AND we.pay_req_date between #{start_dt} and #{end_dt}
+				</if>
+			</if>
+		</if>
+		<if test="req_date_yn != null and req_date_yn != '' and req_date_yn == 'COMP'">
+			<if test="start_dt != null and start_dt != ''">
+				<if test="end_dt != null and end_dt != ''">
+			AND we.exp_no in (
+				SELECT wap.exp_no
+				FROM w_work_expenses_confirm wap
+				WHERE
+					date_format(confirm_date,'%Y%m%d') between #{start_dt} and #{end_dt}
+			)
+				</if>
+			</if>
+		</if>
+		<if test="req_name != null and req_name != ''">
+			AND ww.req_name LIKE concat('%', #{req_name}, '%')
+		</if>
+		<if test="work_id != null and work_id != ''">
+			AND ww.work_id LIKE concat('%', #{work_id}, '%')
+		</if>
+		<if test="create_name != null and create_name != ''">
+			AND F_GET_ADMIN_NAME(we.create_no) LIKE concat('%', #{create_name}, '%')
+		</if>
+		<if test="exp_stat != null and exp_stat != ''">
+			AND we.exp_stat = #{exp_stat}
+		</if>
+		<if test="exp_type != null and exp_type != ''">
+			AND we.exp_type = #{exp_type}
+		</if>
+
+		ORDER BY
+			we.exp_no DESC
+		<if test="pageFirst != null and pageFirst != ''">
+		LIMIT #{pageFirst}, #{pageLast}
+		</if>
+		) T
+	</select>
+
+	<select id="listExpensesCnt" resultType="int">
+
+		/* SQL_ID : expenses.listExpensesCnt */
+		SELECT
+			count(distinct we.exp_no) as totalRecords
+		FROM
+			w_work_expenses we
+				left join w_work ww on(we.work_no = ww.work_no AND ww.delete_yn != 'Y')
+				left join w_partner wp on (we.partner_no = wp.partner_no)
+				left join w_vendor wv on (we.vendor_no = wv.vendor_no)
+				left join w_abc_payment wap on (we.exp_no = wap.exp_no)
+		WHERE
+			1 = 1
+		AND we.del_yn='N'	
+		<if test="req_date_yn != null and req_date_yn != '' and req_date_yn == 'REQ'">
+			<if test="start_dt != null and start_dt != ''">
+				<if test="end_dt != null and end_dt != ''">
+			AND we.pay_req_date between #{start_dt} and #{end_dt}
+				</if>
+			</if>
+		</if>
+		<if test="req_date_yn != null and req_date_yn != '' and req_date_yn == 'COMP'">
+			<if test="start_dt != null and start_dt != ''">
+				<if test="end_dt != null and end_dt != ''">
+			AND we.exp_no in (
+				SELECT wap.exp_no
+				FROM w_work_expenses_confirm wap
+				WHERE
+					date_format(confirm_date,'%Y%m%d') between #{start_dt} and #{end_dt}
+			)
+				</if>
+			</if>
+		</if>
+		<if test="req_name != null and req_name != ''">
+			AND ww.req_name LIKE concat('%', #{req_name}, '%')
+		</if>
+		<if test="work_id != null and work_id != ''">
+			AND ww.work_id LIKE concat('%', #{work_id}, '%')
+		</if>
+		<if test="create_name != null and create_name != ''">
+			AND F_GET_ADMIN_NAME(we.create_no) LIKE concat('%', #{create_name}, '%')
+		</if>
+		<if test="exp_stat != null and exp_stat != ''">
+			AND we.exp_stat = #{exp_stat}
+		</if>
+		<if test="exp_type != null and exp_type != ''">
+			AND we.exp_type = #{exp_type}
+		</if>
+	</select>
+
+	<select id="getExpensesId" resultType="string">
+		/* SQL_ID : vendor.getMaterialPcsId */
+		SELECT
+			CONCAT('EXP_', date_format(now(), '%y%m'), '_', LPAD(IFNULL(MAX(exp_no), 0)+1, 3, '0')) material_pcs_id
+		FROM
+			w_work_expenses wm
+		FOR UPDATE
+	</select>
+
+
+	<select id="selectExpenses" resultType="map">
+		/* SQL_ID : expenses.selectExpenses */
+		SELECT
+			we.exp_no,
+			we.work_no,
+			we.material_pcs_no,
+			we.material_pcs_item_no,
+			we.exp_type,
+			we.exp_usage,
+			we.exp_id,
+			we.st_date,
+			we.ed_date,
+			we.exp_unit_cd,
+			we.exp_cnt,
+			we.exp_price,
+			we.exp_target,
+			we.exp_stat,
+			we.exp_reject,
+			we.bank_code,
+			we.acct,
+			we.partner_no,
+			we.vendor_no,
+			we.pay_type,
+			we.pay_card,
+			we.pay_card_no,
+			we.pay_req_date,
+			we.evidence,
+			we.del_yn,
+			we.create_no,
+			we.create_date,
+			we.update_no,
+			we.update_date,
+			wp.partner_name,
+			wv.vendor_name,
+			ww.work_no,
+			ww.req_name,
+			ww.work_id,
+			ww.work_target,
+			(SELECT sum(pay_price) FROM w_work_expenses_confirm wwec WHERE exp_no) pay_price
+		FROM
+			w_work_expenses we
+				left join w_work ww on(we.work_no = ww.work_no AND ww.delete_yn != 'Y')
+				left join w_partner wp on (we.partner_no = wp.partner_no)
+				left join w_vendor wv on (we.vendor_no = wv.vendor_no)
+		WHERE
+			we.exp_no = #{exp_no }
+	</select>
+
+	<insert id="insertExpenses" useGeneratedKeys="true" keyProperty="key_no">
+		/* SQL_ID : expenses.insertExpenses */
+		INSERT INTO w_work_expenses (
+			work_no,
+			exp_type,
+			exp_usage,
+			exp_id,
+			st_date,
+			ed_date,
+			exp_unit_cd,
+			exp_cnt,
+			exp_price,
+			exp_target,
+			exp_stat,
+			bank_code,
+			acct,
+			partner_no,
+			vendor_no,
+			pay_type,
+			pay_card,
+			pay_card_no,
+			pay_req_date,
+			evidence,
+			create_no,
+			create_date,
+			update_no,
+			update_date
+		) VALUES (
+			#{work_no},
+			#{exp_type},
+			#{exp_usage},
+			#{exp_id},
+			#{st_date},
+			#{ed_date},
+			#{exp_unit_cd},
+			#{exp_cnt},
+			#{exp_price},
+			#{exp_target},
+			#{exp_stat},
+			#{bank_code},
+			#{acct},
+			#{partner_no},
+			#{vendor_no},
+			#{pay_type},
+			#{pay_card},
+			#{pay_card_no},
+			#{pay_req_date},
+			#{evidence},
+			#{create_no},
+			now(),
+			#{update_no},
+			now()
+		)
+	</insert>
+
+	<update id="updateExpenses">
+		/* SQL_ID : expenses.updateExpenses */
+		UPDATE w_work_expenses SET
+			work_no = #{work_no},
+			exp_type = #{exp_type},
+			exp_usage = #{exp_usage},
+			exp_id = #{exp_id},
+			st_date = #{st_date},
+			ed_date = #{ed_date},
+			exp_unit_cd = #{exp_unit_cd},
+			exp_cnt = #{exp_cnt},
+			exp_price = #{exp_price},
+			exp_target = #{exp_target},
+			exp_stat = #{exp_stat},
+			exp_reject = #{exp_reject},
+			bank_code = #{bank_code},
+			acct = #{acct},
+			partner_no = #{partner_no},
+			vendor_no = #{vendor_no},
+			pay_type = #{pay_type},
+			pay_card = #{pay_card},
+			pay_card_no = #{pay_card_no},
+			pay_req_date = #{pay_req_date},
+			evidence = #{evidence},
+			update_no = #{update_no},
+			update_date = now()
+		WHERE
+			exp_no = #{exp_no}
+	</update>
+
+	<update id="deleteExpenses">
+		/* SQL_ID : expenses.deleteExpenses */
+		UPDATE w_work_expenses SET
+		    del_yn = #{del_yn},
+		    update_no = #{update_no},
+		    update_date = now()
+		WHERE
+			exp_no = #{exp_no}
+	</update>
+
+	<update id="updateExpStat">
+		/* SQL_ID : expenses.updateExpReject */
+		UPDATE w_work_expenses SET
+			exp_stat = #{exp_stat},
+			<if test="exp_reject != null and exp_reject != ''">
+			exp_reject = #{exp_reject},
+			</if>
+			<if test="remarks != null and remarks != ''">
+			remarks = #{remarks},
+			</if>
+			<if test="pay_req_date != null and pay_req_date != ''">
+			pay_req_date = #{pay_req_date},
+			</if>
+			<if test="confirm_admin_no != null and confirm_admin_no != ''">
+			confirm_admin_no = #{confirm_admin_no},
+			</if>			
+			update_no = #{update_no},
+			update_date = now()
+		WHERE
+			exp_no = #{exp_no}
+	</update>
+
+	<!-- 구매에서 비용처리되는 내용 exp_cnt는 1건으로 처리한다. -->
+	<insert id="insertExpensesPcs" useGeneratedKeys="true" keyProperty="key_no">
+		/* SQL_ID : expenses.insertExpensesPcs */
+		INSERT INTO w_work_expenses (
+			work_no,
+			material_pcs_no,
+			material_pcs_item_no,
+			exp_type,
+			exp_usage,
+			exp_id,
+			st_date,
+			ed_date,
+			exp_unit_cd,
+			exp_cnt,
+			exp_price,
+			exp_target,
+			exp_stat,
+			bank_code,
+			acct,
+			partner_no,
+			vendor_no,
+			pay_type,
+			pay_card,
+			pay_card_no,
+			pay_req_date,
+			evidence,
+			create_no,
+			create_date,
+			update_no,
+			update_date
+		)
+		SELECT
+			wmp.work_no,
+			wmpi.material_pcs_no,
+			wmpi.material_pcs_item_no,
+			#{exp_type} exp_type,
+			#{exp_usage} exp_usage,
+			#{exp_id} exp_id,
+			#{st_date} st_date,
+			'' ed_date,
+			#{exp_unit_cd} exp_unit_cd,
+			1 exp_cnt,
+			SUM(wmpi.item_cnt * wm.purchased_price) * (CASE WHEN wmp.vat_yn='Y' THEN 1.1 ELSE 1 END) exp_price,
+			NULL exp_target,
+			#{exp_stat} exp_stat,
+			wv.bank_code bank_code,
+			wv.acct acct,
+			NULL partner_no,
+			wmp.vendor_no vendor_no,
+			NULL pay_type,
+			NULL pay_card,
+			NULL pay_card_no,
+			#{st_date} pay_req_date,
+			wv.comp_number evidence,
+			#{create_no} create_no,
+			now() create_date,
+			#{update_no} update_no,
+			now() update_date
+			FROM
+				w_material_pcs wmp
+					INNER JOIN w_material_pcs_item wmpi ON (wmp.material_pcs_no = wmpi.material_pcs_no)
+					INNER JOIN w_material wm ON (wmpi.material_no = wm.material_no)
+					LEFT JOIN w_vendor wv on (wmp.vendor_no = wv.vendor_no)
+			WHERE
+				wmp.material_pcs_no =#{material_pcs_no}
+
+	</insert>
+
+</mapper>

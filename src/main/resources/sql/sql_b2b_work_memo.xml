@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="b2bWorkMemo">
+
+	<!-- 메모 조회 -->
+		<select id="selectWorkMemoList" resultType="map">
+		/* b2bWorkMemo.selectWorkMemoList */
+		select
+		    wwm.work_memo_no,
+		    wwm.memo_type,
+		    wwm.memo,
+		    wwm.admin_no,
+		    F_GET_ADMIN_NAME(wwm.admin_no) as admin_name,
+		    wwm.work_no,
+		    wwm.create_date,
+		    wwm.update_date
+		from
+		    w_work_memo wwm
+		    INNER JOIN w_work ww ON ww.work_no = wwm.work_no
+		where
+			IFNULL(ww.p_work_no,ww.work_no) 		= #{work_no}
+		AND wwm.memo_type 		= #{memo_type}
+		AND ww.delete_yn != 'Y'
+		order by create_date desc
+	</select>
+	<insert id="insertWorkMemo" parameterType="map">
+		/* WorkerManMapper.insertWorkMemo */
+		insert into w_work_memo (
+			memo_type,
+			memo,
+			admin_no,
+			work_no,
+			create_date,
+			update_date
+		)
+		values (
+			#{memo_type},
+			#{memo},
+			#{admin_no},
+			#{work_no},
+			now(),
+			now()
+		)
+	</insert>
+</mapper>
+
+

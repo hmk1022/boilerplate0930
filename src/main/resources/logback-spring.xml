@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<property name="file-pattern" value="${user.dir}/logs/local" />
+
+	<logger name="org.springframework" 		level="ERROR" />
+	<logger name="org.apache.http" 			level="ERROR" />
+	
+	<logger name="com.workerman">
+		<level value="DEBUG" />
+	</logger>
+
+	<logger name="jdbc.sqlonly" level="info" />
+	<logger name="jdbc.sqltiming" level="info" /><!-- 실행쿼리라인 -->
+	<logger name="jdbc.audit" level="off" />
+	<logger name="jdbc.resultset" level="off" />
+	<logger name="jdbc.resultsettable" level="debug" /><!-- 쿼리데이터결과 -->
+	<logger name="jdbc.connection" level="off" />
+	
+	<logger name="com.zaxxer.hikari" level="off" />
+
+	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+            <charset>UTF-8</charset>
+			<pattern>[%d{HH:mm:ss.SSS}] [%thread] %-5level %logger{5} - %msg%n
+			</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="STD-FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${file-pattern}-std.log</file>
+
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <charset>UTF-8</charset>
+			<pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] %-5level %logger{36} - %msg%n</pattern>
+		</encoder>
+
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${file-pattern}.%d{yyyy-MM-dd}.log</fileNamePattern>
+		</rollingPolicy>
+	</appender>
+
+	<appender name="ERR-FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<filter class="ch.qos.logback.classic.filter.LevelFilter">
+			<level>error</level>
+			<onMatch>ACCEPT</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+
+		<file>${file-pattern}-err.log</file>
+
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <charset>UTF-8</charset>
+			<pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] %-5level %logger{36} - %msg%n</pattern>
+		</encoder>
+
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${file-pattern}-err.%d{yyyy-MM-dd}.log
+			</fileNamePattern>
+		</rollingPolicy>
+	</appender>
+
+	<springProfile name="local">
+		<root level="debug">
+			<appender-ref ref="CONSOLE" />
+		</root>
+	</springProfile>
+
+	<springProfile name="dev">
+
+		<root level="debug">
+			<appender-ref ref="CONSOLE" />
+			<appender-ref ref="STD-FILE" />
+			<appender-ref ref="ERR-FILE" />
+		</root>
+	</springProfile>
+
+	<springProfile name="prod">
+
+		<root level="debug">
+			<appender-ref ref="CONSOLE" />
+			<appender-ref ref="STD-FILE" />
+			<appender-ref ref="ERR-FILE" />
+		</root>
+	</springProfile>
+
+</configuration>

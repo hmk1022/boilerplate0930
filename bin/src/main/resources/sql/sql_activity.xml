@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="activity">
+
+	<!-- 신규알림수조회 -->
+	<select id="selectActivityNewCnt" parameterType="map" resultType="int">
+		<![CDATA[ /* SQL_ID : activity.selectActivityNewCnt */ ]]>
+		select count(*)
+		from 
+			w_activity
+		where 
+			member_no = #{member_no} 
+			and read_yn = 'N'
+	</select>
+	
+	<!-- 관리자알림수조회 -->
+	<select id="selectActivityNewCntByAdmin" parameterType="map" resultType="int">
+		<![CDATA[ /* SQL_ID : activity.selectActivityNewCntByAdmin */ ]]>
+		select count(*)
+		from 
+			w_activity
+		where 
+			admin_no = #{admin_no} 
+			and read_yn = 'N'
+	</select>
+	
+	<!-- 알림목록 -->
+	<select id="selectActivityList" resultType="ActivityListDataVo" parameterType="map">
+		<![CDATA[ /* SQL_ID : activity.selectActivityList */ ]]>
+		select
+			a.landing_type,
+			a.work_no,
+			a.title,
+			a.content,
+			date_format(a.create_date,'%Y.%m.%d %H:%i') as create_date_str
+		from
+			w_activity a
+		where
+			1=1
+			and a.member_no = #{member_no}
+		order by a.create_date desc
+	</select>
+	
+	<!-- 읽음여부갱신 -->
+	<update id="updateActivityReadYn" parameterType="map">
+		<![CDATA[ /* SQL_ID : activity.updateActivityReadYn */ ]]>
+		update w_activity
+		set	
+			read_yn = 'Y'
+		where
+			1=1
+			and member_no = #{member_no}
+	</update>
+	
+</mapper>
+
+

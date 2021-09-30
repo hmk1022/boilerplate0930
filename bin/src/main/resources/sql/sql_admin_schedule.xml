@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="adminSchedule">
+	<select id="selectScheduleList" resultType="map" parameterType="map">
+			<![CDATA[ /* SQL_ID : adminSchedule.selectScheduleList */ ]]>
+			SELECT waasg.schedule_stat, waas.work_no,
+			       waas.schedule_group_no,
+			       waas.schedule_type,
+			       GROUP_CONCAT(DISTINCT IF(waas.workerman_type = '01', waas.admin_no, NULL)) AS workerman_no,
+			       GROUP_CONCAT(DISTINCT IF(waas.workerman_type = '02', waas.admin_no, NULL)) AS other1_no,
+			       GROUP_CONCAT(DISTINCT IF(waas.workerman_type = '03', waas.admin_no, NULL)) AS other2_no,
+			       min(waas.st_date_ymd) AS st_date_ymd,
+			       max(waas.ed_date_ymd) AS ed_date_ymd,
+			       min(waas.st_date_h) AS st_date_h,
+			       min(waas.st_date_m) AS st_date_m,
+			       max(waas.ed_date_h) AS ed_date_h,
+			       max(waas.ed_date_m) AS ed_date_m,
+       		       GROUP_CONCAT(DISTINCT  (IF (waas.workerman_type='02', F_GET_ABC_ADMIN_NAME(waas.admin_no,waas.workerman_type),NULL) )) AS workerman_admin_name,
+			       GROUP_CONCAT(DISTINCT  (IF (waas.workerman_type='03', F_GET_ABC_ADMIN_NAME(waas.admin_no,waas.workerman_type),NULL) )) AS workerman_partner_name
+			FROM w_abc_admin_schedule waas
+			INNER JOIN w_abc_admin_schedule_group waasg ON waas.schedule_group_no = waasg.schedule_group_no
+			WHERE waas.work_no = #{work_no}
+			And waasg.schedule_stat <![CDATA[  <> ]]> '99'
+			GROUP BY waas.work_no,
+			         waas.schedule_group_no,
+			         waas.schedule_type
+			ORDER BY waas.st_date_ymd,waas.schedule_group_no
+	</select>
+
+	<select id="selectSchedule" resultType="map" parameterType="map">
+			<![CDATA[ /* SQL_ID : adminSchedule.selectSchedule */ ]]>
+			SELECT waasg.schedule_stat,
+			       waas.work_no,
+			       waas.schedule_group_no,
+			       waas.schedule_type,
+			       waas.st_date_ymd,
+			       waas.ed_date_ymd,
+			       waas.st_date_h,
+			       waas.st_date_m,
+			       waas.ed_date_h,
+			       waas.ed_date_m,
+			       waas.scd_text,
+			       waas.scd_content
+			FROM w_abc_admin_schedule waas
+			INNER JOIN w_abc_admin_schedule_group waasg ON waas.schedule_group_no = waasg.schedule_group_no
+			WHERE waasg.schedule_group_no = #{schedule_group_no}
+			GROUP BY waas.work_no,
+			         waas.schedule_group_no,
+			         waas.schedule_type
+	</select>
+	<select id="listAdminScheduleTime" resultType="map" parameterType="map">
+			<![CDATA[ /* SQL_ID : adminSchedule.listAdminScheduleTime */ ]]>
+			SELECT
+				a.schedule_no AS id,
+				CONCAT(a.workerman_type,'_',a.admin_no) AS resourceId,
+				CONCAT('[',(SELECT code_name FROM w_code WHERE code_gb = 'work_type' AND code_value = a.schedule_type),'] ',IF (ifnull (a.customer_no,'') = '',ifnull (a.req_name,''),CONCAT(ifnull (a.customer_name,''),' ',ifnull (a.branch_name,''))),' / ',ifnull (a.location_name,'')) AS title,
+       			CONCAT(a.start,'T',st_date_h,':',st_date_m,':00') AS start,
+				CONCAT(a.end,'T',ed_date_h,':',ed_date_m,':00') AS end,
+				CONCAT(a.end,' ',ed_date_h,':',ed_date_m,'까지') AS end_str,
+				a.schedule_type,
+				a.work_stat,
+				a.wait_yn,
+				a.scd_text,
+				a.si,
+				a.goo,
+				a.rpt_no,
+				a.admin_name,
+				a.req_name,
+				a.work_no,
+				a.schedule_group_no,
+				IF(a.admin_name = a.jung_name,CONCAT('부:',a.boo_name),CONCAT('정:',a.jung_name)) AS partner_name
+			FROM
+			(
+				SELECT
+					s.work_no,
+					s.workerman_type ,
+					s.schedule_no,
+					DATE_FORMAT(s.st_date_ymd,'%Y-%m-%d') AS START,
+					DATE_FORMAT(s.ed_date_ymd,'%Y-%m-%d') AS END,
+					s.st_date_h AS st_date_h,
+					s.st_date_m AS st_date_m,
+					s.ed_date_h AS ed_date_h,
+					s.ed_date_m AS ed_date_m,
+					s.schedule_group_no,
+					s.schedule_type,
+					IFNULL(w.work_stat,'35') AS work_stat,
+					IFNULL(w.wait_yn,'N') AS wait_yn,
+					s.scd_text,
+					s.admin_no,
+					CASE WHEN SUBSTRING_INDEX(w.work_addr1, ' ', 1) = '서울특별시' THEN
+					'서울'
+					WHEN SUBSTRING_INDEX(w.work_addr1, ' ', 1) = '경기도' THEN
+						'경기'
+					ELSE
+						SUBSTRING_INDEX(w.work_addr1, ' ', 1)
+					END AS si,
+					SUBSTRING_INDEX(SUBSTRING_INDEX(w.work_addr1, ' ', 2)," ",-1) AS goo,
+					wr.rpt_no,
+					a.admin_name,
+					w.req_name,
+					F_GET_JUNG_NAME(w.work_no,s.schedule_type) AS jung_name,
+			 		F_GET_BOO_NAMES(w.work_no,s.schedule_type) AS boo_name,
+			 		w.delete_yn,
+             		w.location_name,
+	                w.customer_no ,
+	                wc.customer_name ,
+	                w.branch_no ,
+	                wcb.branch_name
+      FROM w_abc_admin_schedule s
+      				INNER JOIN w_abc_admin_schedule_group waasg ON s.schedule_group_no = waasg.schedule_group_no AND waasg.schedule_stat != '99'
+					LEFT OUTER JOIN w_work w ON w.work_no = s.work_no AND w.delete_yn != 'Y'
+				    LEFT OUTER JOIN w_admin a ON a.admin_no = s.admin_no
+			        LEFT OUTER JOIN w_customer wc ON wc.customer_no = w.customer_no
+			        LEFT OUTER JOIN w_customer_branch wcb ON wcb.branch_no = w.branch_no
+					LEFT OUTER JOIN w_work_report wr ON wr.work_no = w.work_no and w.wait_yn = 'N' AND w.work_stat != '19'
+				ORDER BY a.admin_no ASC ,CONCAT(s.st_date_ymd,s.st_date_h,s.st_date_m) DESC
+			) a
+			WHERE
+			<![CDATA[
+				DATE_FORMAT(a.start,'%Y%m%d') >= DATE_FORMAT(#{start},'%Y%m%d')
+				and DATE_FORMAT(a.end,'%Y%m%d') <= DATE_FORMAT(#{end},'%Y%m%d')
+			]]>
+			AND   a.work_stat != '19'
+			AND  ( (a.schedule_type IN ('01','02') AND  a.delete_yn != 'Y') OR  a.schedule_type NOT IN ('01','02') )
+			<if test=" null != schedule_type and '' != schedule_type ">
+				and
+					(
+						a.schedule_type in (${schedule_type})
+						<if test=" null != work_stat and '' != work_stat ">
+							or a.work_stat = #{work_stat}
+						</if>
+						<if test=" null == work_stat or '' == work_stat ">
+							and (a.work_stat is null or a.work_stat != '19')
+						</if>
+
+					)
+			</if>
+
+			<if test=" null != wait_yn and '' != wait_yn ">
+				and a.wait_yn = #{wait_yn}
+			</if>
+
+			<if test=" null != admin_no and '' != admin_no ">
+				and a.admin_no = #{admin_no}
+			</if>
+
+			<if test=" (null == schedule_type or '' == schedule_type) and null != work_stat and '' != work_stat ">
+				and a.work_stat = #{work_stat}
+			</if>
+
+			<if test='keyword != null and keyword != ""'>
+			and a.admin_name like '%${keyword}%'
+			</if>
+		</select>
+
+	<!-- 스케줄등록 -->
+	<insert id="insertAdminSchedule" parameterType="map">
+		<![CDATA[ /* SQL_ID : adminSchedule.insertAdminSchedule */ ]]>
+		INSERT INTO w_abc_admin_schedule (
+			st_date_type,
+			st_date_ymd,
+			st_date_h,
+			st_date_m,
+			ed_date_type,
+			ed_date_ymd,
+			ed_date_h,
+			ed_date_m,
+			schedule_type,
+			admin_no,
+			workerman_type,
+			work_no,
+			schedule_group_no,
+			scd_text,
+			scd_content,
+			create_date
+		) VALUES (
+			#{st_date_type},
+			date_format(#{st_date_ymd},'%Y%m%d'),
+			#{st_date_h},
+			#{st_date_m},
+			#{ed_date_type},
+			date_format(#{ed_date_ymd},'%Y%m%d'),
+			#{ed_date_h},
+			#{ed_date_m},
+			#{schedule_type},
+			#{admin_no},
+			#{workerman_type},
+			#{work_no},
+			#{schedule_group_no},
+			#{scd_text},
+			#{scd_content},
+			now()
+		)
+	</insert>
+		<!-- 스케줄갱신 -->
+	<update id="updateAdminSchedule" parameterType="map">
+		<![CDATA[ /* SQL_ID : adminSchedule.updateAdminSchedule */ ]]>
+		update w_abc_admin_schedule
+		set
+			update_date = now()
+			<if test=" null != schedule_type and '' != schedule_type ">
+				,schedule_type = #{schedule_type}
+			</if>
+			<if test=" null != st_date_ymd and '' != st_date_ymd ">
+				,st_date_ymd = DATE_FORMAT(#{st_date_ymd},'%Y%m%d')
+			</if>
+			<if test=" null != ed_date_ymd and '' != ed_date_ymd ">
+				,ed_date_ymd = DATE_FORMAT(#{ed_date_ymd},'%Y%m%d')
+			</if>
+			<if test=" null != st_date_h and '' != st_date_h ">
+				,st_date_h = #{st_date_h}
+			</if>
+			<if test=" null != st_date_m and '' != st_date_m ">
+				,st_date_m = #{st_date_m}
+			</if>
+			<if test=" null != ed_date_h and '' != ed_date_h ">
+				,ed_date_h = #{ed_date_h}
+			</if>
+			<if test=" null != ed_date_m and '' != ed_date_m ">
+				,ed_date_m = #{ed_date_m}
+			</if>
+			<if test=" null != scd_text and '' != scd_text ">
+				,scd_text = #{scd_text}
+			</if>
+			<if test=" null != scd_content and '' != scd_content ">
+				,scd_content = #{scd_content}
+			</if>
+			<where>
+			<if test=" null != work_no and '' != work_no ">
+				and work_no = #{work_no}
+			</if>
+			<if test=" null != schedule_group_no and '' != schedule_group_no ">
+				and schedule_group_no = #{schedule_group_no}
+			</if>
+			</where>
+	</update>
+</mapper>
+
+

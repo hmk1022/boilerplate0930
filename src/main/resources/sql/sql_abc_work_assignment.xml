@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="abc_work_assignment">
+
+	<!-- 배정워커맨번호조회 -->
+	<select id="selectWorkAssignmentList" parameterType="map" resultType="map">
+		<![CDATA[ /* SQL_ID : workAssignment.selectWorkAssignmentList */ ]]>
+		select admin_no
+		from w_abc_work_assignment
+		where work_no = #{work_no}
+		and work_type = #{work_type}
+	</select>
+
+		<!-- 배정등록 -->
+	<insert id="insertWorkAssignment" parameterType="map">
+		<![CDATA[ /* SQL_ID : workAssignment.insertWorkAssignment */ ]]>
+		insert into w_abc_work_assignment (
+			work_no,
+			assignment_type,
+			admin_no,
+			workerman_type,
+			work_type,
+			create_date
+		) values (
+			#{work_no},
+			#{assignment_type},
+			#{admin_no},
+			#{workerman_type},
+			#{work_type},
+			now()
+		)
+	</insert>
+</mapper>
+
+

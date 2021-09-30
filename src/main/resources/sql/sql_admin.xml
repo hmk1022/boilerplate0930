@@ -1,0 +1,423 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="admin">
+
+	<!-- 관리자목록조회 -->
+	<select id="selectAdminList" parameterType="map" resultType="map">
+	/* SQL_ID : admin.selectAdminList */
+		SELECT wa.admin_no,
+		wa.admin_group_no,
+		wa.company_no,
+		wc.name AS company_nm,
+		wa.admin_id,
+		wa.password,
+		wa.disp_ord,
+		wa.admin_name,
+		wa.tablet_hp,
+		wa.admin_type,
+		wa.profile_url,
+		wa.mobile,
+		wa.level_cd,
+		wa.web_push_token,
+		wa.create_date,
+		wa.update_date,
+		wa.team_yn,
+		wa.master_w_yn,
+		wa.main_type,
+        wa.card_no,
+        wa.car_no,
+        wa.jandi_id,
+        wa.department_cd as dp_code,
+        ps.code_name as position_cd,
+		wa.stat as stat_cd,
+		st.code_name as stat,
+		wa.department_cd,
+        dc.code_name as department_name,
+        mt.main_name,
+        sg.special_cd
+	FROM w_admin wa
+	LEFT JOIN w_company wc ON (wa.company_no = wc.company_no)
+    left join (select code_name, code_value from w_code where code_gb ='position') ps
+    on ps.code_value = wa.position_cd
+    left join (select code_name, code_value from w_code where code_gb ='stat_cd') st
+    on st.code_value = wa.stat
+    left join (select code_name, code_value from w_code where code_gb ='department') dc
+	on dc.code_value = wa.department_cd
+    left join (select
+	GROUP_CONCAT(wc.code_name SEPARATOR '/') AS special_cd ,
+    admin_no
+	from
+	w_admin_special was
+    left join (select code_name, code_value from w_code wc
+		where wc.code_gb = 'admin_cate' ) wc on wc.code_value = was.special_cd
+        group by admin_no) sg on sg.admin_no = wa.admin_no
+    left join (select  admin_no, CASE
+				         WHEN main_type = '00' THEN '견습'
+				         WHEN main_type = '01' THEN 'B2C'
+				         WHEN main_type = '02' THEN '프로젝트팀'
+				         WHEN main_type = '03' THEN 'B2B'
+				         ELSE 'B2B'
+				       END AS main_name from w_admin ) mt on mt.admin_no = wa.admin_no
+                       WHERE wa.admin_type = #{admin_type}
+	<if test='stat != null and stat != "" '>
+	AND stat = #{stat}
+	</if>
+	<if test='admin_name != null and admin_name != "" '>
+	AND wa.admin_name like concat('%',#{admin_name},'%')
+	<!--OR wa.admin_id like concat('%',#{admin_name},'%')-->
+	</if>
+	<if test='company_no != null and company_no != "" '>
+	AND wa.company_no = #{company_no}
+	</if>
+	<if test='department_cd != null and department_cd != "" '>
+	AND wa.department_cd = #{department_cd}
+	</if>
+	<if test='main_type != null and main_type != "" '>
+	AND wa.main_type = #{main_type}
+	</if>
+	<if test='admin_id != null and admin_id != "" '>
+	AND wa.admin_id = #{admin_id}
+	</if>
+	ORDER BY wa.create_date DESC
+	<if test='pageLast != null and pageLast != "" '>
+	limit #{pageFirst},#{pageLast}
+	</if>
+	</select>
+
+
+	<!-- admin 계정 조회 -->
+	<select id="selectAdmin" parameterType="map" resultType="map">
+	/* SQL_ID : admin.selectAdmin */
+	 select
+		wd.admin_group_no,
+		wd.admin_no,
+		wd.admin_id,
+        wd.company_no,
+        wd.admin_name,
+        wd.mobile,
+		wd.password,
+        wd.b2c_yn,
+        wd.admin_type,
+		wd.main_type,
+        wd.profile_url,
+		wd.department_cd as department_code,
+        dc.code_name as department_cd,
+        ps.code_name as position_name,
+		wd.position_cd,
+        wd.stat,
+        st.code_name as stat_cd,
+        wd.mobile,
+        wd.card_no,
+        wd.car_no,
+        wd.jandi_id,
+		wd.mac_address,
+		wd.level_cd,
+		lc.code_name as level_name,
+		sg.special_cd
+	from w_admin wd
+	left join (select code_name, code_value from w_code where code_gb ='position') ps
+    on ps.code_value = wd.position_cd
+    left join (select code_name, code_value from w_code where code_gb ='stat_cd') st
+    on st.code_value = wd.stat
+    left join (select code_name, code_value from w_code where code_gb ='department') dc
+    on dc.code_value = wd.department_cd
+	left join (select code_name, code_value from w_code where code_gb ='level_cd') lc
+	on lc.code_value = wd.level_cd
+	left join (select
+	GROUP_CONCAT(wc.code_name SEPARATOR '/') AS special_cd ,
+    admin_no
+	from
+	w_admin_special was
+    left join (select code_name, code_value from w_code wc
+		where wc.code_gb = 'admin_cate' ) wc on wc.code_value = was.special_cd
+        group by admin_no) sg on sg.admin_no = wd.admin_no
+    where wd.admin_no = #{admin_no}
+	and wd.admin_type = #{w_admin}
+	order by wd.admin_no
+    limit 1;
+	</select>
+
+	<!-- 관리자목록조회 -->
+	<select id="selectAdminListCnt" parameterType="map" resultType="int">
+	/* SQL_ID : admin.selectAdminListCnt */
+	SELECT count(*)
+	FROM w_admin wa
+	LEFT JOIN w_company wc ON (wa.company_no = wc.company_no)
+	WHERE wa.admin_type = '01'
+	<if test='admin_name != null and admin_name != "" '>
+	AND wa.admin_name like concat('%',#{admin_name},'%')
+	OR wa.admin_id like concat('%',#{admin_name},'%')
+	</if>
+	<if test='company_no != null and company_no != "" '>
+	AND wa.company_no = #{company_no}
+	</if>
+	</select>
+
+	<!-- 관리자등록 -->
+	<insert id="insertAdmin" parameterType="map" keyProperty="key_no" keyColumn="admin_no">
+		<![CDATA[ /* SQL_ID : admin.insertAdmin */ ]]>
+		insert into w_admin(
+			admin_group_no,
+			company_no,
+			admin_id,
+			password,
+			disp_ord,
+			admin_name,
+			tablet_hp,
+			admin_type,
+			profile_url,
+			department_cd,
+			position_cd,
+			mobile,
+			stat,
+			level_cd,
+			web_push_token,
+			main_type,
+			team_yn,
+			master_w_yn,
+			create_date,
+			update_date,
+			card_no,
+			car_no,
+			jandi_id,
+			mac_address
+		) values(
+			#{admin_group_no},
+			#{company_no},
+			#{admin_id},
+			#{password},
+			#{disp_ord},
+			#{admin_name},
+			#{tablet_hp},
+			#{admin_type},
+			#{profile_url},
+			#{department_cd},
+			#{position_cd},
+			#{mobile},
+			#{stat},
+			#{level_cd},
+			#{web_push_token},
+			#{main_type},
+			'N',
+			'N',
+			now(),
+			now(),
+			#{card_no},
+			#{car_no},
+			#{jandi_id},
+			#{mac_address}
+		)
+		<selectKey keyProperty="admin_no" resultType= "long" order="AFTER">
+			SELECT MAX(admin_no) as admin_no FROM w_admin
+		</selectKey>
+	</insert>
+
+	<!-- 관리자정보갱신 -->
+	<update id="updateAdminInfo" parameterType="map">
+		<![CDATA[ /* SQL_ID : admin.updateAdminInfo */ ]]>
+		update w_admin set
+			company_no = #{company_no},
+			<if test='password != null and password != "" '>
+				password = #{password},
+			</if>
+			admin_name = #{admin_name},
+			admin_type = #{admin_type},
+			profile_url = #{profile_url},
+			department_cd = #{department_cd},
+			position_cd = #{position_cd},
+			mobile = #{mobile},
+			stat = #{stat},
+			level_cd = #{level_cd},
+			main_type = #{main_type},
+			update_date = now(),
+			card_no = #{card_no},
+			car_no = #{car_no},
+			jandi_id = #{jandi_id},
+			mac_address = #{mac_address}
+		where admin_no = #{admin_no}
+	</update>
+
+	<!-- 관리자상태갱신 -->
+	<update id="updateAdminStat" parameterType="map">
+		<![CDATA[ /* SQL_ID : admin.updateAdminStat */ ]]>
+		update w_admin set stat = #{stat} where admin_no = #{admin_no}
+	</update>
+
+	<!-- 관리자비번갱신 -->
+	<update id="updateAdminPassword" parameterType="map">
+		<![CDATA[ /* SQL_ID : admin.updateAdminPassword */ ]]>
+		update w_admin set password = #{password} where admin_no = #{admin_no}
+	</update>
+		<!-- 아이디로 관리자정보조회 -->
+	<select id="selectAdminById" parameterType="map" resultType="map">
+		<![CDATA[ /* SQL_ID : admin.selectAdminById */ ]]>
+		select * from w_admin where admin_id = #{admin_id}
+	</select>
+	<!-- admin_no로 프로필 이미지 조회 -->
+	<select id="selectAdminImg" parameterType="map" resultType="map">
+		select
+			wii.img_no,
+		    wii.img_type,
+		    wii.img_url,
+		    wii.key_no
+			from w_img_info  wii
+			where img_type = 'IMG_TYPE_ADMIN'
+		    and key_no = #{admin_no};
+	</select>
+
+
+	<select id="selectScheduleAdminList" parameterType="map" resultType="map">
+			<![CDATA[ /* SQL_ID : admin.selectScheduleAdminList */ ]]>
+			 SELECT
+			 t.id,
+			 t.admin_name,
+			 t.dept,
+			 t.title,
+			 t.workerman_type,
+			 t.main_type
+			 FROM (
+				SELECT CONCAT('02_',admin_no) AS id,
+				       admin_name,
+				       CASE
+				         WHEN main_type = '00' THEN '견습'
+				         WHEN main_type = '01' THEN 'B2C'
+				         WHEN main_type = '02' THEN '프로젝트팀'
+				         WHEN main_type = '03' THEN 'B2B'
+				         ELSE 'B2B'
+				       END AS dept,
+				       CONCAT(admin_name,'(',CASE WHEN main_type = '00' THEN '견습' WHEN main_type = '01' THEN 'B2C' WHEN main_type = '02' THEN '프로젝트팀' WHEN main_type = '03' THEN 'B2B' ELSE 'B2B' END,')') AS title,
+				       '02' AS workerman_type,
+				       main_type
+				FROM w_admin
+				WHERE stat = '00'
+				AND admin_type = '02'
+				AND main_type IN ('02','03')
+				UNION ALL
+				SELECT CONCAT('03_',partner_no) AS id,
+				       partner_name AS admin_name,
+		               CONCAT('외주_',wc.code_name) AS dept,
+				       CONCAT(partner_name,'(외주_',wc.code_name,')') AS title,
+				       '03' AS workerman_type,
+				       '' AS main_type
+				FROM w_partner wp
+				INNER JOIN w_code wc ON wp.partner_type = wc.code_value AND wc.code_gb = 'partner_type'
+			) t
+			<where>
+			<if test=" null != workerman_type and '' != workerman_type ">
+				AND workerman_type = #{workerman_type}
+			</if>
+			</where>
+			ORDER BY t.workerman_type,
+			         t.main_type DESC,
+			         t.admin_name
+		</select>
+		<select id="selectAdminMenuList" parameterType="map" resultType="map">
+			<![CDATA[ /* SQL_ID : admin.selectAdminMenuList */ ]]>
+			select
+					(select count(*) from w_abc_admin_menu where p_menu_no = t.menu_no) as sub_cnt,
+					t.level,
+					t.p_menu_no,
+					t.menu_no,
+					t.name,
+					t.icon,
+					t.url,
+					t.role_no,
+					t.use_yn,
+					t.prefix,
+					t.create_id,
+					t.create_nm,
+					t.create_date,
+					t.update_id,
+					t.update_nm,
+					t.update_date,
+					t.order_num
+				from (
+					select
+						v.level,
+						v.p_menu_no,
+						v.menu_no,
+						v.name,
+						v.icon,
+						v.url,
+						v.role_no,
+						max(v.use_yn) as use_yn,
+						v.prefix,
+						v.create_id,
+						v.create_nm,
+						v.create_date,
+						v.update_id,
+						v.update_nm,
+						v.update_date,
+						v.order_num
+					from (
+						select
+							concat(ifnull((select disp_order from w_abc_admin_menu where menu_no = tm.p_menu_no), tm.disp_order),tv.level, length(tm.disp_order), substring(tm.disp_order, 1,1)) as order_num,
+							ifnull((select disp_order from w_abc_admin_menu where menu_no = tm.p_menu_no), tm.disp_order) as
+							p_order,
+							tv.level,
+							substring(tm.disp_order, 1,1) as custom_order,
+							tm.disp_order,
+							tm.p_menu_no,
+							tv.menu_no,
+							tm.name,
+							tm.icon,
+							tm.url,
+							tr.role_no,
+							tr.use_yn,
+							tm.prefix,
+							ta1.admin_id as create_id,
+							ta1.admin_name as create_nm,
+							ta1.create_date as create_date,
+							ta2.admin_id as update_id,
+							ta2.admin_name as update_nm,
+							ta2.update_date as update_date
+						from (
+							SELECT
+								abc_start_with_connect_by(menu_no) AS menu_no,
+								@level AS level,
+								CONCAT(REPEAT('', @level - 1), name) AS name
+								FROM (
+								SELECT @start_with := 0,
+								@id := @start_with,
+								@level := 0
+							) vars, w_abc_admin_menu
+							WHERE @id IS NOT NULL
+						) tv
+						join w_abc_admin_menu tm on(tv.menu_no = tm.menu_no)
+						left join w_abc_admin_menu_role tr on(tr.menu_no = tm.menu_no)
+						left join w_admin ta1 on(tr.create_no = ta1.admin_no)
+						left join w_admin ta2 on(tr.update_no = ta2.admin_no)
+						left join w_abc_role te on(tr.role_no = te.role_no)
+						left join w_abc_role_admin ra on(te.role_no = ra.role_no)
+						where 1=1
+						and tm.use_yn = 'Y'
+							and ra.admin_no = #{admin_no}
+					) v
+					group by v.menu_no
+					order by CAST(order_num AS UNSIGNED) asc
+				) t
+				where 1=1
+				and t.use_yn = 'Y'
+		    	order by CAST(t.order_num AS UNSIGNED) asc
+		</select>
+		
+		<select id="selectAdminProfile" parameterType="map" resultType="map">
+			<![CDATA[ /* SQL_ID : admin.selectAdminProfile */ ]]>
+			select 
+				wa.admin_name,
+				wa.profile_url,
+				cd.code_name as department,
+			    ifnull(abr.name, "일반") as authority
+			from w_admin wa
+			left join (select code_name, code_value from w_code where code_gb = 'department') cd
+			on cd.code_value = wa.department_cd
+			left join (select admin_no, role_no from w_abc_role_admin) war
+			on  war.admin_no = wa.admin_no
+			left join (select role_no, name from w_abc_role) abr 
+			on abr.role_no = war.role_no 
+			where wa.admin_no = #{admin_no};
+		</select>
+</mapper>
+
+

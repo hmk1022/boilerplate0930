@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>워커맨 Admin</title>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+    <meta content="" name="description">
+    <meta content="" name="author">
+    <link href="/assets/css/vendor.min.css" rel="stylesheet">
+    <link href="/assets/css/workman_admin.css" rel="stylesheet">
+    <link href="/assets/css/datepicker.css" rel="stylesheet">
+    <link href="/assets/css/jquery.gritter.css" rel="stylesheet">
+    <script src="/assets/js/vendor.min.js" type="text/javascript"></script>
+    <script src="/assets/js/app.min.js" type="text/javascript"></script>
+    <script src="/assets/js/moment.min.js" type="text/javascript"></script>
+    <script src="/assets/js/datepicker.js" type="text/javascript"></script>
+    <script>
+    $(document).ready(function() {
+        $('#reg_date_from,#reg_date_from2,#reg_date_to').val(moment().format('YYYY. MM. DD'));
+        $('#reg_date_from,#reg_date_from2,#reg_date_to').datepicker({
+           format: 'YYYY. MM. DD',
+           autoHide: true,
+        }); 
+    }); 
+    function date() {
+        if($('.single').hasClass('active')) {
+           $('.single').removeClass('active');
+           $('.single').hide();
+           $('.twin').show();
+           $('.btn_add').html('X 종료일 삭제');
+        } else {
+           $('.single').addClass('active'); 
+           $('.twin').hide();
+           $('.single').show();
+           $('.btn_add').html('+ 종료일 추가');
+        }
+    }
+    </script>
+</head>
+
+<body class="p-3">
+    <div class="card">
+        <div class="card-header">
+            <h3>비용등록<span class="text-muted small d-block">등록한 비용은 각 작업의 실행가로 적용됩니다</span></h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                        <label class="form-label">작업선택 <span class="text-danger">*</span></label>
+                        <select class="form-select">
+                            <option value="">B2B_2105250001</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <label class="form-label">비용분류 <span class="text-danger">*</span></label>
+                        <select class="form-select">
+                            <option value="">선택</option>
+                            <option value="">인건비</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-6 mt-3">
+                    <div class="form-group">
+                        <label class="form-label">비용용도 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" placeholder="100자 이내">
+                    </div>
+                </div>
+                <div class="col-6 mt-3">
+                    <div class="form-group">
+                        <label class="form-label">품의번호 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" placeholder="100자 이내">
+                    </div>
+                </div>
+                <div class="col-6 mt-3">
+                    <div class="form-group">
+                        <label class="form-label">외주용역 선택 <span class="text-danger">*</span></label>
+                        <select class="form-select">
+                            <option value="">선택</option>
+                            <option value="">option1</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-6 mt-3">
+                    <div class="form-group">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <label class="form-label">사용일 <span class="text-danger">*</span></label>
+                            <a href="javascript:date()" class="btn_add">+ 종료일 추가</a>
+                        </div>
+                        <input type="text" class="form-control single active" id="reg_date_from" placeholder="연도. 월. 일.">
+                        <div class="input-group twin" style="display: none">
+                            <input type="text" class="form-control text-center" id="reg_date_from2" placeholder="연도. 월. 일.">
+                            <span class="input-group-append input-group-text px-1 my-0 pt-1 rounded-0 border-right-0"> ~ </span>
+                            <input type="text" class="form-control text-center" id="reg_date_to" placeholder="연도. 월. 일.">
+                         </div>
+                    </div>
+                </div>
+                <div class="col-12 mt-3">
+                   <div class="form-group">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <label class="form-label">비용 <span class="text-danger">*</span></label>
+                            <span class="text-muted">VAT가 포함된 금액으로 입력하세요</span>
+                        </div>
+                        <div class="input-group">
+                            <select class="form-select">
+                                <option value="">단위</option>
+                                <option value="">py</option>
+                            </select>
+                            <input type="text" class="form-control" placeholder="100자 이내">
+                            <input type="text" class="form-control" placeholder="100자 이내">
+                            <div class="unit">
+                                <span>원</span>
+                                <input type="text" class="form-control text-end" placeholder="100자 이내">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4 mt-3">
+                    <label class="form-label mb-2">결제수단</label>
+                    <!--<div class="is-invalid">-->
+                    <div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="inlineRadio1" name="inlineRadio">
+                            <label class="form-check-label" for="inlineRadio1">계좌이체</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="inlineRadio2" name="inlineRadio">
+                            <label class="form-check-label" for="inlineRadio2">카드</label>
+                        </div>
+                    </div>
+                    <div class="invalid-feedback">유효성체크 문구 자리</div>
+                </div>
+                <div class="col-4 mt-3">
+                    <div class="form-group">
+                        <label class="form-label">결제정보</label>
+                        <input type="text" class="form-control" value="신한은행 100212345678">
+                    </div>
+                </div>
+                <div class="col-4 mt-3">
+                    <div class="form-group">
+                        <label class="form-label">지출증빙</label>
+                        <input type="text" class="form-control" value="사업소득공제 / 901231-1******">
+                    </div>
+                </div>
+                <div class="col-12 mt-3">
+                    <div class="form-group">
+                        <label class="form-label">거래명세서</label>
+                        <form id="fileupload" action="#" method="POST" enctype="multipart/form-data" class="">
+                            <div class="row fileupload-buttonbar">
+                                <div class="col-12">
+                                    <span class="btn btn-success fileinput-button">
+                                        <i class="fa fa-plus"></i>
+                                        <span>사진첨부</span>
+                                        <input type="file" name="files[]" >
+                                    </span>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-primary btn-block">등록</button>
+        </div>
+    </div>
+</body>
+
+</html>

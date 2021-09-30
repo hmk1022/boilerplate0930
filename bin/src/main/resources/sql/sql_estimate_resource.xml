@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="estimateResource">
+
+	<select id="listEstimateResource" resultType="map">
+		/* SQL_ID : estimateResource.listEstimateResource */
+		SELECT
+			wver.resource_no,
+			wver.estimate_no,
+			wver.resource_type,
+			wver.resource_name,
+			wver.resource_standard,
+			wver.resource_count,
+			wver.unit_cd,
+			wver.unit_price,
+			wver.est_resource_count,
+			wver.est_unit_cd,
+			wver.est_unit_price,
+			wver.del_yn,
+			wver.create_no,
+			wver.create_date,
+			wver.update_no,
+			wver.update_date
+		FROM
+			w_version_estimate_resource wver
+		WHERE
+			wver.estimate_no = #{estimate_no}
+		ORDER BY wmd.estimateResource_no DESC
+
+	</select>
+
+	<insert id="insertEstimateResource" useGeneratedKeys="true" keyProperty="key_no">
+		/* SQL_ID : estimateResource.insertEstimateResource */
+		INSERT INTO w_version_estimate_resource (
+			estimate_no,
+			resource_type,
+			resource_name,
+			resource_standard,
+			resource_count,
+			unit_cd,
+			unit_price,
+			est_resource_count,
+			est_unit_cd,
+			est_unit_price,
+			del_yn,
+			create_no,
+			create_date,
+			update_no,
+			update_date
+		) VALUES (
+			#{estimate_no},
+			#{resource_type},
+			#{resource_name},
+			#{resource_standard},
+			#{resource_count},
+			#{unit_cd},
+			#{unit_price},
+			#{est_resource_count},
+			#{est_unit_cd},
+			#{est_unit_price},
+			#{del_yn},
+			#{create_no},
+			now(),
+			#{update_no},
+			now()
+		)
+	</insert>
+
+	<update id="updateEstimateResource">
+		/* SQL_ID : estimateResource.updateEstimateResource */
+		UPDATE w_version_estimate_resource SET
+			estimate_no = #{estimate_no},
+			resource_type = #{resource_type},
+			resource_name = #{resource_name},
+			resource_standard = #{resource_standard},
+			resource_count = #{resource_count},
+			unit_cd = #{unit_cd},
+			unit_price = #{unit_price},
+			est_resource_count = #{est_resource_count},
+			est_unit_cd = #{est_unit_cd},
+			est_unit_price = #{est_unit_price},
+			update_no = #{update_no},
+			update_date = now()
+		WHERE
+			resource_no = #{resource_no}
+	</update >
+
+	<update id="deleteEstimateResource">
+		/* SQL_ID : estimateResource.deleteEstimateResource */
+		UPDATE w_version_estimate_resource SET
+		    del_yn = #{del_yn},
+		    update_no = #{update_no},
+		    update_date = now()
+		WHERE
+			resource_no = #{resource_no}
+	</update>
+
+</mapper>

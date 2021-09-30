@@ -1,0 +1,404 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="material">
+	
+	<!-- begin 자재조회 -->
+	<select id="listMaterial" resultType="map">
+		/* SQL_ID : material.listMaterial */
+		SELECT
+			wm.material_no,
+			wm.material_id,
+			wm.category_no,
+			wm.material_name,
+			wm.house_name,
+			wm.model_name,
+			wm.material_link,
+			wm.material_link1,
+			wm.material_link2,
+			wm.brand_no,
+			wm.unit_cd,
+			ifnull(wm.purchased_price, 0) purchased_price,
+			ifnull(wm.sale_price, 0) sale_price,
+			ifnull(wm.workerman_price, 0) workerman_price,
+			ifnull(wm.multi_price, 0) multi_price,
+			wm.work_targets,
+			wm.rack_id,
+			ifnull(wm.house_cnt, 0) house_cnt,
+			wm.company_cnt,
+			ifnull(wm.sba_cnt, 0) sba_cnt,
+			ifnull(wm.vehicle_cnt, 0) vehicle_cnt,
+			wm.remarks,
+			wm.member_open_yn,
+			wm.confirm_admin_no,
+			wm.confirm_date,
+			wm.del_yn,
+			wm.create_no,
+			wm.create_date,
+			wm.update_no,
+			wm.update_date,
+			wmc.category_id,
+			wmc.p_category_id,
+			wmc.category_level,
+			wmc.name category_name,
+			(
+				SELECT name 
+				FROM w_material_category
+				WHERE category_id = SUBSTR(wmc.category_id, 1, 5) LIMIT 1
+			) cate1_name,
+			(
+				SELECT name FROM w_material_category
+				WHERE category_id = SUBSTR(wmc.category_id, 1, 8) LIMIT 1
+			) cate2_name,
+			wmc.name cate3_name,
+			wb.brand_name
+		FROM
+			w_material wm 
+				left join w_material_category wmc on (wm.category_no = wmc.category_no)
+				left join w_brand wb on (wm.brand_no = wb.brand_no)
+		WHERE 1=1
+		AND wm.del_yn ='N'
+		<if test="s_material_name != null and s_material_name != ''">
+			AND wm.material_name LIKE CONCAT('%', #{s_material_name}, '%')
+		</if>
+		<if test="s_category_id != null and s_category_id != ''">
+			AND wm.category_no IN (
+				SELECT 
+					category_no 
+				FROM w_material_category wmc
+				WHERE 
+					category_id LIKE CONCAT(#{s_category_id},'%') 
+			)
+		</if>
+		<if test="category_no != null and category_no != ''">
+		AND wm.category_no = #{category_no}
+		</if>
+		ORDER BY 
+			wm.material_no DESC
+		<if test="pageFirst != null and pageFirst != ''">	
+		LIMIT #{pageFirst}, #{pageLast}
+		</if>
+		
+	</select>
+	
+	<select id="listMaterialCnt" resultType="int">
+		
+		/* SQL_ID : material.listMaterialCnt */
+		SELECT
+			count(1) as totalRecords
+		FROM
+			w_material wm
+		WHERE
+			1 = 1
+		AND wm.del_yn ='N'	
+		<if test="s_material_name != null and s_material_name != ''">
+			AND wm.material_name LIKE CONCAT('%', #{s_material_name}, '%')
+		</if>
+		<if test="s_category_id != null and s_category_id != ''">
+			AND wm.category_no IN (
+				SELECT 
+					category_no 
+				FROM w_material_category wmc
+				WHERE 
+					category_id LIKE CONCAT(#{s_category_id},'%') 
+			)
+		</if>
+		<if test="category_no != null and category_no != ''">
+		AND wm.category_no = #{category_no}
+		</if>		
+	</select>
+	
+	<select id="getMaterialId" resultType="string">
+		/* SQL_ID : vendor.getMaterialId */
+		SELECT
+			CONCAT('MAT_', date_format(now(), '%y%m'), '_', LPAD(IFNULL(MAX(material_no), 0)+1, 4, '0')) material_id 
+		FROM
+			w_material wm FOR UPDATE
+	</select>
+		
+	<select id="selectMaterial" resultType="map">
+		/* SQL_ID : material.selectMaterial */
+		SELECT
+			wm.material_no,
+			wm.material_id,
+			wm.category_no,
+			wm.material_name,
+			wm.house_name,
+			wm.model_name,
+			wm.material_link,
+			wm.material_link1,
+			wm.material_link2,
+			wm.brand_no,
+			wm.unit_cd,
+			ifnull(wm.purchased_price, 0) purchased_price,
+			ifnull(wm.sale_price, 0) sale_price,
+			ifnull(wm.workerman_price, 0) workerman_price,
+			ifnull(wm.multi_price, 0) multi_price,
+			wm.work_targets,
+			wm.rack_id,
+			ifnull(wm.house_cnt, 0) house_cnt,
+			wm.company_cnt,
+			ifnull(wm.sba_cnt, 0) sba_cnt,
+			ifnull(wm.vehicle_cnt, 0) vehicle_cnt,
+			wm.remarks,
+			wm.member_open_yn,
+			wm.confirm_admin_no,
+			wm.confirm_date,
+			wm.del_yn,
+			wm.create_no,
+			wm.create_date,
+			wm.update_no,
+			wm.update_date,
+			wmc.category_id,
+			wmc.p_category_id,
+			wmc.category_level,
+			wmc.name category_name,
+			(
+				SELECT name 
+				FROM w_material_category
+				WHERE category_id = SUBSTR(wmc.category_id, 1, 5) LIMIT 1
+			) cate1_name,
+			(
+				SELECT name FROM w_material_category
+				WHERE category_id = SUBSTR(wmc.category_id, 1, 8) LIMIT 1
+			) cate2_name,
+			wmc.name cate3_name,
+			wb.brand_name,
+			SUBSTRING(wmc.category_id,1,8) cate2,
+			SUBSTRING(wmc.category_id,1,5) cate1
+		FROM
+			w_material wm 
+				left join w_material_category wmc on (wm.category_no = wmc.category_no)
+				left join w_brand wb on (wm.brand_no = wb.brand_no)
+		WHERE  
+			wm.material_no = #{material_no }
+	</select>
+	
+	<insert id="insertMaterial" useGeneratedKeys="true" keyProperty="key_no">
+		/* SQL_ID : material.insertMaterial */
+		INSERT INTO w_material (
+			material_id,
+			category_no,
+			material_name,
+			house_name,
+			model_name,
+			material_link,
+			material_link1,
+			material_link2,
+			brand_no,
+			unit_cd,
+			purchased_price,
+			sale_price,
+			workerman_price,
+			multi_price,
+			work_targets,
+			rack_id,
+			house_cnt,
+			company_cnt,
+			sba_cnt,
+			vehicle_cnt,
+			remarks,
+			member_open_yn,
+			confirm_admin_no,
+			confirm_date,
+			del_yn,
+			create_no,
+			create_date,
+			update_no,
+			update_date
+		) VALUES (
+			#{material_id},
+			#{category_no},
+			#{material_name},
+			#{house_name},
+			#{model_name},
+			#{material_link},
+			#{material_link1},
+			#{material_link2},
+			#{brand_no},
+			#{unit_cd},
+			#{purchased_price},
+			#{sale_price},
+			#{workerman_price},
+			#{multi_price},
+			#{work_targets},
+			#{rack_id},
+			#{house_cnt},
+			#{company_cnt},
+			#{sba_cnt},
+			#{vehicle_cnt},
+			#{remarks},
+			#{member_open_yn},
+			#{confirm_admin_no},
+			#{confirm_date},
+			#{del_yn},
+			#{create_no},
+			now(),
+			#{update_no},
+			now()
+		)	
+	</insert>
+	
+	<update id="updateMaterial">
+		/* SQL_ID : material.updateMaterial */
+		UPDATE w_material SET 
+			category_no = #{category_no},
+			material_name = #{material_name},
+			house_name = #{house_name},
+			model_name = #{model_name},
+			material_link = #{material_link},
+			material_link1 = #{material_link1},
+			material_link2 = #{material_link2},
+			brand_no = #{brand_no},
+			unit_cd = #{unit_cd},
+			<if test="purchased_price != null and purchased_price != ''">
+			purchased_price = #{purchased_price},
+			</if>
+			<if test="sale_price != null and sale_price != ''">
+			sale_price = #{sale_price},
+			</if>
+			<if test="workerman_price != null and workerman_price != ''">
+			workerman_price = #{workerman_price},
+			</if>
+			<if test="multi_price != null and multi_price != ''">
+			multi_price = #{multi_price},
+			</if>
+			work_targets = #{work_targets},
+			rack_id = #{rack_id},
+			remarks = #{remarks},
+			member_open_yn = #{member_open_yn},
+			<if test="confirm_admin_no != null and confirm_admin_no != ''">
+			confirm_admin_no = #{confirm_admin_no},
+			</if>
+			<if test="confirm_date != null and confirm_date != ''">
+			confirm_date = #{confirm_date},
+			</if>
+			update_no = #{update_no},
+			update_date = now()
+		WHERE
+			material_no = #{material_no}
+	</update>
+		
+	<update id="deleteMaterial">
+		/* SQL_ID : material.deleteMaterial */
+		UPDATE w_material SET 
+		    del_yn = #{del_yn},
+		    update_no = #{update_no},
+		    update_date = now()
+		WHERE
+			material_no = #{material_no}
+	</update>
+
+	<insert id="insertMaterialDoc" useGeneratedKeys="true" keyProperty="key_no">
+		/* SQL_ID : material.insertMaterialDoc */
+		INSERT INTO w_material (
+			material_id,
+			category_no,
+			material_name,
+			house_name,
+			model_name,
+			material_link,
+			material_link1,
+			material_link2,
+			brand_no,
+			unit_cd,
+			purchased_price,
+			sale_price,
+			workerman_price,
+			multi_price,
+			work_targets,
+			rack_id,
+			house_cnt,
+			company_cnt,
+			sba_cnt,
+			vehicle_cnt,
+			remarks,
+			member_open_yn,
+			material_req_no,
+			confirm_admin_no,
+			confirm_date,
+			del_yn,
+			create_no,
+			create_date,
+			update_no,
+			update_date
+		) 
+		SELECT 
+			#{material_id} material_id,
+			ifnull(wmr.category_no, #{category_no} ) category_no,
+			wmr.material_name,
+			'' house_name,
+			'' model_name,
+			wmr.material_link,
+			'' material_link1,
+			'' material_link2,
+			wmr.brand_no brand_no,
+			wmr.unit_cd,
+			wmr.purchased_price,
+			0 sale_price,
+			wmr.purchased_price workerman_price,
+			0 multi_price,
+			NULL work_targets,
+			NULL rack_id,
+			0 house_cnt,
+			NULL company_cnt,
+			0 sba_cnt,
+			0 vehicle_cnt,
+			'[자재요청]' remarks,
+			'N' member_open_yn,
+			wmr.material_req_no,
+			NULL confirm_admin_no,
+			NULL confirm_date,
+			'N' del_yn,
+			#{create_no} create_no,
+			now() create_date,
+			#{update_no} update_no,
+			now() update_date
+		FROM 
+			w_material_req wmr 
+		WHERE
+			wmr.material_req_no =#{material_req_no}			 	
+	</insert>
+	<!-- end 뮬류센터 -->
+	
+	
+	<!-- 자재 재고 수량 -->
+	<update id="updateMaterialCnt">
+		/* SQL_ID : material.updateMaterialCnt */
+		UPDATE w_material SET 
+			house_cnt = (
+				SELECT  
+				SUM(CASE WHEN bound_type='01' THEN inout_cnt WHEN bound_type='02' THEN -1*inout_cnt ELSE 0 END) 
+				FROM 
+					w_material_bound_inout wmbi 
+						INNER JOIN w_material_bound wmb on(wmbi.material_bound_no = wmb.material_bound_no)
+				WHERE
+					bound_locate = '01'
+				AND wmbi.material_no = #{material_no}	
+			),
+			sba_cnt = (
+				SELECT  
+				SUM(CASE WHEN bound_type='01' THEN inout_cnt WHEN bound_type='02' THEN -1*inout_cnt ELSE 0 END) 
+				FROM 
+					w_material_bound_inout wmbi 
+						INNER JOIN w_material_bound wmb on(wmbi.material_bound_no = wmb.material_bound_no)
+				WHERE
+					bound_locate = '02'
+				AND wmbi.material_no = #{material_no}	
+			),	
+			vehicle_cnt = (
+				SELECT  
+				SUM(CASE WHEN bound_type='01' THEN inout_cnt WHEN bound_type='02' THEN -1*inout_cnt ELSE 0 END) 
+				FROM 
+					w_material_bound_inout wmbi 
+						INNER JOIN w_material_bound wmb on(wmbi.material_bound_no = wmb.material_bound_no)
+				WHERE
+					bound_locate = '05'
+				AND wmbi.material_no = #{material_no}	
+			),
+			update_no = #{update_no},
+			update_date = now()
+		WHERE
+			material_no = #{material_no}
+	</update>		
+</mapper>

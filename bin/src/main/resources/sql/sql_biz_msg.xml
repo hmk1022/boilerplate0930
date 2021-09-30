@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="bizMsg">
+
+	<!-- 문자등록 -->
+	<insert id="insertBizMsg" parameterType="map">
+		<![CDATA[ /* SQL_ID : bizMsg.insertBizMsg */ ]]>
+		insert into BIZ_MSG
+		(
+			msg_type,
+			cmid,
+			request_time,
+			send_time,
+			dest_phone,
+			send_phone,
+			msg_body
+		)
+		values
+		(
+			#{msgType},
+			#{cmId},
+			now(),
+			now(),
+			#{callTo},
+			#{callFrom},
+			#{smsTxt}
+		)
+	</insert>
+	
+	<!--업무시간 문자등록 -->
+	<insert id="insertBizTimeMsg" parameterType="map">
+		<![CDATA[ /* SQL_ID : bizMsg.insertBizMsg */ ]]>
+		insert into BIZ_MSG
+		(
+			MSG_TYPE, CMID, REQUEST_TIME, SEND_TIME, DEST_PHONE, SEND_PHONE, MSG_BODY,TEMPLATE_CODE,SENDER_KEY,NATION_CODE
+			<if test=" 6 == msgType ">
+			,RE_TYPE,RE_BODY
+			</if>
+		)
+		values
+		(
+			#{msgType},
+			#{cmId},
+			now(), 
+			now(), 
+			
+			#{callTo},
+			#{callFrom},
+			#{smsTxt},
+			#{atTmplCode},
+			#{senderKey},
+			'82'
+			<if test=" 6 == msgType ">
+			,'MMS',#{smsTxt}
+			</if>
+		)
+	</insert>
+	
+	<!--알림톡 -->
+	<insert id="insertBizAtMsg" parameterType="map">
+		/* SQL_ID : bizMsg.insertBizAtMsg */
+		insert into BIZ_MSG
+		(
+			msg_type, 
+			cmid, 
+			request_time, 
+			send_time, 
+			dest_phone, 
+			send_phone, 
+			msg_body,
+			template_code,
+			sender_key,
+			nation_code,
+			re_type,
+			re_body
+		)
+		values
+		(
+			#{msgType},
+			#{cmId},
+			now(), 
+			now(), 
+			#{callTo},
+			#{callFrom},
+			#{smsTxt},
+			#{atTmplCode},
+			#{senderKey},
+			'82',
+			'MMS',
+			#{smsTxt}
+		)
+	</insert>
+	
+		
+</mapper>
+
+

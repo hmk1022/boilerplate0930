@@ -1,0 +1,423 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="reportIn">
+	<select id="reportInPay" resultType="map">
+		SELECT
+			resource_type,
+			SUM(wver.resource_count*wver.unit_price) as price,
+			SUM(wver.est_resource_count*wver.est_unit_price) as est_price,
+			(wver.resource_count*wver.unit_price - wver.est_resource_count*wver.est_unit_price) as profit
+        FROM w_work ww
+        LEFT JOIN w_version_estimate wve ON (wve.work_no = ww.work_no)
+		LEFT JOIN w_customer_branch wcb ON wcb.customer_no= ww.customer_no
+        LEFT JOIN w_version_estimate_resource wver ON wve.estimate_no = wver.estimate_no
+        WHERE IFNULL(ww.p_work_no, ww.work_no) = #{work_no}
+		AND wver.del_yn != 'Y'
+        and wve.stat ='30'
+		group by wver.resource_type;
+	  </select>
+
+	<!-- 고객사용 report 정보 가져오기 -->
+    <select id="selectB2bWorkReport" parameterType="map" resultType="map">
+    	<![CDATA[ /* SQL_ID : b2bWork.selectB2bWorkReport */
+    	SELECT
+			ww.work_no
+			, ww.work_id
+			, ww.req_name
+			, ww.work_addr_cd
+			, ww.work_target
+			, ww.location_name
+			, ww.work_addr1
+			, ww.work_addr2
+			, ww.manager_admin_no
+			, ww.customer_no
+			, ww.branch_no
+			, F_GET_ADMIN_NAME(ww.manager_admin_no) as manager_admin_name
+			, wc.customer_name
+			, wc.manager_name
+       		, wcb.branch_name
+       		, wcb.manager_name AS branch_manager_name
+			, wasg.st_working_date
+			, wasg.ed_working_date
+       		, waasg.workerman_admin_name
+       		, waasg.supervisor_admin_name
+  	 		, wve.version_no
+  	 		, DATE_FORMAT(wve.apply_date,'%Y-%m-%d') AS apply_date
+		FROM w_work ww
+		LEFT OUTER JOIN w_customer wc ON wc.customer_no = ww.customer_no
+  		LEFT OUTER JOIN w_customer_branch wcb ON wcb.branch_no = ww.branch_no
+		LEFT OUTER JOIN (SELECT ifnull(ww.p_work_no,ww.work_no) AS work_no,
+		                          GROUP_CONCAT(ww.location_name ORDER BY ww.work_no) AS location_name,
+		                          MIN(str_to_Date (st_date_ymd,'%Y%m%d')) AS st_working_date,
+		                          MAX(str_to_Date (ed_date_ymd,'%Y%m%d')) AS ed_working_date
+		                   FROM w_work ww
+		                   LEFT OUTER JOIN w_abc_admin_schedule waas ON waas.work_no = ww.work_no AND waas.schedule_type IN ('31', '32', '33')
+		                   GROUP BY (ifnull (ww.p_work_no,ww.work_no))
+		                 ) wasg ON wasg.work_no = ww.work_no
+		LEFT OUTER JOIN (SELECT IFNULL( ww.p_work_no, ww.work_no ) AS work_no,
+					       swve.estimate_no,
+					       swve.version_no ,
+					       swve.apply_date ,
+					       SUM(swver.resource_count*swver.unit_price) AS total_unit_price,
+					       SUM(swver.est_resource_count*swver.est_unit_price) AS total_est_unit_price
+					FROM w_version_estimate swve
+					INNER JOIN w_version_estimate_resource swver ON swve.estimate_no = swver.estimate_no
+					INNER JOIN w_work ww ON ww.work_no = swve.work_no
+                    WHERE apply_date IS NOT NULL
+                    AND swver.del_yn != 'Y'
+					GROUP BY IFNULL( ww.p_work_no, ww.work_no )
+					) wve ON wve.work_no = ww.work_no
+   		LEFT OUTER JOIN w_work_reject wwr ON wwr.work_no = ww.work_no
+  		LEFT OUTER JOIN (SELECT IFNULL(ww.p_work_no,ww.work_no) AS work_no,
+						       GROUP_CONCAT(DISTINCT IF (waasg.workerman_type='02',F_GET_ABC_ADMIN_NAME (waas.admin_no,waas.workerman_type),NULL) ORDER BY waasg.workerman_type,waasg.admin_no) AS workerman_admin_name,
+						       GROUP_CONCAT(DISTINCT IF (waas.schedule_type = '33',F_GET_ABC_ADMIN_NAME (waas.admin_no,waas.workerman_type),NULL)) AS supervisor_admin_name
+						FROM w_work ww
+						INNER JOIN w_abc_admin_schedule_group waasg ON waasg.work_no = ww.work_no AND waasg.schedule_stat <> '99'
+						INNER JOIN w_abc_admin_schedule waas ON waas.schedule_group_no = waasg.schedule_group_no
+						GROUP BY IFNULL(ww.p_work_no,ww.work_no)
+		) waasg ON waasg.work_no = ww.work_no
+   		LEFT OUTER JOIN ( 	SELECT work_no
+   								, sum(paid_amount) AS paid_amount
+								, sum(total_pay_price) AS total_pay_price
+							FROM w_abc_payment wap
+							WHERE work_no = #{work_no}
+							AND wap.del_yn != 'Y'
+							GROUP BY work_no
+						) wap ON wap.work_no = ww.work_no
+		WHERE ww.work_no = #{work_no}
+		]]>
+    </select>
+
+	
+
+	<!-- 기타금액합 조회 -->
+    <select id="expPriceSum" parameterType="map" resultType="map">
+    	<![CDATA[ /* SQL_ID : b2bWork.expPriceSum */ ]]>
+    		SELECT
+			sum(wver.resource_count*wver.unit_price) as exp_price,
+			sum(wver.est_resource_count*wver.est_unit_price) as est_exp_price
+        FROM w_work ww
+        LEFT JOIN w_version_estimate wve ON (wve.work_no = ww.work_no)
+		LEFT JOIN w_customer_branch wcb ON wcb.customer_no= ww.customer_no
+        LEFT JOIN w_version_estimate_resource wver ON wve.estimate_no = wver.estimate_no
+        WHERE IFNULL(ww.p_work_no, ww.work_no) = #{work_no}
+		AND wver.del_yn != 'Y'
+        and wve.stat = '30'
+        and wver.resource_type = '99';
+    </select>
+
+
+	<!-- 견적금액 총합 -->
+	<select id="estTotalPrice" parameterType="map" resultType="map">
+    	<![CDATA[ /* SQL_ID : b2bWork.estTotalPrice */ ]]>
+    		SELECT
+			FORMAT(sum(wver.resource_count*wver.unit_price) , 0) as price
+        FROM w_work ww
+        LEFT JOIN w_version_estimate wve ON (wve.work_no = ww.work_no)
+		LEFT JOIN w_customer_branch wcb ON wcb.customer_no= ww.customer_no
+        LEFT JOIN w_version_estimate_resource wver ON wve.estimate_no = wver.estimate_no
+        WHERE IFNULL(ww.p_work_no, ww.work_no) = ${work_no}
+		AND wver.del_yn != 'Y'
+        AND wve.stat = '30';
+    </select>
+	
+	<!-- 완료보고서 실행가 총합 -->
+		<select id="totalexcutePrice" parameterType="map" resultType="map">
+    	<![CDATA[ /* SQL_ID : b2bWork.totalexcutePrice */ ]]>
+    	select 
+		SUM(ps.price) as sum_price 
+		from 
+        (SELECT '비용등록' AS exp_category 				
+       			, wwe.exp_price * wwe.exp_cnt AS price
+		FROM w_work_expenses wwe
+		INNER JOIN w_work ww ON ww.work_no = wwe.work_no AND ww.delete_yn != 'Y'
+		LEFT OUTER JOIN w_partner wp ON wp.partner_no = wwe.partner_no
+		LEFT OUTER JOIN w_vendor wv ON wv.vendor_no = wwe.vendor_no
+		WHERE IFNULL(ww.p_work_no,ww.work_no) = #{work_no}
+        and wwe.del_yn != 'Y'
+		UNION ALL
+		SELECT '지출결의' AS exp_category,
+		       wd.disb_amt AS price
+		FROM w_disbursement wd
+		  LEFT JOIN w_work ww ON (wd.work_no = ww.work_no AND ww.delete_yn != 'Y')
+		WHERE IFNULL(ww.p_work_no,ww.work_no) = #{work_no}
+		and wd.del_yn != 'Y'
+		and wd.disb_reject is NULL
+		UNION ALL
+		SELECT
+		'자재요청' AS exp_category,
+		sum(wmr.purchased_price * wmr.material_cnt) AS price
+		FROM w_material_doc wmd
+		INNER JOIN w_work ww ON (wmd.work_no = ww.work_no AND ww.delete_yn != 'Y')
+		INNER JOIN w_material_req wmr ON (wmr.material_doc_no = wmd.material_doc_no)
+		WHERE 1 = 1
+		and wmr.del_yn != 'Y'
+		AND   IFNULL(ww.p_work_no,ww.work_no) = #{work_no} ) as ps
+    </select>
+	<!--<select id="totalexcutePrice" parameterType="map" resultType="map">
+    	<![CDATA[ /* SQL_ID : b2bWork.totalexcutePrice */ ]]>
+    	SELECT '비용등록' AS exp_category 				
+       			, wwe.exp_price * wwe.exp_cnt AS price
+		FROM w_work_expenses wwe
+		INNER JOIN w_work ww ON ww.work_no = wwe.work_no AND ww.delete_yn != 'Y'
+		LEFT OUTER JOIN w_partner wp ON wp.partner_no = wwe.partner_no
+		LEFT OUTER JOIN w_vendor wv ON wv.vendor_no = wwe.vendor_no
+		WHERE IFNULL(ww.p_work_no,ww.work_no) = #{work_no}
+		UNION ALL
+		SELECT '지출결의' AS exp_category,
+		       wd.disb_amt AS price
+		FROM w_disbursement wd
+		  LEFT JOIN w_work ww ON (wd.work_no = ww.work_no AND ww.delete_yn != 'Y')
+		WHERE IFNULL(ww.p_work_no,ww.work_no) = #{work_no}
+		UNION ALL
+		SELECT
+		'자재요청' AS exp_category,
+		sum(wmr.purchased_price * wmr.material_cnt) AS price
+		FROM w_material_doc wmd
+		INNER JOIN w_work ww ON (wmd.work_no = ww.work_no AND ww.delete_yn != 'Y')
+		INNER JOIN w_material_req wmr ON (wmr.material_doc_no = wmd.material_doc_no)
+		WHERE 1 = 1
+		AND   IFNULL(ww.p_work_no,ww.work_no) = #{work_no}
+    </select>-->
+	
+	
+	
+	
+	<!-- 카테고리 추가 이전 -->
+ 	<select id="DailyReportList" parameterType="map" resultType="map">
+    	<![CDATA[ /* SQL_ID : b2bWork.DailyReportList */ ]]>
+    	SELECT DATE_FORMAT(waas.st_date_ymd,'%Y-%m-%d') AS st_date_ymd
+    		,SUBSTR( _UTF8'일월화수목금토', DAYOFWEEK( waas.st_date_ymd ), 1 ) AS day_of_week
+			,wwdr.schedule_memo
+			,wwdr.next_schedule_memo
+			,F_GET_ADMIN_NAME(wwdr.update_no) AS admin_name
+			,wwdr.daily_report_no
+       		, F_GET_DAILY_EXCUTE_PRICE(ifnull(ww.p_work_no,ww.work_no) ,waas.st_date_ymd) AS excute_price
+			,wwc.category_no
+            ,wwc.name
+			,ww.location_name
+			,ww.admin_memo
+		FROM w_work ww
+		INNER JOIN w_abc_admin_schedule waas ON waas.work_no = ww.work_no AND waas.schedule_type IN ('31', '32', '33')
+		LEFT OUTER JOIN w_work_daily_report wwdr ON wwdr.report_date = waas.st_date_ymd AND wwdr.work_no = #{work_no}
+		left join (select name, category_no from w_work_category) wwc on wwc.category_no = ww.category_no
+		WHERE ifnull(ww.p_work_no,ww.work_no) = #{work_no}
+		GROUP BY st_date_ymd
+    </select>
+
+	
+	
+	<!-- 완료보고서 특이사항 -->
+	<select id="selectReport" parameterType="map" resultType="map">
+		select
+			wcr.work_no,
+            wcr.report_memo,
+            wcr.update_date,
+			DATE_FORMAT(create_date,'%Y-%m-%d') AS create_day,
+			SUBSTR( _UTF8'일월화수목금토', DAYOFWEEK(create_date), 1 ) AS day_of_week
+			from w_completion_report wcr 
+		    where wcr.work_no = #{work_no}
+			group by wcr.work_no;        
+	</select>
+
+	<!-- 완료보고서 내부 보고용 작성 폼 데이터 -->
+	<select id="reportInForm" parameterType="map" resultType="map">
+		select
+			ww.work_id
+			,ww.work_no
+	        ,ww.location_name
+	        ,ww.req_name
+			,ww.work_addr1
+	        ,ww.work_addr2
+			,wc.customer_name
+			,wcb.branch_name
+			,ww.delete_yn
+            ,wcb.create_no
+            ,wcb.update_no
+			from w_work ww 
+			left join w_customer wc on wc.customer_no = ww.customer_no
+	        left join w_customer_branch wcb on ww.branch_no = wcb.branch_no
+			where ww.work_no = #{work_no};   
+
+	</select>
+	
+		<!-- 완료보고서 고객용  -->
+	<select id="reportClient" parameterType="map" resultType="map">
+			select 
+				wccr.workerman_admin_name,
+				wccr.supervisor_admin_no,
+				wccr.report_name,
+				wccr.customer_name,
+		        wccr.report_memo,
+		        wccr.update_date,
+		        wccr.work_no,
+		        wccr.create_no,
+		        wccr.create_date,
+		        wccr.report_no,
+		        wccr.update_date,
+		        DATE_FORMAT(create_date,'%Y-%m-%d') AS create_day,
+		        SUBSTR( _UTF8'일월화수목금토', DAYOFWEEK(create_date), 1 ) AS day_of_week
+		        from w_completion_client_report wccr 
+				where wccr.work_no = #{work_no};  
+	</select>
+
+	<!-- 완료보고서 고객용 이미지들 -->
+	<select id="reportClientImg" parameterType="map" resultType="map">
+		select 
+			win.img_type, 
+		    win.img_name, 
+		    win.img_url 
+			from w_img_info win
+			left join w_completion_client_report wccr on wccr.report_no = win.key_no
+			where win.img_type LIKE 'IMG_TYPE_REPORT%'
+		    and wccr.work_no = #{work_no};
+	</select>
+	
+	
+	<!-- 완료보고서 내부 보고용 수정 -->
+	<select id="reportInPost" parameterType="map" resultType="map">
+		select 
+			wcr.report_memo,
+            wcr.create_date,
+			wcr.create_no 
+			from 
+			w_completion_report wcr 
+			where wcr.work_no = #{work_no}
+			limit 1;
+	</select>
+	
+
+	<!-- 완료보고서 내부 보고용 수정 이미지-->
+	<select id="reportPostImg" parameterType="map" resultType="map">
+		 select 
+			img_no,
+            img_type,
+			img_name,
+			img_url,
+			img_size,
+			img_ext,
+			wii.use_yn,
+			wii.del_yn,
+            key_no,
+            wii.create_no,
+            wii.create_date,
+            date_format(wii.create_date,'%Y-%m-%d') img_date
+		from w_completion_client_report wccr 
+		inner join w_img_info wii on wii.key_no = wccr.report_no
+		where wccr.work_no = #{work_no}
+		and wii.img_type IN ('IMG_TYPE_REPORT_BEFORE','IMG_TYPE_REPORT_ING','IMG_TYPE_REPORT_AFTER'); 
+	</select>
+		
+	<!-- 완료보고서 작성 -->
+	<insert id="insertReportIn" useGeneratedKeys="true" keyProperty="report_no" keyColumn="report_no">
+		<![CDATA[ /* SQL_ID : reportIn.insertReportIn */ ]]>
+		INSERT INTO w_completion_report (
+			report_id, 
+			work_no,
+			report_name,
+			customer_name,
+			manager_admin_no,
+			supervisor_admin_no,
+			report_memo,
+			del_yn,
+			create_no,
+			create_date,
+			update_no,
+			update_date
+		) VALUES (
+			#{report_id},
+			#{work_no},
+			#{report_name},
+			#{customer_name},
+			#{manager_admin_no},
+			#{supervisor_admin_no},
+			#{report_memo},
+			#{del_yn},
+			#{create_no},
+			now(),
+			#{update_no},
+			now()
+		)
+		<selectKey keyProperty="report_no" resultType= "long" order="AFTER">
+			SELECT MAX(report_no) + 1 as report_no FROM w_completion_report
+		</selectKey>
+	</insert>
+	
+	
+	<!-- 고객용 완료보고서 작성 -->
+	<insert id="insertReportClient" useGeneratedKeys="true" keyProperty="report_no" keyColumn="report_no">
+		<![CDATA[ /* SQL_ID : reportIn.insertReportClient */ ]]>
+		INSERT INTO w_completion_client_report (
+			report_id, 
+			work_no,
+			report_name,
+			customer_name,
+			manager_admin_no,
+			supervisor_admin_no,
+			report_memo,
+			del_yn,
+			create_no,
+			create_date,
+			update_no,
+			update_date,
+			workerman_admin_name
+		) VALUES (
+			#{report_id},
+			#{work_no},
+			#{report_name},
+			#{customer_name},
+			#{manager_admin_no},
+			#{supervisor_admin_no},
+			#{report_memo},
+			#{del_yn},
+			#{create_no},
+			now(),
+			#{update_no},
+			now(),
+			#{workerman_admin_name}
+			
+		)
+		<selectKey keyProperty="report_no" resultType= "long" order="AFTER">
+			SELECT MAX(report_no) as report_no FROM w_completion_client_report
+		</selectKey>
+	</insert>
+	
+	<!-- 내부용 보고서 수정 -->
+	<update id="updateReportIn" useGeneratedKeys="true" keyProperty="key_no">
+		update w_completion_report set
+			report_id = #{report_id}, 
+			work_no = #{work_no},
+			report_name = #{report_name},
+			customer_name = #{customer_name},
+			manager_admin_no = #{manager_admin_no},
+			supervisor_admin_no = #{supervisor_admin_no},
+			report_memo = #{report_memo},
+			del_yn = #{del_yn},
+			create_no = #{create_no},
+			create_date = #{create_date},
+			update_no = #{update_no},
+			update_date = now()
+			where work_no = #{work_no}
+	</update>
+	
+	<!-- 고객전송용 보고서 수정 -->
+	<update id="updateReportClient" useGeneratedKeys="true" keyProperty="key_no">
+		update w_completion_client_report set
+			report_id = #{report_id}, 
+			work_no = #{work_no},
+			report_name = #{report_name},
+			customer_name = #{customer_name},
+			manager_admin_no = #{manager_admin_no},
+			supervisor_admin_no = #{supervisor_admin_no},
+			report_memo = #{report_memo},
+			del_yn = #{del_yn},
+			create_no = #{create_no},
+			create_date = #{create_date},
+			update_no = #{update_no},
+			update_date = now()
+			where work_no = #{work_no}
+	</update>
+</mapper>
+
+
+   

@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="brand">
+
+	<!-- 작업 요청 리스트 조회 -->
+	<select id="selectBrandList" parameterType="map" resultType="map">
+		<![CDATA[ /* SQL_ID : brand.selectBrandList */ ]]>
+		
+		SELECT 
+			wb.brand_no,
+			wb.brand_name,
+			wb.brand_eng_name,
+			wb.brand_url,
+			wb.remarks,
+			wb.del_yn,
+			wb.create_no,
+			wb.create_date,
+			wb.update_no,
+			wb.update_date
+		FROM 
+			w_brand wb
+		where del_yn != 'Y'	
+		ORDER BY brand_name 
+	</select>
+
+	<select id="listBrand" resultType="map">
+		/* SQL_ID : brand.listBrand */
+		SELECT 
+			wb.brand_no,
+			wb.brand_name,
+			wb.brand_eng_name,
+			wb.brand_url,
+			wb.remarks,
+			wb.del_yn,
+			wb.create_no,
+			wa1.admin_name create_name,
+			wb.create_date,
+			wb.update_no,
+			wa2.admin_name update_name,
+			wb.update_date
+		FROM 
+			w_brand wb
+				left join w_admin wa1 on(wb.create_no = wa1.admin_no)
+				left join w_admin wa2 on(wb.create_no = wa2.admin_no)
+		ORDER BY wb.brand_no DESC 
+		LIMIT #{pageFirst}, #{pageLast}
+	</select>
+	
+	<select id="listBrandCnt" resultType="int">
+		
+		/* SQL_ID : brand.listBrandCnt */
+		SELECT
+			count(1) as totalRecords
+		FROM
+			w_brand wb
+		WHERE
+			1 = 1
+	</select>
+	
+	<select id="selectBrand" resultType="map">
+		/* SQL_ID : brand.listBrand */
+		SELECT 
+			wb.brand_no,
+			wb.brand_name,
+			wb.brand_eng_name,
+			wb.brand_url,
+			wb.remarks,
+			wb.del_yn,
+			wb.create_no,
+			wb.create_date,
+			wb.update_no,
+			wb.update_date
+		FROM 
+			w_brand wb
+		WHERE 
+			wb.brand_no = #{brand_no }
+			 
+	</select>
+	
+	<insert id="insertBrand" useGeneratedKeys="true" keyProperty="key_no">
+		/* SQL_ID : brand.insertBrand */
+		INSERT INTO w_brand (
+			brand_name,
+			brand_eng_name,
+			brand_url,
+			remarks,
+			del_yn,
+			create_no,
+			create_date,
+			update_no,
+			update_date
+		) VALUES (
+			#{brand_name},
+			#{brand_eng_name},
+			#{brand_url},
+			#{remarks},
+			#{del_yn},
+			#{create_no},
+			now(),
+			#{update_no},
+			now()
+		)	
+	</insert>
+	
+	<update id="updateBrand">
+		/* SQL_ID : brand.updateBrand */
+		UPDATE w_brand SET 
+			brand_name =#{brand_name},
+			brand_eng_name =#{brand_eng_name},
+			brand_url =#{brand_url},
+			remarks =#{remarks},
+			update_no =#{update_no},
+			update_date =now(),
+			del_yn=#{del_yn}
+		WHERE
+			brand_no = #{brand_no}
+	</update>
+	
+	<!-- 브랜드상태갱신 -->
+	<update id="updateBrandStat" parameterType="map">
+		<![CDATA[ /* SQL_ID : admin.updateBrandStat */ ]]>
+		update w_brand set del_yn = #{del_yn} where brand_no = #{brand_no}
+	</update>
+		
+	<update id="deleteBrand">
+		/* SQL_ID : brand.deleteBrand */
+		UPDATE w_brand SET 
+		    del_yn = #{del_yn},
+		    update_no = #{update_no},
+		    update_date = now()
+		WHERE
+			brand_no = #{brand_no}
+	</update>
+	
+	
+</mapper>
+
+

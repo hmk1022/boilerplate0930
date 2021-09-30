@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="imgInfo">
+
+	<insert id="insertImgInfo" useGeneratedKeys="true" keyProperty="key_no">
+		
+		/* SQL_ID : imgInfo.insertImgInfo */
+		INSERT INTO w_img_info (
+			img_type,
+			img_name,
+			img_url,
+			img_size,
+			img_ext,
+			key_no,
+			create_no,
+			create_date
+		) VALUES (
+			#{img_type},
+			#{img_name},
+			#{img_url},
+			#{img_size},
+			#{img_ext},
+			#{key_no},
+			#{create_no},
+			NOW()
+		)
+
+	</insert>
+	
+	<delete id="deleteImgInfo">
+	
+		/* SQL_ID : imgInfo.deleteImgInfo */
+		DELETE FROM w_img_info
+		WHERE 
+			img_no = #{img_no}
+
+	</delete>
+
+	<select id="listImgInfo" parameterType="map" resultType="map">
+		<![CDATA[ /* SQL_ID : imgInfo.listImgInfo */ ]]>
+		
+		SELECT 	
+			img_no,
+			img_type,
+			img_name,
+			img_url,
+			img_size,
+			img_ext,
+			use_yn,
+			del_yn,
+			key_no,
+			create_no,
+			create_date,
+			date_format(create_date,'%Y-%m-%d') img_date
+		FROM	
+			w_img_info wii
+		WHERE 
+			img_type =#{img_type}
+		AND key_no =#{key_no}
+		ORDER BY key_no				
+			
+	</select>
+		
+	
+	<insert id="insertImgInfoDoc" useGeneratedKeys="true" keyProperty="key_no">
+		
+		/* SQL_ID : imgInfo.insertImgInfoReq */
+		INSERT INTO w_img_info (
+			img_type,
+			img_name,
+			img_url,
+			img_size,
+			img_ext,
+			key_no,
+			create_no,
+			create_date
+		) 
+		SELECT
+			#{add_img_type} img_type,
+			img_name,
+			img_url,
+			img_size,
+			img_ext,
+			#{add_key_no} key_no,
+			#{create_no} create_no,
+			now() create_date		
+		FROM 
+			w_img_info
+		WHERE 
+			img_type= #{img_type}	
+		AND key_no = #{key_no}
+
+	</insert>
+
+</mapper>

@@ -1,0 +1,33 @@
+# ===================================================================
+# Spring Boot configuration for the "dev" profile.
+#
+# This configuration overrides the application.yml file.
+# ===================================================================
+
+# ===================================================================
+# Standard Spring Boot properties.
+# Full reference is available at:
+# http://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
+# ===================================================================
+         
+spring:
+  profiles:
+    active: local
+      
+workman:
+  datasource:
+    default:
+      driver-class-name: org.mariadb.jdbc.Driver
+      url: jdbc:mariadb://workerman-dev.cge3o0m3ox6w.ap-northeast-2.rds.amazonaws.com:3306/workerman_dev2?useUnicode=true&autoReconnect=true&zeroDateTimeBehavior=convertToNull&characterEncoding=UTF-8&allowMultiQueries=true
+      name: ExnetDB
+      username: mallet
+      password: \!dkapflzksh\#\@
+      
+      
+            
+# 파일 사이즈 설정
+multipart:
+  maxFileSize: 20Mb
+  maxRequestSize: 100Mb 
+
+# security.require-ssl: false  

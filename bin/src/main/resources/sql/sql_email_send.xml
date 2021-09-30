@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="emailSend">
+
+	<!-- 인증코드 등록 -->
+	<insert id="insertEmailSend" parameterType="map" useGeneratedKeys="true" keyProperty="email_send_no" keyColumn="email_send_no">
+		<![CDATA[ /* SQL_ID : emailSend.insertEmailSend */ ]]>
+		insert into w_email_send(
+   			email_send_type,
+   			email,
+   			security_code,
+   			create_date
+    	)values(
+   			#{email_send_type},
+   			#{email},
+   			#{security_code},
+   			now()
+   		)
+   		<selectKey resultType="long" keyProperty="email_send_no" order="AFTER">
+			select last_insert_id();
+		</selectKey>
+	</insert>
+	
+	<!-- 인증코드 조회 -->
+	<select id="selectEmailSend" resultType="map" parameterType="map">
+		<![CDATA[ /* SQL_ID : emailSend.selectEmailSend */ ]]>
+		<![CDATA[
+			select *, if(create_date > date_add(now(), interval -24 hour), false, true) as 'expire_flag'
+			from w_email_send
+			where email = #{email}
+			and binary(security_code) = #{security_code}
+			order by email_send_no desc
+			limit 1
+		]]>
+	</select>
+	
+</mapper>
+
+

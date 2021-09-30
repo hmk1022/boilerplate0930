@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="payment">
+
+	<!-- 고객사 목록 -->
+	<select id="listPayment" resultType="map">
+		/* SQL_ID : payment.listPayment */
+		SELECT
+			wp.pay_no,
+			wp.admin_no,
+			wp.estimate_no,
+			wp.approval_no,
+			wp.work_no,
+			wp.amount_type,
+			wp.pay_type,
+			wp.total_pay_price,
+			wp.paid_amount,
+			wp.paid_date,
+			wp.stat,
+			wp.confirm_date,
+			wp.confirm_admin_no,
+			wp.remarks,
+			wp.create_no,
+			wp.create_date,
+			wp.update_no,
+			wp.update_date
+		FROM
+			w_abc_payment wp
+		WHERE 1=1
+		<if test="payment_name != null and payment_name != ''">
+			AND payment_name LIKE concat('%', #{payment_name}, '%')
+		</if>
+		ORDER BY 
+			wp.pay_no 
+		<if test="pageFirst != null and pageFirst != ''">	
+		LIMIT #{pageFirst}, #{pageLast}
+		</if>
+		
+	</select>
+	
+	<select id="listPaymentCnt" resultType="int">
+		
+		/* SQL_ID : payment.listPaymentCnt */
+		SELECT
+			count(1) as totalRecords
+		FROM
+			w_abc_payment wp
+		WHERE
+			1 = 1
+		<if test="payment_name != null and payment_name != ''">
+			AND payment_name LIKE concat('%', #{payment_name}, '%')
+		</if>			
+	</select>
+	
+	<select id="selectPayment" resultType="map">
+		/* SQL_ID : payment.listPayment */
+		SELECT
+			wp.pay_no,
+			wp.admin_no,
+			wp.estimate_no,
+			wp.approval_no,
+			wp.work_no,
+			wp.amount_type,
+			wp.pay_type,
+			wp.total_pay_price,
+			wp.paid_amount,
+			wp.paid_date,
+			wp.stat,
+			wp.confirm_date,
+			wp.confirm_admin_no,
+			wp.remarks,
+			wp.create_no,
+			wp.create_date,
+			wp.update_no,
+			wp.update_date
+		FROM
+			w_abc_payment wp
+		WHERE 
+			wp.pay_no = #{pay_no }
+			 
+	</select>
+	
+	<insert id="insertPayment" useGeneratedKeys="true" keyProperty="key_no">
+		/* SQL_ID : payment.insertPayment */
+		INSERT INTO w_abc_payment (
+			admin_no,
+			estimate_no,
+			approval_no,
+			work_no,
+			amount_type,
+			pay_type,
+			total_pay_price,
+			paid_amount,
+			paid_date,
+			stat,
+			confirm_date,
+			confirm_admin_no,
+			remarks,
+			create_no,
+			create_date,
+			update_no,
+			update_date
+		) VALUES (
+			#{admin_no},
+			#{estimate_no},
+			#{approval_no},
+			#{work_no},
+			#{amount_type},
+			#{pay_type},
+			#{total_pay_price},
+			#{paid_amount},
+			#{paid_date},
+			#{stat},
+			#{confirm_date},
+			#{confirm_admin_no},
+			#{remarks},
+			#{create_no},
+			now(),
+			#{update_no},
+			now()
+		)	
+	</insert>
+	
+	<update id="updatePayment">
+		/* SQL_ID : payment.updatePayment */
+		UPDATE w_abc_payment SET 
+			pay_no = #{pay_no},
+			admin_no = #{admin_no},
+			estimate_no = #{estimate_no},
+			approval_no = #{approval_no},
+			work_no = #{work_no},
+			amount_type = #{amount_type},
+			pay_type = #{pay_type},
+			total_pay_price = #{total_pay_price},
+			paid_amount = #{paid_amount},
+			paid_date = #{paid_date},
+			stat = #{stat},
+			confirm_date = #{confirm_date},
+			confirm_admin_no = #{confirm_admin_no},
+			remarks = #{remarks},
+			update_no = #{update_no},
+			update_date = now()
+		WHERE
+			pay_no = #{pay_no}
+	</update>
+		
+	<update id="deletePayment">
+		/* SQL_ID : payment.deletePayment */
+		UPDATE w_abc_payment SET 
+		    del_yn = #{del_yn},
+		    update_no = #{update_no},
+		    update_date = now()
+		WHERE
+			pay_no = #{pay_no}
+	</update>
+			
+</mapper>

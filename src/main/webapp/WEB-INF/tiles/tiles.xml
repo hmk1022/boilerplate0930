@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN" "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+
+<tiles-definitions>
+
+	<!-- 메인템플릿 -->
+	<definition name="main.index" template="/WEB-INF/layout/content.jsp">
+		<put-attribute name="title" value=":::WORKERMAN:::" />
+		<put-attribute name="active" value="" />
+		<put-attribute name="header" value="/WEB-INF/layout/header.jsp" />
+		<put-attribute name="body" value="" />
+		<put-attribute name="footer" value="/WEB-INF/layout/footer.jsp" />
+	</definition>
+
+	<!-- jsp 템플릿 -->
+	<definition name="view:/*/*"  extends="main.index">
+		<put-attribute name="body" value="/WEB-INF/views/{1}/{2}.jsp"/>
+	</definition>
+	<definition name="view:/*/*/*"  extends="main.index">
+		<put-attribute name="body" value="/WEB-INF/views/{1}/{2}/{3}.jsp"/>
+	</definition>
+	<definition name="view:/*/*/*/*"  extends="main.index">
+		<put-attribute name="body" value="/WEB-INF/views/{1}/{2}/{3}/{4}.jsp"/>
+	</definition>
+
+	<!-- ajax -->
+	<definition name="ajax:/*/*/*/*" template="/WEB-INF/views/{1}/{2}/{3}/{4}.jsp" />
+	<definition name="ajax:/*/*/*" template="/WEB-INF/views/{1}/{2}/{3}.jsp" />
+	<definition name="ajax:/*/*" template="/WEB-INF/views/{1}/{2}.jsp" />
+	<definition name="ajax:/*" template="/WEB-INF/views/k{1}.jsp" />
+
+
+	<!-- 팝업템플릿 -->
+	<definition name="pop" template="/WEB-INF/layout/pop.jsp">
+		<put-attribute name="title" value=":::WORKERMAN:::" />
+		<put-attribute name="active" value="" />
+		<put-attribute name="header" value="/WEB-INF/layout/header.jsp" />
+		<put-attribute name="body" value="" />
+		<put-attribute name="footer" value="/WEB-INF/layout/footer.jsp" />
+	</definition>
+
+	<!-- jsp 템플릿 -->
+	<definition name="pop:/*/*"  extends="pop">
+		<put-attribute name="body" value="/WEB-INF/views/{1}/{2}.jsp"/>
+	</definition>
+	<definition name="pop:/*/*/*"  extends="pop">
+		<put-attribute name="body" value="/WEB-INF/views/{1}/{2}/{3}.jsp"/>
+	</definition>
+	<definition name="pop:/*/*/*/*"  extends="pop">
+		<put-attribute name="body" value="/WEB-INF/views/{1}/{2}/{3}/{4}.jsp"/>
+	</definition>
+
+</tiles-definitions>

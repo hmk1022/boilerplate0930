@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="material_doc">
+
+	<select id="listMaterialDoc" resultType="map">
+		/* SQL_ID : material_doc.listMaterialDoc */
+		SELECT
+			wmd.material_doc_no,
+			wmd.material_doc_id,
+			wmd.material_no,
+			wmd.work_no,
+			wmd.manager_no,
+			F_GET_ADMIN_NAME(wmd.manager_no) manager_name,
+			wmd.use_date,
+			wmd.use_hh,
+			wmd.use_mm,
+			wmd.receive_type,
+			wmd.doc_stat,
+			dc.code_name as doc_stat_name,
+			wmd.doc_admin_no,
+			F_GET_ADMIN_NAME(wmd.doc_admin_no) doc_admin_name,
+			wmd.doc_date,
+			wmd.remarks,
+			wmd.req_usage,
+			wmd.confirm_admin_no,
+			F_GET_ADMIN_NAME(wmd.confirm_admin_no) confirm_admin_name,
+			wmd.confirm_date,
+			wmd.delivery_name,
+			wmd.del_yn,
+			wmd.create_no,
+			wmd.create_date,
+			wmd.update_no,
+			wmd.update_date,
+			ww.req_name,
+			ww.manager_admin_no,
+			ww.work_id,
+			ww.work_zip,
+			ww.work_addr1,
+			ww.work_addr2,
+			ww.req_name,
+			(SELECT SUM(material_cnt * purchased_price) FROM w_material_req WHERE material_doc_no = wmd.material_doc_no) total_amt,
+			(SELECT COUNT(material_cnt)-1
+				FROM w_material_req
+			WHERE material_doc_no = wmd.material_doc_no) material_cnt,
+			(
+			SELECT
+				IFNULL(b.material_name, a.material_name)
+			FROM w_material_req a LEFT JOIN w_material b ON (a.material_no = b.material_no)
+			WHERE a.material_doc_no = wmd.material_doc_no
+			ORDER BY a.material_req_no LIMIT 1
+			) material_name
+		FROM
+			w_material_doc wmd
+				left join w_work ww on (wmd.work_no = ww.work_no AND ww.delete_yn != 'Y')
+				left join (select code_value, code_name from w_code where code_gb = 'doc_stat') dc on dc.code_value = wmd.doc_stat 
+		WHERE 1=1
+		AND wmd.del_yn = 'N'
+		AND EXISTS (SELECT 'Y' FROM w_material_req wmr WHERE wmr.material_doc_no = wmd.material_doc_no)
+		<if test="s_material_doc_id != null and s_material_doc_id != ''">
+			AND wmd.material_doc_id LIKE concat('%', #{s_material_doc_id}, '%')
+		</if>
+		<if test="s_manager_name != null and s_manager_name != ''">
+			AND (
+					F_GET_ADMIN_NAME(wmd.manager_no) LIKE concat('%', #{s_manager_name}, '%')
+				OR F_GET_ADMIN_NAME(wmd.doc_admin_no) LIKE concat('%', #{s_manager_name}, '%')
+			)
+		</if>
+		<!-- 수령방법 조회  -->
+		<if test="s_receive_type != null and s_receive_type != ''">
+			AND wmd.receive_type = #{s_receive_type}
+		</if>
+		<!-- 요청상태 조회  -->
+		<if test="s_doc_stat != null and s_doc_stat != ''">
+			AND wmd.doc_stat = #{s_doc_stat}
+		</if>
+		<if test="s_start_dt != null and s_start_dt != ''">
+			<if test="s_end_dt != null and s_end_dt != ''">
+			AND wmd.use_date BETWEEN #{s_start_dt} AND #{s_end_dt}
+			</if>
+		</if>
+
+		ORDER BY wmd.material_doc_no DESC
+		<if test="pageFirst != null and pageFirst != ''">
+		LIMIT #{pageFirst}, #{pageLast}
+		</if>
+
+	</select>
+
+	<select id="listMaterialDocCnt" resultType="int">
+		/* SQL_ID : material_doc.listMaterialDocCnt */
+		SELECT
+			count(1) as totalRecords
+		FROM
+			w_material_doc wmd
+		WHERE
+			1 = 1
+		AND wmd.del_yn = 'N'	
+		AND EXISTS (SELECT 'Y' FROM w_material_req wmr WHERE wmr.material_doc_no = wmd.material_doc_no)
+		<if test="s_material_doc_id != null and s_material_doc_id != ''">
+			AND wmd.material_doc_id LIKE concat('%', #{s_material_doc_id}, '%')
+		</if>
+		<if test="s_manager_name != null and s_manager_name != ''">
+			AND (
+					F_GET_ADMIN_NAME(wmd.manager_no) LIKE concat('%', #{s_manager_name}, '%')
+				OR F_GET_ADMIN_NAME(wmd.doc_admin_no) LIKE concat('%', #{s_manager_name}, '%')
+			)
+		</if>
+		<!-- 수령방법 조회  -->
+		<if test="s_receive_type != null and s_receive_type != ''">
+			AND wmd.receive_type = #{s_receive_type}
+		</if>
+		<!-- 요청상태 조회  -->
+		<if test="s_doc_stat != null and s_doc_stat != ''">
+			AND wmd.doc_stat = #{s_doc_stat}
+		</if>
+		<if test="s_start_dt != null and s_start_dt != ''">
+			<if test="s_end_dt != null and s_end_dt != ''">
+			AND wmd.use_date BETWEEN #{s_start_dt} AND #{s_end_dt}
+			</if>
+		</if>
+	</select>
+
+	<select id="selectMaterialDoc" resultType="map">
+		/* SQL_ID : material_doc.selectMaterialDoc */
+		SELECT
+			wmd.material_doc_no,
+			wmd.material_doc_id,
+			wmd.material_no,
+			wmd.work_no,
+			wmd.manager_no,
+			F_GET_ADMIN_NAME(wmd.manager_no) manager_name,
+			wmd.use_date,
+			wmd.use_hh,
+			wmd.use_mm,
+			wmd.receive_type,
+			wmd.doc_stat,
+			wmd.material_cnt,
+			wmd.doc_admin_no,
+			F_GET_ADMIN_NAME(wmd.doc_admin_no) doc_admin_name,
+			wmd.doc_date,
+			wmd.remarks,
+			wmd.req_usage,
+			wmd.confirm_admin_no,
+			wmd.confirm_date,
+			wmd.delivery_name,
+			wmd.del_yn,
+			wmd.create_no,
+			wmd.create_date,
+			wmd.update_no,
+			wmd.update_date,
+			ww.req_name,
+			ww.manager_admin_no,
+			ww.work_id,
+			ww.work_zip,
+			ww.work_addr1,
+			ww.work_addr2,
+			concat(ww.work_addr1, ' ', ww.work_addr2) work_addr,
+			wa.admin_name create_name,
+			date_format(wmd.create_date, '%Y-%m-%d') create_str_date,
+			wa2.admin_name confirm_admin_name,
+			wa3.jandi_id,
+			wc.customer_name,
+			wcb.branch_name
+		FROM
+			w_material_doc wmd 
+				left join w_work ww on (wmd.work_no = ww.work_no AND ww.delete_yn != 'Y')
+				left join w_admin wa on (wmd.create_no = wa.admin_no)
+				left join w_admin wa2 on (wmd.confirm_admin_no = wa2.admin_no)
+				left join w_admin wa3 on (wmd.doc_admin_no = wa3.admin_no)
+				left join w_customer_branch wcb on(wcb.branch_no = ww.branch_no)
+				left join w_customer wc on(wc.customer_no = wcb.customer_no)
+		WHERE
+			wmd.material_doc_no = #{material_doc_no }
+
+	</select>
+
+	<select id="getMaterialDocId" resultType="string">
+		/* SQL_ID : vendor.getMaterialDocId */
+		SELECT
+			CONCAT('DOC_', date_format(now(), '%y%m'), '_', LPAD(IFNULL(MAX(material_doc_no), 0)+1, 3, '0')) material_doc_id
+		FROM
+			w_material_doc wm
+		FOR UPDATE
+	</select>
+
+	<insert id="insertMaterialDoc" useGeneratedKeys="true" keyProperty="material_doc_no">
+		/* SQL_ID : material_doc.insertMaterialDoc */
+		INSERT INTO w_material_doc (
+			material_doc_id,
+			material_no,
+			work_no,
+			manager_no,
+			use_date,
+			use_hh,
+			use_mm,
+			receive_type,
+			doc_stat,
+			material_cnt,
+			doc_admin_no,
+			doc_date,
+			req_usage,
+			remarks,
+			confirm_admin_no,
+			confirm_date,
+			delivery_name,
+			del_yn,
+			create_no,
+			create_date,
+			update_no,
+			update_date
+		) VALUES (
+			#{material_doc_id},
+			#{material_no},
+			#{work_no},
+			#{manager_no},
+			#{use_date},
+			#{use_hh},
+			#{use_mm},
+			#{receive_type},
+			#{doc_stat},
+			#{material_cnt},
+			#{doc_admin_no},
+			now(),
+			#{req_usage},
+			#{remarks},
+			#{confirm_admin_no},
+			#{confirm_date},
+			#{delivery_name},
+			#{del_yn},
+			#{create_no},
+			now(),
+			#{update_no},
+			now()
+		)
+	</insert>
+
+	<update id="updateMaterialDoc">
+		/* SQL_ID : material_doc.updateMaterialDoc */
+		UPDATE w_material_doc SET
+			work_no = #{work_no},
+			manager_no = #{manager_no},
+			use_date = #{use_date},
+			use_hh = #{use_hh},
+			use_mm = #{use_mm},
+			receive_type = #{receive_type},
+			update_no = #{update_no},
+			update_date = now()
+		WHERE
+			material_doc_no = #{material_doc_no}
+	</update>
+
+	<update id="deleteMaterialDoc">
+		/* SQL_ID : material_doc.deleteMaterialDoc */
+		UPDATE w_material_doc SET
+		    del_yn = #{del_yn},
+		    update_no = #{update_no},
+		    update_date = now()
+		WHERE
+			material_doc_no = #{material_doc_no}
+	</update>
+
+
+	<update id="updateDocStat">
+		/* SQL_ID : material_doc.updateDocStat */
+		UPDATE w_material_doc SET
+			doc_stat = #{doc_stat},
+			remarks = #{remarks},
+			delivery_name = #{delivery_name},
+			confirm_admin_no = #{confirm_admin_no},
+			confirm_date = now()
+		WHERE
+			material_doc_no = #{material_doc_no}
+	</update>
+
+
+</mapper>

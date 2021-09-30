@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>워커맨 Admin</title>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+    <meta content="" name="description">
+    <meta content="" name="author">
+    <link href="/assets/css/vendor.min.css" rel="stylesheet">
+    <link href="/assets/css/workman_admin.css" rel="stylesheet">
+    <link href="/assets/css/datepicker.css" rel="stylesheet">
+    <link href="/assets/css/jquery.gritter.css" rel="stylesheet">
+    <script src="/assets/js/vendor.min.js" type="text/javascript"></script>
+    <script src="/assets/js/app.min.js" type="text/javascript"></script>
+    <script src="/assets/js/moment.min.js" type="text/javascript"></script>
+    <script src="/assets/js/datepicker.js" type="text/javascript"></script>
+    <script>
+    $(document).ready(function() {
+        $('#reg_date_from,#reg_date_from2,#reg_date_to').val(moment().format('YYYY. MM. DD'));
+        $('#reg_date_from,#reg_date_from2,#reg_date_to').datepicker({
+           format: 'YYYY. MM. DD',
+           autoHide: true,
+        }); 
+    }); 
+    </script>
+</head>
+
+<body class="p-3">
+    <div class="card">
+        <div class="card-header">
+            <h3>자재요청서<span class="text-muted small d-block">각 일정별로 필요한 자재들을 요청할 수 있습니다</span></h3>
+        </div>
+        <div class="card-body">
+            <h5>기본 정보 입력</h5>
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                        <label class="form-label">작업선택 <span class="text-danger">*</span></label>
+                        <select class="form-select">
+                            <option value="">B2B_2105250001</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <label class="form-label">사용일(수령일) <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="reg_date_from" placeholder="연도. 월. 일.">
+                            <select class="form-select">
+                                <option value="">09시</option>
+                            </select>
+                            <select class="form-select">
+                                <option value="">00분</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 mt-3">
+                    <div class="form-group">
+                        <label class="form-label">고객(사)명</label>
+                        <input type="text" class="form-control" placeholder="100자 이내">
+                    </div>
+                </div>
+                <div class="col-6 mt-3">
+                    <div class="form-group">
+                        <label class="form-label">현장주소</label>
+                        <input type="text" class="form-control" placeholder="100자 이내">
+                    </div>
+                </div>
+                <div class="col-6 mt-3">
+                    <div class="form-group">
+                        <label class="form-label">담당자 <span class="text-danger">*</span></label>
+                        <select class="form-select">
+                            <option value="">선택</option>
+                            <option value="">option1</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-6 mt-3">
+                    <label class="form-label mb-2">수령방법 <span class="text-danger">*</span></label>
+                    <!--<div class="is-invalid">-->
+                    <div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="inlineRadio1" name="inlineRadio">
+                            <label class="form-check-label" for="inlineRadio1">물류센터 픽업</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="inlineRadio2" name="inlineRadio">
+                            <label class="form-check-label" for="inlineRadio2">우면동 사옥</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="inlineRadio3" name="inlineRadio">
+                            <label class="form-check-label" for="inlineRadio3">성수동 SBA</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="inlineRadio4" name="inlineRadio">
+                            <label class="form-check-label" for="inlineRadio4">현장배송</label>
+                        </div>
+                    </div>
+                    <div class="invalid-feedback">유효성체크 문구 자리</div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-primary btn-block">등록</button>
+        </div>
+    </div>
+</body>
+
+</html>

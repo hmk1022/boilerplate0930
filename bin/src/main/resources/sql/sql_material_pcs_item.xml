@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="material_pcs_item">
+
+	<select id="listMaterialPcsItem" resultType="map">
+		
+		/* SQL_ID : material_pcs_item.listMaterialPcsItem */
+		SELECT
+			wmpi.material_pcs_item_no,
+			wmpi.material_pcs_no,
+			wmpi.material_no,
+			wmpi.item_cnt,
+			wmpi.item_stat,
+			wmpi.del_yn,
+			wmpi.create_no,
+			wmpi.create_date,
+			wmpi.update_no,
+			wmpi.update_date, 
+			wm.material_id,
+			wm.material_name,
+			wm.unit_cd,
+			wm.purchased_price,
+			wm.workerman_price,
+			wm.brand_no,
+			(wmpi.item_cnt * wm.purchased_price)  * (case when wmp.vat_yn ='Y' then 1.1 else 1 end) total_purchased_price,
+			F_GET_BRAND_NAME(wm.brand_no) brand_name,
+			wm.house_cnt,
+			wm.sba_cnt,
+			wm.vehicle_cnt,
+			wmp.vendor_no,
+			wmp.bank_code,
+			wmp.acct,
+			wmp.evidence,
+			wmp.pcs_reason,
+			wmd.receive_type
+		FROM
+			w_material_pcs_item wmpi 
+				inner join w_material wm on (wmpi.material_no = wm.material_no)
+				inner join w_material_pcs wmp on (wmpi.material_pcs_no = wmp.material_pcs_no)
+				left join w_material_doc wmd ON (wmp.material_doc_no = wmd.material_doc_no)
+		WHERE 
+			wmpi.material_pcs_no = #{material_pcs_no}
+		AND wmpi.del_yn = 'N'	
+		ORDER BY 
+			wmpi.material_pcs_item_no 
+		
+	</select>
+	
+	
+	<insert id="insertMaterialPcsItem" useGeneratedKeys="true" keyProperty="key_no">
+		
+		/* SQL_ID : material_pcs_item.insertMaterialPcsItem */
+		INSERT INTO w_material_pcs_item (
+			material_pcs_no,
+			material_no,
+			item_cnt,
+			item_stat,
+			create_no,
+			create_date,
+			update_no,
+			update_date
+		) VALUES (
+			#{material_pcs_no},
+			#{material_no},
+			#{item_cnt},
+			#{item_stat},
+			#{create_no},
+			now(),
+			#{update_no},
+			now()
+		)
+	</insert>
+	
+	<update id="deleteMaterialPcsItem">
+		/* SQL_ID : material_pcs_item.deleteMaterialPcsItem */
+		DELETE FROM w_material_pcs_item 
+		WHERE
+			material_pcs_item_no = #{material_pcs_item_no}
+	</update>
+
+	<update id="updateMaterialPcsItemStat">
+		/* SQL_ID : material_pcs_item.updateMaterialPcsItemStat */
+		update w_material_pcs_item
+			SET req_stat =#{req_stat},
+			update_no = #{update_no},
+			update_date = now()
+		WHERE
+			material_pcs_item_no = #{material_pcs_item_no}
+	</update>
+			
+</mapper>

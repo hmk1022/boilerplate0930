@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="material_bound">
+
+	<select id="listMaterialBound" resultType="map">
+		/* SQL_ID : material_bound.listMaterialBound */
+		SELECT
+			wmp.material_bound_no,
+			wmp.material_bound_id,
+			-- wmp.bound_reason,
+			wmp.material_doc_no,
+			-- wmp.material_doc_admin_no,
+			-- F_GET_ADMIN_NAME(wmp.material_doc_admin_no) material_doc_admin_name,
+			wmp.vendor_no,
+			-- wmp.bank_code,
+			-- wmp.acct,
+			-- wmp.evidence,
+			-- wmp.vat_yn,
+			-- wmp.pay_req_date,
+			-- wmp.etc_remarks,
+			-- wmp.remarks,
+			wmp.bound_stat,
+			-- wmp.bound_sum_price,
+			wmp.del_yn,
+			wmp.create_no,
+			wmp.create_date,
+			wmp.update_no,
+			wmp.update_date,
+			wmp.bound_date
+			-- wmp.bound_sum_price
+		FROM
+			w_material_bound wmp
+		WHERE 1=1
+		<if test="material_bound_name != null and material_bound_name != ''">
+			AND material_bound_name LIKE concat('%', #{material_bound_name}, '%')
+		</if>
+		ORDER BY wmp.material_bound_no DESC
+		<if test="pageFirst != null and pageFirst != ''">
+		LIMIT #{pageFirst}, #{pageLast}
+		</if>
+
+	</select>
+
+	<select id="listMaterialBoundCnt" resultType="int">
+
+		/* SQL_ID : material_bound.listMaterialBoundCnt */
+		SELECT
+			count(1) as totalRecords
+		FROM
+			w_material_bound wmp
+		WHERE
+			1 = 1
+		<if test="material_bound_name != null and material_bound_name != ''">
+			AND material_bound_name LIKE concat('%', #{material_bound_name}, '%')
+		</if>
+	</select>
+
+	<select id="selectMaterialBound" resultType="map">
+		/* SQL_ID : material_bound.listMaterialBound */
+		SELECT
+			wmp.material_bound_no,
+			wmp.material_bound_id,
+			-- wmp.bound_reason,
+			-- wmp.material_doc_admin_no,
+			-- F_GET_ADMIN_NAME(wmp.material_doc_admin_no) material_doc_admin_name,
+			wmp.vendor_no,
+			-- wmp.bank_code,
+			wmp.acct,
+			wmp.evidence,
+			wmp.vat_yn,
+			wmp.pay_req_date,
+			wmp.etc_remarks,
+			wmp.remarks,
+			wmp.bound_stat,
+			wmp.bound_sum_price,
+			wmp.del_yn,
+			wmp.create_no,
+			wmp.create_date,
+			wmp.update_no,
+			wmp.update_date,
+			wv.vendor_name,
+			wv.vendor_hp1,
+			wv.bank_code ,
+			wv.acct,
+			ww.work_id,
+			ww.req_name
+		FROM
+			w_material_bound wmp
+				left join w_vendor wv on (wmp.vendor_no = wv.vendor_no)
+				left join w_material_doc wm on (wm.material_doc_no = wmp.material_doc_no)
+				left join w_work ww on (wm.work_no = ww.work_no AND ww.delete_yn != 'Y')
+		WHERE
+			wmp.material_bound_no = #{material_bound_no }
+
+	</select>
+
+	<select id="getMaterialBoundId" resultType="string">
+		/* SQL_ID : vendor.getMaterialBoundId */
+		SELECT
+			CONCAT(CASE WHEN #{bound_type}='01' THEN 'BIN_' WHEN #{bound_type}='02' THEN 'BOT_' ELSE 'XXX' END , date_format(now(), '%y%m'), '_', LPAD(IFNULL(MAX(material_bound_no), 0)+1, 4, '0')) material_bound_id
+		FROM
+			w_material_bound wm
+		FOR UPDATE
+	</select>
+
+	<insert id="insertMaterialBound" useGeneratedKeys="true" keyProperty="key_no">
+		/* SQL_ID : material_bound.insertMaterialBound */
+		INSERT INTO w_material_bound (
+			material_bound_id,
+			bound_date,
+			bound_type,
+			bound_locate,
+			income_type,
+			material_no,
+			work_no,
+			vendor_no,
+			out_type,
+			out_admin_no,
+			material_pcs_no,
+			material_doc_no,
+			bound_stat,
+			etc_remarks,
+			create_no,
+			create_date,
+			update_no,
+			update_date
+		) VALUES (
+			#{material_bound_id},
+			#{bound_date},
+			#{bound_type},
+			#{bound_locate},
+			#{income_type},
+			#{material_no},
+			#{work_no},
+			#{vendor_no},
+			#{out_type},
+			#{out_admin_no},
+			#{material_pcs_no},
+			#{material_doc_no},
+			#{bound_stat},
+			#{etc_remarks},
+			#{create_no},
+			now(),
+			#{update_no},
+			now()
+		)
+	</insert>
+
+	<update id="updateMaterialBound">
+		/* SQL_ID : material_bound.updateMaterialBound */
+		UPDATE w_material_bound SET
+			bound_date= #{bound_date},
+			bound_type= #{bound_type},
+			bound_locate= #{bound_locate},
+			income_type= #{income_type},
+			material_no= #{material_no},
+			work_no= #{work_no},
+			vendor_no= #{vendor_no},
+			out_type= #{out_type},
+			out_admin_no= #{out_admin_no},
+			material_pcs_no= #{material_pcs_no},
+			material_doc_no= #{material_doc_no},
+			bound_stat= #{bound_stat},
+			etc_remarks= #{etc_remarks},
+			update_no= #{update_no},
+			update_date= now()
+		WHERE
+			material_bound_no = #{material_bound_no}
+	</update>
+
+	<update id="deleteMaterialBound">
+		/* SQL_ID : material_bound.deleteMaterialBound */
+		UPDATE w_material_bound SET
+		    del_yn = #{del_yn},
+		    update_no = #{update_no},
+		    update_date = now()
+		WHERE
+			material_bound_no = #{material_bound_no}
+	</update>
+
+
+	<update id="updateMaterialBoundStat">
+		/* SQL_ID : material_bound.updateMaterialBoundStat */
+		UPDATE w_material_bound SET
+			bound_stat = #{bound_stat},
+			update_no = #{update_no},
+			update_date = now()
+		WHERE
+			material_bound_no = #{material_bound_no}
+	</update>
+
+	<update id="updateMaterialBoundSumPrice">
+		/* SQL_ID : material_bound.updateMaterialBoundSumPrice */
+		UPDATE w_material_bound wmb SET
+			material_bound_amt = (
+				SELECT
+				SUM(b.purchased_price)
+				FROM
+					w_material_bound_inout a INNER JOIN w_material b on(a.material_no=b.material_no)
+				WHERE
+					a.material_bound_no = #{material_bound_no}
+			),
+			material_bound_cnt = (
+				SELECT
+				SUM(a.inout_cnt)
+				FROM
+					w_material_bound_inout a
+				WHERE
+					a.material_bound_no = #{material_bound_no}
+			),
+			update_no = #{update_no},
+			update_date = now()
+		WHERE
+			material_bound_no =#{material_bound_no}
+	</update>
+
+
+	<select id="getMaterialBoundDocNo" resultType="long">
+
+		/* SQL_ID : material_bound.getMaterialBoundDocNo */
+		SELECT
+			material_bound_no as material_bound_no
+		FROM
+			w_material_bound wmp
+		WHERE
+			material_doc_no = #{material_doc_no}
+	</select>
+
+
+	<select id="getMaterialBoundPcsNo" resultType="long">
+
+		/* SQL_ID : material_bound.getMaterialBoundPcsNo */
+		SELECT
+			material_bound_no as material_bound_no
+		FROM
+			w_material_bound wmp
+		WHERE
+			material_pcs_no = #{material_pcs_no}
+	</select>
+
+</mapper>

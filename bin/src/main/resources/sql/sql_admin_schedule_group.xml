@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="adminScheduleGroup">
+
+	<!-- 스케줄그룹등록 -->
+	<insert id="insertAdminScheduleGroup" parameterType="map" keyProperty="schedule_group_no" keyColumn="schedule_group_no">
+		<![CDATA[ /* SQL_ID : adminScheduleGroup.insertAdminScheduleGroup */ ]]>
+		insert into w_abc_admin_schedule_group (
+			work_no,
+			admin_no,
+			workerman_type,
+			schedule_type,
+			working_time,
+			gubun,
+			schedule_stat,
+			create_date
+		) values (
+			#{work_no},
+			#{admin_no},
+			#{workerman_type},
+			#{schedule_type},
+			#{working_time},
+			#{gubun},
+			#{schedule_stat},
+			now()
+		)
+
+		<selectKey  keyProperty="schedule_group_no" resultType="long">
+			select last_insert_id();
+		</selectKey>
+
+	</insert>
+
+	<!-- 스케줄그룹삭제 -->
+	<delete id="deleteAdminScheduleGroup" parameterType="map">
+		<![CDATA[ /* SQL_ID : adminScheduleGroup.deleteAdminScheduleGroup */ ]]>
+		delete from w_abc_admin_schedule_group
+		where
+		 	work_no = #{work_no}
+			<if test=" null != work_type and '' != work_type ">
+				<if test=" '01' == work_type ">
+					and schedule_type in (01,03)
+				</if>
+				<if test=" '02' == work_type ">
+					and schedule_type in (02,04)
+				</if>
+			</if>
+	</delete>
+
+	<!-- 스케줄그룹스케줄타입갱신 -->
+	<update id="updateAdminScheduleGroupByScheduleGroupNo" parameterType="map">
+		<![CDATA[ /* SQL_ID : adminScheduleGroup.updateAdminScheduleGroup */ ]]>
+		update w_abc_admin_schedule_group
+		set
+			update_date = now()
+			<if test=" null != schedule_type and '' != schedule_type ">
+			,schedule_type = #{schedule_type}
+			</if>
+			<if test=" null != schedule_stat and '' != schedule_stat ">
+			,schedule_stat = #{schedule_stat}
+			</if>
+		WHERE schedule_group_no = #{schedule_group_no}
+	</update>
+
+	<!-- 스케줄그룹스케줄타입갱신 -->
+	<update id="updateAdminScheduleGroupByWorkNo" parameterType="map">
+		<![CDATA[ /* SQL_ID : adminScheduleGroup.updateAdminScheduleGroup */ ]]>
+		update w_abc_admin_schedule_group
+		set
+			update_date = now()
+			<if test=" null != schedule_type and '' != schedule_type ">
+			,schedule_type = #{schedule_type}
+			</if>
+			<if test=" null != schedule_stat and '' != schedule_stat ">
+			,schedule_stat = #{schedule_stat}
+			</if>
+		WHERE work_no = #{work_no}
+	</update>
+
+
+
+	<select id="selectAdminScheduleGroupInfo" parameterType="map" resultType="map">
+		SELECT
+			*
+		FROM
+			w_abc_admin_schedule_group
+		WHERE
+			1=1
+			<if test=" null != work_no and '' != work_no ">
+			and work_no = #{work_no}
+			</if>
+
+			<if test=" null != schedule_type and '' != schedule_type ">
+			and schedule_type = #{schedule_type}
+			</if>
+
+	</select>
+
+</mapper>
+
+

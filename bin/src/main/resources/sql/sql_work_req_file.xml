@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="workReqFile">
+
+	<!-- 작업 요청 파일리스트 조회 -->
+	<select id="selectWorkReqFileList" parameterType="map" resultType="WorkResFileDataVo">
+		<![CDATA[ /* SQL_ID : workReqFile.selectWorkReqFileList */ ]]>
+		select *
+		from w_work_req_file
+		where work_no = #{work_no}
+	</select>
+
+	<!-- 작업 요청 파일 등록 -->
+	<insert id="insertWorkReqFile" parameterType="map" useGeneratedKeys="true" keyProperty="file_no" keyColumn="file_no">
+		<![CDATA[ /* SQL_ID : workReqFile.insertWorkReqFile */ ]]>
+		insert into w_work_req_file
+			(
+				work_no,
+				file_url,
+				create_date
+			)
+		values
+			(
+				#{work_no},
+				#{file_url},
+				now()
+			)
+			
+		<selectKey resultType="long" keyProperty="file_no" order="AFTER">
+			select last_insert_id() as file_no
+		</selectKey>
+	</insert>
+	
+</mapper>
+
+

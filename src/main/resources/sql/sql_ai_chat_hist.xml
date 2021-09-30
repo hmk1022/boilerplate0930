@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="aiChatHist">
+
+	<!-- 대화이력 -->
+	<select id="selectAiChatHistList" parameterType="map" resultType="ChatHistDataVo">
+		<![CDATA[ /* SQL_ID : aiChatHist.selectAiChatHistList */ ]]>
+		select v.* from (
+			select * from w_ai_chat_hist where member_no = #{member_no} order by create_date desc limit 20
+		) v order by v.create_date asc, v.ch_no asc
+	</select>
+	
+	<!-- 대화이력등록 -->
+	<insert id="insertAiChatHist" parameterType="map">
+		<![CDATA[ /* SQL_ID : aiChatHist.insertAiChatHist */ ]]>
+		insert into w_ai_chat_hist(
+			member_no,
+			ment_no,
+			msg,
+			msg_type,
+			img_path,
+			req_yn,
+			create_date
+		)values(
+			#{member_no},
+			#{ment_no},
+			#{msg},
+			#{msg_type},
+			#{img_path},
+			#{req_yn},
+			now()
+		)
+	</insert>
+	
+	
+</mapper>
+
+

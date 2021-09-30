@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="estimate">
+	<select id="listEstimate" resultType="map">
+		/* SQL_ID : estimate.listEstimate */
+		SELECT
+			wve.estimate_no,
+			wve.version_no,
+			wve.admin_no,
+			wve.work_no,
+			wve.stat,
+			wve.estimate_date,
+			wve.apply_admin_no,
+			wve.apply_date,
+			wve.del_yn,
+			wve.create_no,
+			wve.create_date,
+			wve.update_no,
+			wve.update_date,
+			wver.resource_no,
+			wver.resource_type,
+			wver.resource_name,
+			wver.resource_standard,
+			wver.resource_count,
+			wver.unit_cd,
+			FORMAT(wver.unit_price,0) as unit_price,
+			wver.est_resource_count,
+			wver.est_unit_cd,
+			FORMAT(wver.est_unit_price,0) as est_unit_price,
+			wver.del_yn,
+			wver.create_no,
+			wver.create_date,
+			wver.update_no,
+			wver.update_date
+		FROM
+			w_version_estimate wve
+				inner join w_version_estimate_resource wver on (wve.estimate_no = wver.estimate_no)
+		WHERE
+			wve.work_no = #{work_no}
+		AND wve.version_no = #{version_no}
+		AND   wver.del_yn != 'Y'
+		ORDER BY
+			wve.estimate_no, wver.resource_no
+	</select>
+
+	<select id="getEstimateVersion" resultType="int">
+		SELECT
+				IFNULL(MAX(version_no), 0) +1
+			FROM
+				w_version_estimate
+			WHERE
+				work_no = #{work_no}
+	</select>
+
+	<insert id="insertEstimate" useGeneratedKeys="true" keyProperty="key_no">
+		/* SQL_ID : estimate.insertEstimate */
+		INSERT INTO w_version_estimate (
+			version_no,
+			admin_no,
+			work_no,
+			stat,
+			estimate_date,
+			apply_admin_no,
+			apply_date,
+			del_yn,
+			create_no,
+			create_date,
+			update_no,
+			update_date
+		) VALUES (
+			#{version_no},
+			#{admin_no},
+			#{work_no},
+			#{stat},
+			#{estimate_date},
+			#{apply_admin_no},
+			#{apply_date},
+			#{del_yn},
+			#{create_no},
+			now(),
+			#{update_no},
+			now()
+		)
+	</insert>
+
+	<update id="updateEstimate">
+		/* SQL_ID : estimate.updateEstimate */
+		UPDATE w_version_estimate SET
+			version_no = #{version_no},
+			admin_no = #{admin_no},
+			work_no = #{work_no},
+			stat = #{stat},
+			estimate_date = #{estimate_date},
+			apply_admin_no = #{apply_admin_no},
+			apply_date = #{apply_date},
+			update_no = #{update_no},
+			update_date = now()
+		WHERE
+			estimate_no = #{estimate_no}
+	</update>
+
+	<update id="deleteEstimate">
+		/* SQL_ID : estimate.deleteEstimate */
+		UPDATE w_version_estimate SET
+		    del_yn = #{del_yn},
+		    update_no = #{update_no},
+		    update_date = now()
+		WHERE
+			estimate_no = #{estimate_no}
+	</update>
+	<select id="selectEstimateVersionList" resultType="map">
+		/* SQL_ID : estimate.selectEstimateVersionList */
+		SELECT IFNULL( ww.p_work_no, ww.work_no ) AS work_no,
+		       wve.estimate_no,
+		       wve.version_no ,
+		       MAX(wve.stat) AS stat,
+		       MAX(wve.apply_date) AS apply_date ,
+		       SUM(wver.resource_count*wver.unit_price) AS total_unit_price,
+		       SUM(wver.resource_count*wver.est_unit_price) AS total_est_unit_price,
+		       MAX(ww.work_id) AS work_id
+		FROM w_version_estimate wve
+		INNER JOIN w_version_estimate_resource wver ON wve.estimate_no = wver.estimate_no
+		INNER JOIN w_work ww ON ww.work_no = wve.work_no AND ww.delete_yn != 'Y'
+		WHERE IFNULL(ww.p_work_no, ww.work_no) = #{work_no}
+		AND wver.del_yn != 'Y'
+		GROUP BY IFNULL(ww.p_work_no, ww.work_no ),wve.version_no
+		ORDER BY ww.work_no DESC ,wve.version_no DESC
+	</select>
+	<select id="selectEstimate" resultType="map">
+		SELECT
+			estimate_no
+			,version_no
+			,admin_no
+			,work_no
+			,stat
+			,estimate_date
+			,apply_admin_no
+			,apply_date
+			,del_yn
+			,create_no
+			,create_date
+			,update_no
+			,update_date
+		FROM
+			w_version_estimate
+		<where>
+			<if test='estimate_no != null and estimate_no != "" '>
+				AND	estimate_no = #{estimate_no}
+			</if>
+			<if test='work_no != null and work_no != "" and version_no != null and version_no != ""  '>
+				AND work_no = #{work_no}
+				AND version_no = #{version_no}
+			</if>
+		</where>
+	</select>
+	<update id="applyEstimate">
+		/* SQL_ID : estimate.updateEstimate */
+		UPDATE w_version_estimate  wve INNER JOIN w_work ww ON ww.work_no = wve.work_no
+		SET
+			wve.stat = 30,
+			wve.apply_admin_no = #{apply_admin_no},
+			wve.apply_date = now(),
+			wve.update_no = #{update_no},
+			wve.update_date = now()
+		WHERE
+			IFNULL(ww.p_work_no,ww.work_no) = #{work_no}
+		AND wve.version_no = #{version_no}
+	</update>
+	<update id="initApplyEstimate">
+		/* SQL_ID : estimate.updateEstimate */
+		UPDATE w_version_estimate  wve INNER JOIN w_work ww ON ww.work_no = wve.work_no
+		SET
+			wve.stat = null,
+			wve.apply_admin_no = null,
+			wve.apply_date = null,
+			wve.update_no = #{update_no},
+			wve.update_date = now()
+		WHERE
+			IFNULL(ww.p_work_no,ww.work_no) = #{work_no}
+	</update>
+
+	<select id="selectEstimateTotalAmount" resultType="map">
+		SELECT
+		       SUM(wver.resource_count*wver.unit_price) AS total_unit_price,
+		       SUM(wver.resource_count*wver.est_unit_price) AS total_est_unit_price
+		FROM w_version_estimate wve
+		INNER JOIN w_version_estimate_resource wver ON wve.estimate_no = wver.estimate_no
+		INNER JOIN w_work ww ON ww.work_no = wve.work_no AND ww.delete_yn != 'Y'
+		WHERE apply_date IS NOT NULL
+		AND wver.del_yn != 'Y'
+		AND IFNULL(ww.p_work_no,ww.work_no) = #{work_no}
+		GROUP BY IFNULL(ww.p_work_no,ww.work_no)
+	</select>
+
+</mapper>

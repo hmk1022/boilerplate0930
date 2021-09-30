@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="work">
+
+	<!-- 작업 요청 리스트 조회 -->
+	<select id="selectWorkList" parameterType="map" resultType="map">
+		<![CDATA[ /* SQL_ID : work.selectWorkList */ ]]>
+
+		SELECT
+			ww.work_no,
+			ww.p_work_no,
+			ww.work_id,
+			ww.member_no,
+			ww.admin_no,
+			ww.manager_admin_no,
+			ww.req_path,
+			ww.req_name,
+			ww.work_stat,
+			ww.work_target,
+			ww.req_hp,
+			ww.work_zip,
+			ww.work_addr1,
+			ww.work_addr2,
+			ww.work_addr_cd,
+			ww.req_content,
+			ww.req_visit_date,
+			ww.req_visit_date_type,
+			ww.st_working_date,
+			ww.ed_working_date,
+			ww.location_name,
+			ww.cancel_admin_no,
+			ww.easy_pay_yn,
+			ww.pay_type,
+			ww.pay_stat,
+			ww.pay_hp,
+			ww.pay_name,
+			ww.pay_req_date,
+			ww.pay_date,
+			ww.pay_amount,
+			ww.pay_card_quota,
+			ww.pay_admin_no,
+			ww.pay_confirm_admin_no,
+			ww.pay_confirm_date,
+			ww.pay_bill_stat,
+			ww.pay_bill_type,
+			ww.pay_bill_number,
+			ww.work_confirm_yn,
+			ww.admin_memo,
+			ww.wait_yn,
+			ww.wait_reason,
+			ww.wait_cd,
+			ww.wait_expire_date,
+			ww.channel,
+			ww.call_cnt,
+			ww.last_call_date,
+			ww.workerman_memo,
+			ww.use_yn,
+			ww.category_no,
+			ww.req_img_stat,
+			ww.new_yn,
+			ww.req_w_date_ymd,
+			ww.req_w_date_h,
+			ww.req_w_date_m,
+			ww.garbage_agree_yn,
+			ww.time_msg_yn,
+			ww.loc_msg_yn,
+			ww.create_date,
+			ww.refuse_pictures_yn,
+			ww.update_date,
+			ww.delete_yn,
+			ww.delete_date,
+			ww.delete_req_name,
+			ww.delete_memo,
+			ww.update_admin_no,
+			wc.customer_name,
+			wcb.branch_name,
+			wcb.manager_name
+		FROM
+			w_work ww
+				left join w_customer_branch wcb on(wcb.branch_no = ww.branch_no)
+				left join w_customer wc on(wc.customer_no = wcb.customer_no)
+		WHERE
+			ww.work_stat NOT IN ('35', '19', '99')
+		AND ww.work_target IN ('01','03','04')
+		AND ww.delete_yn != 'Y'
+		<choose>
+		<when test='work_no != null and work_no != "" '>
+			AND IFNULL(ww.p_work_no,ww.work_no) = #{work_no}
+			ORDER BY work_no
+		</when>
+		<otherwise>
+		ORDER BY work_no DESC
+		</otherwise>
+		</choose>
+
+	</select>
+
+	<!-- 작업 요청 리스트 조회 -->
+	<select id="selectWorkParentList" parameterType="map" resultType="map">
+		<![CDATA[ /* SQL_ID : work.selectWorkList */ ]]>
+
+		SELECT
+			ww.work_no,
+			ww.p_work_no,
+			ww.work_id,
+			ww.member_no,
+			ww.admin_no,
+			ww.manager_admin_no,
+			ww.req_path,
+			ww.req_name,
+			ww.work_stat,
+			ww.work_target,
+			ww.req_hp,
+			ww.work_zip,
+			ww.work_addr1,
+			ww.work_addr2,
+			ww.work_addr_cd,
+			ww.req_content,
+			ww.req_visit_date,
+			ww.req_visit_date_type,
+			ww.st_working_date,
+			ww.ed_working_date,
+			ww.location_name,
+			ww.cancel_admin_no,
+			ww.easy_pay_yn,
+			ww.pay_type,
+			ww.pay_stat,
+			ww.pay_hp,
+			ww.pay_name,
+			ww.pay_req_date,
+			ww.pay_date,
+			ww.pay_amount,
+			ww.pay_card_quota,
+			ww.pay_admin_no,
+			ww.pay_confirm_admin_no,
+			ww.pay_confirm_date,
+			ww.pay_bill_stat,
+			ww.pay_bill_type,
+			ww.pay_bill_number,
+			ww.work_confirm_yn,
+			ww.admin_memo,
+			ww.wait_yn,
+			ww.wait_reason,
+			ww.wait_cd,
+			ww.wait_expire_date,
+			ww.channel,
+			ww.call_cnt,
+			ww.last_call_date,
+			ww.workerman_memo,
+			ww.use_yn,
+			ww.category_no,
+			ww.req_img_stat,
+			ww.new_yn,
+			ww.req_w_date_ymd,
+			ww.req_w_date_h,
+			ww.req_w_date_m,
+			ww.garbage_agree_yn,
+			ww.time_msg_yn,
+			ww.loc_msg_yn,
+			ww.create_date,
+			ww.refuse_pictures_yn,
+			ww.update_date,
+			ww.delete_yn,
+			ww.delete_date,
+			ww.delete_req_name,
+			ww.delete_memo,
+			ww.update_admin_no,
+			(SELECT estimate_no FROM w_version_estimate WHERE work_no = ww.work_no LIMIT 1) estimate_no
+		FROM
+			w_work ww
+		WHERE
+			ww.work_no = #{work_no } or ww.p_work_no = #{work_no }
+		AND ww.delete_yn != 'Y'
+		ORDER BY work_no
+
+	</select>
+
+	<!-- 작업 관련 어드민 리스트 조회 -->
+	<select id="selectWorkAdminList" parameterType="map" resultType="map">
+		<![CDATA[ /* SQL_ID : work.selectWorkAdminList */ ]]>
+		SELECT
+			ww.work_no,
+			ww.manager_admin_no admin_no,
+			wa.admin_name
+		FROM
+			w_work ww left join w_admin wa on (ww.manager_admin_no = wa.admin_no)
+		WHERE
+			ww.work_no = #{work_no } or ww.p_work_no =#{work_no }
+		AND ww.delete_yn != 'Y'
+		UNION
+		SELECT
+			waas.work_no ,
+			waas.admin_no ,
+			wa.admin_name
+		FROM
+			w_abc_admin_schedule waas
+			left join w_admin wa on (waas.admin_no = wa.admin_no)
+		WHERE work_no = #{work_no }
+			UNION
+		SELECT
+			waas.work_no ,
+			waas.admin_no ,
+			wa.admin_name
+		FROM
+			w_admin_schedule waas
+			left join w_admin wa on (waas.admin_no = wa.admin_no)
+		WHERE work_no = #{work_no }
+		ORDER BY admin_name DESC
+	</select>
+	
+	<!-- 작업 요청 리스트 조회 autocomplete -->
+	<select id="selectAutoWorkList" parameterType="map" resultType="map">
+		<![CDATA[ /* SQL_ID : work.selectAutoWorkList */ ]]>
+
+		SELECT
+			ww.work_no,
+			ww.p_work_no,
+			ww.work_id,
+			ww.member_no,
+			ww.admin_no,
+			ww.manager_admin_no,
+			ww.req_path,
+			ww.req_name,
+			ww.work_stat,
+			ww.work_target,
+			ww.req_hp,
+			ww.work_zip,
+			ww.work_addr1,
+			ww.work_addr2,
+			ww.work_addr_cd,
+			ww.req_content,
+			ww.req_visit_date,
+			ww.req_visit_date_type,
+			ww.st_working_date,
+			ww.ed_working_date,
+			ww.location_name,
+			ww.cancel_admin_no,
+			ww.easy_pay_yn,
+			ww.pay_type,
+			ww.pay_stat,
+			ww.pay_hp,
+			ww.pay_name,
+			ww.pay_req_date,
+			ww.pay_date,
+			ww.pay_amount,
+			ww.pay_card_quota,
+			ww.pay_admin_no,
+			ww.pay_confirm_admin_no,
+			ww.pay_confirm_date,
+			ww.pay_bill_stat,
+			ww.pay_bill_type,
+			ww.pay_bill_number,
+			ww.work_confirm_yn,
+			ww.admin_memo,
+			ww.wait_yn,
+			ww.wait_reason,
+			ww.wait_cd,
+			ww.wait_expire_date,
+			ww.channel,
+			ww.call_cnt,
+			ww.last_call_date,
+			ww.workerman_memo,
+			ww.use_yn,
+			ww.category_no,
+			ww.req_img_stat,
+			ww.new_yn,
+			ww.req_w_date_ymd,
+			ww.req_w_date_h,
+			ww.req_w_date_m,
+			ww.garbage_agree_yn,
+			ww.time_msg_yn,
+			ww.loc_msg_yn,
+			ww.create_date,
+			ww.refuse_pictures_yn,
+			ww.update_date,
+			ww.delete_yn,
+			ww.delete_date,
+			ww.delete_req_name,
+			ww.delete_memo,
+			ww.update_admin_no,
+			wc.customer_name,
+			wcb.branch_name,
+			wcb.manager_name
+		FROM
+			w_work ww
+				left join w_customer_branch wcb on(wcb.branch_no = ww.branch_no)
+				left join w_customer wc on(wc.customer_no = wcb.customer_no)
+		WHERE
+			ww.work_target IN ('01','03','04')
+		AND ww.delete_yn != 'Y'
+		<if test='s_work_name != null and s_work_name != "" '>
+		AND (
+			ww.work_id LIKE CONCAT('%', #{s_work_name},'%')
+			OR ww.req_name LIKE CONCAT('%', #{s_work_name},'%')
+			OR ww.location_name LIKE CONCAT('%', #{s_work_name},'%')
+			OR wcb.branch_name LIKE CONCAT('%', #{s_work_name},'%')
+		)	
+		</if>
+		ORDER BY ww.work_no DESC
+
+	</select>	
+</mapper>
+
+

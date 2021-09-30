@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="role">
+
+    <!-- 서비스별권한목록 -->
+    <select id="selectRoleList" parameterType="map" resultType="map">
+    	<![CDATA[ /* SQL_ID : role.selectRoleList */ ]]>
+    	select wr.* ,
+    	(select count(*) from w_role_admin where role_no = wr.role_no) as r_cnt,
+    	wa1.admin_id as create_id,
+		wa1.admin_name as create_nm,
+		wa2.admin_id as update_id,
+		wa2.admin_name as update_name
+		from w_role wr
+		join w_admin wa1 on(wr.create_no = wa1.admin_no)
+		left join w_admin wa2 on(wr.update_no = wa2.admin_no)
+		where 1=1
+		<if test='keyword != null and keyword != "" '>
+		and name like '%${role_keyword}%'
+		</if>
+		order by wr.create_date desc
+    </select>
+
+	<!-- abc 권한목록 -->
+    <select id="selectAbcRoleList" parameterType="map" resultType="map">
+    	<![CDATA[ /* SQL_ID : role.selectAbcRoleList */ ]]>
+    	select wr.* ,
+    	(select count(*) from w_abc_role_admin where role_no = wr.role_no) as r_cnt,
+    	wa1.admin_id as create_id,
+		wa1.admin_name as create_nm,
+		wa2.admin_id as update_id,
+		wa2.admin_name as update_name
+		from w_abc_role wr
+		join w_admin wa1 on(wr.create_no = wa1.admin_no)
+		left join w_admin wa2 on(wr.update_no = wa2.admin_no)
+		where 1=1
+		<if test='keyword != null and keyword != "" '>
+		and name like '%${role_keyword}%'
+		</if>
+		order by wr.create_date desc
+    </select>
+	
+	
+	<!-- 권한등록 -->
+    <insert id="insertRole" parameterType="map" useGeneratedKeys="true" keyProperty="role_no" keyColumn="role_no">
+    	<![CDATA[ /* SQL_ID : role.insertRole */ ]]>
+		<selectKey resultType="Integer" keyProperty="role_no" order="BEFORE">
+		   SELECT MAX(role_no) + 1 as role_no FROM w_abc_role	
+		</selectKey>
+    	insert into w_abc_role(
+			role_no,
+	    	name,
+	    	create_no, 
+	    	create_date
+    	) values(
+			#{role_no},
+	    	#{name},
+	    	#{admin_no}, 
+	    	now()
+    	)
+    </insert>
+	
+	<!-- 권한수정 -->
+    <update id="updateRole" parameterType="map" >
+    	<![CDATA[ /* SQL_ID : role.insertRole */ ]]>
+    	update w_abc_role set
+			name = #{name},
+			update_no = #{admin_no},
+			update_date= now()
+		where role_no = #{role_no}
+    </update>
+	
+	<!-- 권한삭제 -->
+    <delete id="deleteRole" parameterType="map">
+    	<![CDATA[ /* SQL_ID : role.deleteRole */ ]]>
+    	delete from w_abc_role where role_no = #{role_no}
+    </delete>
+	
+	<!-- 권한선택 -->
+	<select id="selectRole" parameterType="map" resultType="map">
+    	select 
+			name,
+			role_no 
+			from 
+		w_abc_role 
+		where role_no = #{role_no};
+    </select>
+
+	<!-- 권한명 조회 -->
+	<select id="selectRoleName" parameterType="map" resultType="map">
+    		select 
+				role_no,
+				name 
+			from w_abc_role;
+    </select>
+	
+	<!-- 권한없는 id조회 -->
+	<select id="selectNoRole" parameterType="map" resultType="map">
+    		select 
+				admin_no,
+				admin_id,
+				admin_name
+			from w_admin
+			where admin_type = '01'
+			and stat = '00';
+<!--select 
+				wa.admin_no,
+				wa.admin_id,
+				wa.admin_name
+			from w_admin wa
+			left join w_role_admin wra on wa.admin_no = wra.admin_no
+			where wra.admin_no IS NULL;-->
+    </select>
+	
+	<!-- 관리자 권한추가 -->
+	 <insert id="insertRoleAdmin" parameterType="map" >
+    	<![CDATA[ /* SQL_ID : role.insertRoleAdmin */ ]]>
+    	insert into w_abc_role_admin(
+	    	role_no,
+			admin_no,
+			create_no,
+			update_no,
+			create_date,
+			update_date
+    	) values(
+			#{selcted_role_no},
+			#{admin_no},
+			#{create_no},
+			null,
+			now(),
+			null
+    	)
+    </insert>
+	
+    <!-- 서비스별권한목록cnt -->
+    <select id="selectRoleListCnt" parameterType="map" resultType="int">
+    	<![CDATA[ /* SQL_ID : role.selectRoleListCnt */ ]]>
+    	select count(*)
+		from w_role wr
+		join w_admin wa1 on(wr.create_no = wa1.admin_no)
+		left join w_admin wa2 on(wr.update_no = wa2.admin_no)
+		where 1=1
+		<if test='keyword != null and keyword != "" '>
+		and name like '%${role_keyword}%'
+		</if>
+    </select>
+
+	<!-- abc 서비스별권한목록cnt -->
+    <select id="selectAbcRoleListCnt" parameterType="map" resultType="int">
+    	<![CDATA[ /* SQL_ID : role.selectAbcRoleListCnt */ ]]>
+    	select count(*)
+		from w_abc_role wr
+		join w_admin wa1 on(wr.create_no = wa1.admin_no)
+		left join w_admin wa2 on(wr.update_no = wa2.admin_no)
+		where 1=1
+		<if test='keyword != null and keyword != "" '>
+		and name like '%${role_keyword}%'
+		</if>
+    </select>
+
+</mapper>
+
+
+
+
+

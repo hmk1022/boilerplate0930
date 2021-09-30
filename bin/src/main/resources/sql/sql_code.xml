@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="code">
+
+	<select id="selectCodeByGb" parameterType="string" resultType="map">
+		<![CDATA[ /* SQL_ID : code.selectCodeByGb */ ]]>
+		SELECT
+			*
+		FROM
+			w_code
+		WHERE
+			code_gb =#{code_gb}
+		AND use_yn = 'Y'
+		ORDER BY code_gb ASC,
+		disp_ord ASC
+
+	</select>
+	
+	<!-- 그룹코드로 하위목록조회 -->
+	<select id="selectCodeByGbString" parameterType="string" resultType="map">
+		<![CDATA[ /* SQL_ID : code.selectCodeByGbString */ ]]>
+		select * from w_code where 1=1
+		and code_gb = #{code_gb}
+		order by code_gb asc, disp_ord asc
+	</select>
+
+	<!-- 전체코드 목록 조회 -->
+	<select id="selectCodeAllList" resultType="java.util.LinkedHashMap">
+		<![CDATA[ /* SQL_ID : code.selectCodeAllList */ ]]>
+
+		SELECT 
+			code_gb,
+			code_value,
+			code_name,
+			disp_ord,
+			code_memo
+		FROM
+			w_code wc
+		WHERE
+			use_yn = 'Y'
+		ORDER BY
+			code_gb,
+			disp_ord,
+			code_value 
+			
+	</select>
+	
+	
+</mapper>
+
+

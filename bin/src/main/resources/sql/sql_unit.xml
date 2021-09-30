@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="unit">
+
+	<!-- 작업 요청 리스트 조회 -->
+	<select id="listUnit" parameterType="map" resultType="map">
+		<![CDATA[ /* SQL_ID : brand.selectUnitList */ ]]>	
+	select 
+		code_name as unit_name,
+	    code_memo as unit_memo,
+		code_value,
+	    use_yn
+	from 
+		w_code where code_gb = 'unit_cd';
+	</select>
+	
+	<select id="listUnitCnt" resultType="int">
+		<![CDATA[ /* SQL_ID : unit.listUnitCnt */ ]]>
+		select 
+			count(1) as totalRecords 
+		from 
+			w_code where code_gb = 'unit_cd';
+	</select>
+	
+	<!-- 단위 상세보기-->
+	<select id="selectUnit" resultType="map">
+		<![CDATA[ /* SQL_ID :  unit.selectUnit */ ]]>
+		select 
+			*
+		from w_code where code_gb = 'unit_cd'
+		and code_value = #{code_value}
+	</select>
+	
+	<!-- 단위 상태갱신 -->
+	<update id="updateUnitStat" parameterType="map">
+		<![CDATA[ /* SQL_ID : unit.updateUnitStat */ ]]>
+		update w_code 
+			set use_yn = #{use_yn} 
+		where code_gb = 'unit_cd' 
+	    and code_value = #{unit_value}
+	</update>
+	
+	<insert id="insertUnit" useGeneratedKeys="true" keyProperty="key_no">
+		/* SQL_ID : brand.insertUnit */
+		<!--<selectKey resultType="long" keyProperty="disp_ord" order="BEFORE">
+        	SELECT MAX(disp_ord)+1 FROM w_code where code_gb = 'unit_cd'        
+    	</selectKey>-->
+	  	<selectKey resultType="long" keyProperty="code_value" order="BEFORE">
+        	SELECT MAX(disp_ord) +1 FROM w_code where code_gb = 'unit_cd'        
+    	</selectKey>
+		insert into w_code (
+				code_gb,
+			    code_value,
+			    code_name,
+			    code_memo,
+			    disp_ord,
+			    use_yn,
+			    create_date
+			) values (
+				'unit_cd',
+			    #{code_value},
+			    #{code_name},
+			    #{code_memo},
+			    #{code_value},
+			    #{use_yn},
+			    now()
+			);
+	</insert>
+	
+	<update id="updateUnit" parameterType="map">
+		/* SQL_ID : unit.updateUnit */
+		UPDATE w_code SET 
+			code_name =#{code_name},
+			code_memo =#{code_memo},
+			use_yn=#{use_yn}
+		WHERE
+			code_value = #{code_value}
+		and
+			code_gb ='unit_cd'
+	</update>
+	
+</mapper>
+
+

@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="customerBranch">
+
+	<!-- 고객사 목록 -->
+	<select id="listCustomerBranch" resultType="map">
+		/* SQL_ID : customer.listCustomerBranch */
+		SELECT
+			wcb.branch_no,
+			wcb.branch_id,
+			wcb.customer_no,
+			wcb.branch_name,
+			wcb.comp_number,
+			wcb.work_zip,
+			wcb.comp_addr1,
+			wcb.comp_addr2,
+			wcb.manager_name,
+			wcb.manager_hp1,
+			wcb.manager_hp2,
+			wcb.manager_email,
+			wcb.tax_email,
+			wcb.stat,
+			wcb.del_yn,
+			wcb.create_no,
+			wcb.create_date,
+			wcb.update_no,
+			wcb.update_date,
+			wc.customer_name
+		FROM
+			w_customer wc inner join w_customer_branch wcb  on (wcb.customer_no= wc.customer_no)
+		WHERE
+			1 = 1
+		<if test=" null != customer_no and '' != customer_no ">
+		AND wcb.customer_no =#{customer_no}
+		</if>			
+		ORDER BY
+			wcb.branch_no desc
+		<if test='pageLast != null and pageLast != "" '>
+		LIMIT #{pageFirst}, #{pageLast}
+		</if>
+	</select>
+
+	<!-- 고객사 목록 count -->
+	<select id="listCustomerBranchCnt" resultType="int">
+
+		/* SQL_ID : customer.listCustomerBranchCnt */
+		SELECT
+			count(1) as totalRecords
+		FROM
+			w_customer_branch wcb
+		WHERE
+			1 = 1
+	</select>
+
+	<select id="getBranchId" resultType="string">
+		/* SQL_ID : customer.getCustomerId */
+		SELECT
+			concat(min(wc.customer_id), '_' , LPAD(IFNULL(COUNT(wcb.branch_no), 0)+1, 3, '0')) branch_id
+		FROM
+			w_customer wc LEFT JOIN w_customer_branch wcb 
+			on(wc.customer_no = wcb.customer_no)
+		WHERE
+			wc.customer_no =#{customer_no}
+			FOR UPDATE
+	</select>
+
+	<!-- 고객사 조회 -->
+	<select id="selectCustomerBranch" resultType="map">
+		/* SQL_ID : customer.selectCustomerBranch */
+		SELECT
+			wcb.branch_no,
+			wcb.branch_id,
+			wcb.customer_no,
+			wcb.branch_name,
+			wcb.comp_number,
+			wcb.work_zip,
+			wcb.comp_addr1,
+			wcb.comp_addr2,
+			wcb.manager_name,
+			wcb.manager_hp1,
+			wcb.manager_hp2,
+			wcb.manager_email,
+			wcb.tax_email,
+			wcb.stat,
+			wcb.del_yn,
+			wcb.create_no,
+			wcb.create_date,
+			wcb.update_no,
+			wcb.update_date,
+			wc.customer_name
+		FROM
+			w_customer_branch wcb inner join w_customer wc on (wcb.customer_no= wc.customer_no)
+		WHERE
+			wcb.branch_no = #{branch_no}
+	</select>
+
+
+	<!-- 고객사 등록 -->
+	<insert id="insertCustomerBranch" useGeneratedKeys="true" keyProperty="key_no">
+		/* SQL_ID : customer.insertCustomerBranch */
+		INSERT INTO w_customer_branch (
+		    customer_no,
+		    branch_name,
+		    branch_id,
+		    comp_number,
+		    work_zip,
+		    comp_addr1,
+		    comp_addr2,
+		    manager_name,
+		    manager_hp1,
+		    manager_hp2,
+		    manager_email,
+		    tax_email,
+		    stat,
+		    del_yn,
+		    create_no,
+		    create_date,
+		    update_no,
+		    update_date
+		) VALUES (
+		    #{customer_no},
+		    #{branch_name},
+		    #{branch_id},
+		    #{comp_number},
+		    #{work_zip},
+		    #{comp_addr1},
+		    #{comp_addr2},
+		    #{manager_name},
+		    #{manager_hp1},
+		    #{manager_hp2},
+		    #{manager_email},
+		    #{tax_email},
+		    #{stat},
+		    #{del_yn},
+		    #{create_no},
+		    now(),
+		    #{update_no},
+		    now()
+		)
+	</insert>
+
+	<!-- 고객사 수정 -->
+	<update id="updateCustomerBranch">
+		/* SQL_ID : customer.insertCustomerBranch */
+		UPDATE w_customer_branch SET
+		    customer_no = #{customer_no},
+		    branch_name = #{branch_name},
+		    comp_number = #{comp_number},
+		    work_zip = #{work_zip},
+		    comp_addr1 = #{comp_addr1},
+		    comp_addr2 = #{comp_addr2},
+		    manager_name = #{manager_name},
+		    manager_hp1 = #{manager_hp1},
+		    manager_hp2 = #{manager_hp2},
+		    manager_email = #{manager_email},
+		    tax_email = #{tax_email},
+		    stat = #{stat},
+		    del_yn = #{del_yn},
+		    update_no = #{update_no},
+		    update_date =     now()
+		WHERE
+			branch_no = #{branch_no}
+	</update>
+
+	<!-- 고객사 삭제 -->
+	<update id="deleteCustomerBranch">
+		/* SQL_ID : customer.deleteCustomerBranch */
+		UPDATE w_customer_branch SET
+		    del_yn = #{del_yn},
+		    update_no = #{update_no},
+		    update_date =     now()
+		WHERE
+			branch_no = #{branch_no}
+	</update>
+
+</mapper>

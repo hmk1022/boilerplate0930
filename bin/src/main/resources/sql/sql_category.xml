@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="category">
+
+	<!-- 카테고리경로정보 -->
+	<select id="selectCategoryPathInfo" parameterType="map" resultType="WorkResCategoryDataVo">
+		<![CDATA[ /* SQL_ID : category.selectCategoryPathInfo */ ]]>
+		select image_url, name,
+
+		substring_index(f_get_category_path(#{category_no}),' > ', 2) as path1,
+		substring_index(f_get_category_path(#{category_no}),' > ', -3) as path2
+
+		from w_category where category_no = (
+		select p_category_no from w_category where category_no =
+		(select p_category_no from w_category where category_no = #{category_no}))
+	</select>
+
+	<!-- 카테고리하위목록조회 -->
+	<select id="selectCategorySubList" parameterType="map" resultType="CategoryListDataVo">
+		<![CDATA[ /* SQL_ID : category.selectCategorySubList */ ]]>
+		select category_no, p_category_no, name, image_url, tag, working_time, people_number, price from w_category where p_category_no = #{p_category_no} and disp_yn = 'Y' order by disp_order asc
+	</select>
+
+	<!-- 카테고리하위목록조회_신규 -->
+	<select id="selectnCategorySubList" parameterType="map" resultType="CategoryListDataVo">
+		<![CDATA[ /* SQL_ID : category.selectCategorySubList */ ]]>
+		select category_no, p_category_no, name, image_url, tag, working_time, people_number, price from w_category_new where p_category_no = #{p_category_no} and disp_yn = 'Y' order by disp_order asc
+	</select>
+
+</mapper>
+
+

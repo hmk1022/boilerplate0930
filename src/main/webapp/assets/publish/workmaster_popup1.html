@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>워커맨 Admin</title>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+    <meta content="" name="description">
+    <meta content="" name="author">
+    <link href="/assets/css/vendor.min.css" rel="stylesheet">
+    <link href="/assets/css/workman_admin.css" rel="stylesheet">
+    <link href="/assets/css/datepicker.css" rel="stylesheet">
+    <link href="/assets/css/jquery.gritter.css" rel="stylesheet">
+    <script src="/assets/js/vendor.min.js" type="text/javascript"></script>
+    <script src="/assets/js/app.min.js" type="text/javascript"></script>
+    <script src="/assets/js/moment.min.js" type="text/javascript"></script>
+    <script src="/assets/js/datepicker.js" type="text/javascript"></script>
+</head>
+
+<body class="p-3">
+    <div class="card">
+        <div class="card-header">
+            <h3>견적서 작성<span class="text-primary ms-3">B2B_210525000</span></h3>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th rowspan="2">작업번호</th>
+                        <th rowspan="2">구분</th>
+                        <th rowspan="2">내역</th>
+                        <th rowspan="2">규격</th>
+                        <th colspan="4" class="bg-warning-light">견적</th>
+                        <th colspan="4" class="bg-primary-light">예상실행가</th>
+                        <th colspan="2" class="bg-danger-light">예상마진</th>
+                    </tr>
+                    <tr>
+                        <th class="bg-warning-lighter">단위</th>
+                        <th class="bg-warning-lighter">수량</th>
+                        <th class="bg-warning-lighter">단가</th>
+                        <th class="bg-warning-lighter">① 금액</th>
+                        <th class="bg-primary-lighter">단위</th>
+                        <th class="bg-primary-lighter">수량</th>
+                        <th class="bg-primary-lighter">단가</th>
+                        <th class="bg-primary-lighter">② 금액</th>
+                        <th class="bg-danger-lighter">③ 차액</th>
+                        <th class="bg-danger-lighter">④ 마진율</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="table-warning">
+                        <td>B2B_210525000</td>
+                        <td colspan="13" class="text-start">PO-00419025 - 14-110호(13인실) 인테리어 공사</td>
+                    </tr>
+                    <tr>
+                        <td>B2B_210525000</td>
+                        <td>공과잡비</td>
+                        <td>기업이윤(감리비)</td>
+                        <td></td>
+                        <td>%</td>
+                        <td class="text-end">5</td>
+                        <td class="text-end"></td>
+                        <td class="text-end fw-bold">900,000</td>
+                        <td>%</td>
+                        <td class="text-end"></td>
+                        <td class="text-end"></td>
+                        <td class="text-end fw-bold">-</td>
+                        <td class="text-end fw-bold">900,000</td>
+                        <td class="text-end fw-bold text-primary">100.0%</td>
+                    </tr>
+                    <tr>
+                        <td>B2B_210525000</td>
+                        <td>공과잡비</td>
+                        <td>공과잡비</td>
+                        <td></td>
+                        <td>%</td>
+                        <td class="text-end">3</td>
+                        <td class="text-end"></td>
+                        <td class="text-end fw-bold">540,000</td>
+                        <td>%</td>
+                        <td class="text-end"></td>
+                        <td class="text-end"></td>
+                        <td class="text-end fw-bold">-</td>
+                        <td class="text-end fw-bold">540,000</td>
+                        <td class="text-end fw-bold text-primary">100.0%</td>
+                    </tr>
+                    <tr>
+                        <td>B2B_210525000</td>
+                        <td>기타</td>
+                        <td>NEGO</td>
+                        <td></td>
+                        <td>식</td>
+                        <td class="text-end">1</td>
+                        <td class="text-end">-440,000</td>
+                        <td class="text-end fw-bold">-440,000</td>
+                        <td>식</td>
+                        <td class="text-end"></td>
+                        <td class="text-end"></td>
+                        <td class="text-end fw-bold">-</td>
+                        <td class="text-end fw-bold text-danger">-440,000</td>
+                        <td class="text-end fw-bold">100.0%</td>
+                    </tr>
+                    <tr>
+                        <td colspan="14"><button class="btn btn-block btn-outline-primary btn-xs">항목추가</button></td>
+                    </tr>
+                    <tr class="table-success">
+                        <td colspan="4" class="fw-bold">소계 SUB TOTAL</td>
+                        <td colspan="3"></td>
+                        <td class="text-end fw-bold">1,000,000</td>
+                        <td colspan="3"></td>
+                        <td class="text-end fw-bold">-</td>
+                        <td class="text-end fw-bold">1,000,000</td>
+                        <td class="text-end fw-bold">-</td>
+                    </tr>
+                    
+                    <tr class="table-warning">
+                        <td>B2B_210525000</td>
+                        <td colspan="13" class="text-start">홀 바닥 공사</td>
+                    </tr>
+                    <tr>
+                        <td>B2B_210525000</td>
+                        <td>공과잡비</td>
+                        <td>기업이윤(감리비)</td>
+                        <td></td>
+                        <td>%</td>
+                        <td class="text-end">5</td>
+                        <td class="text-end"></td>
+                        <td class="text-end fw-bold">900,000</td>
+                        <td>%</td>
+                        <td class="text-end"></td>
+                        <td class="text-end"></td>
+                        <td class="text-end fw-bold">-</td>
+                        <td class="text-end fw-bold">900,000</td>
+                        <td class="text-end fw-bold text-primary">100.0%</td>
+                    </tr>
+                    <tr>
+                        <td>B2B_210525000</td>
+                        <td>공과잡비</td>
+                        <td>공과잡비</td>
+                        <td></td>
+                        <td>%</td>
+                        <td class="text-end">3</td>
+                        <td class="text-end"></td>
+                        <td class="text-end fw-bold">540,000</td>
+                        <td>%</td>
+                        <td class="text-end"></td>
+                        <td class="text-end"></td>
+                        <td class="text-end fw-bold">-</td>
+                        <td class="text-end fw-bold">540,000</td>
+                        <td class="text-end fw-bold text-primary">100.0%</td>
+                    </tr>
+                    <tr>
+                        <td>B2B_210525000</td>
+                        <td>기타</td>
+                        <td>NEGO</td>
+                        <td></td>
+                        <td>식</td>
+                        <td class="text-end">1</td>
+                        <td class="text-end">-440,000</td>
+                        <td class="text-end fw-bold">-440,000</td>
+                        <td>식</td>
+                        <td class="text-end"></td>
+                        <td class="text-end"></td>
+                        <td class="text-end fw-bold">-</td>
+                        <td class="text-end fw-bold text-danger">-440,000</td>
+                        <td class="text-end fw-bold">100.0%</td>
+                    </tr>
+                    <tr>
+                        <td colspan="14"><button class="btn btn-block btn-outline-primary btn-xs">항목추가</button></td>
+                    </tr>
+                    <tr class="table-success">
+                        <td colspan="4" class="fw-bold">소계 SUB TOTAL</td>
+                        <td colspan="3"></td>
+                        <td class="text-end fw-bold">1,000,000</td>
+                        <td colspan="3"></td>
+                        <td class="text-end fw-bold">-</td>
+                        <td class="text-end fw-bold">1,000,000</td>
+                        <td class="text-end fw-bold">-</td>
+                    </tr>
+                    
+                    <tr class="table-warning">
+                        <td>B2B_210525000</td>
+                        <td colspan="13" class="text-start">도장 공사</td>
+                    </tr>
+                    <tr>
+                        <td>B2B_210525000</td>
+                        <td>공과잡비</td>
+                        <td>기업이윤(감리비)</td>
+                        <td></td>
+                        <td>%</td>
+                        <td class="text-end">5</td>
+                        <td class="text-end"></td>
+                        <td class="text-end fw-bold">900,000</td>
+                        <td>%</td>
+                        <td class="text-end"></td>
+                        <td class="text-end"></td>
+                        <td class="text-end fw-bold">-</td>
+                        <td class="text-end fw-bold">900,000</td>
+                        <td class="text-end fw-bold text-primary">100.0%</td>
+                    </tr>
+                    <tr>
+                        <td>B2B_210525000</td>
+                        <td>공과잡비</td>
+                        <td>공과잡비</td>
+                        <td></td>
+                        <td>%</td>
+                        <td class="text-end">3</td>
+                        <td class="text-end"></td>
+                        <td class="text-end fw-bold">540,000</td>
+                        <td>%</td>
+                        <td class="text-end"></td>
+                        <td class="text-end"></td>
+                        <td class="text-end fw-bold">-</td>
+                        <td class="text-end fw-bold">540,000</td>
+                        <td class="text-end fw-bold text-primary">100.0%</td>
+                    </tr>
+                    <tr>
+                        <td>B2B_210525000</td>
+                        <td>기타</td>
+                        <td>NEGO</td>
+                        <td></td>
+                        <td>식</td>
+                        <td class="text-end">1</td>
+                        <td class="text-end">-440,000</td>
+                        <td class="text-end fw-bold">-440,000</td>
+                        <td>식</td>
+                        <td class="text-end"></td>
+                        <td class="text-end"></td>
+                        <td class="text-end fw-bold">-</td>
+                        <td class="text-end fw-bold text-danger">-440,000</td>
+                        <td class="text-end fw-bold">100.0%</td>
+                    </tr>
+                    <tr>
+                        <td colspan="14"><button class="btn btn-block btn-outline-primary btn-xs">항목추가</button></td>
+                    </tr>
+                    <tr class="table-success">
+                        <td colspan="4" class="fw-bold">소계 SUB TOTAL</td>
+                        <td colspan="3"></td>
+                        <td class="text-end fw-bold">1,000,000</td>
+                        <td colspan="3"></td>
+                        <td class="text-end fw-bold">-</td>
+                        <td class="text-end fw-bold">1,000,000</td>
+                        <td class="text-end fw-bold">-</td>
+                    </tr>
+                    <tr class="table-danger">
+                        <td colspan="4" class="fw-bolder">총 계 GRAND TOTAL</td>
+                        <td colspan="3"></td>
+                        <td class="text-end fw-bolder">1,000,000</td>
+                        <td colspan="3"></td>
+                        <td class="text-end fw-bolder">-</td>
+                        <td class="text-end fw-bolder">1,000,000</td>
+                        <td class="text-end fw-bolder">-</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-primary btn-block">등록</button>
+        </div>
+    </div>
+</body>
+
+</html>

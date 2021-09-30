@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="partner">
+
+	<select id="listPartner" resultType="map">
+		/* SQL_ID : partner.listPartner */
+		SELECT
+			wp.partner_no,
+			wp.partner_name,
+			wp.work_cate1,
+			wp.work_cate2,
+			wp.work_cate3,
+			wp.zip_code,
+			wp.addr1,
+			wp.addr2,
+			wp.manager_name,
+			wp.manager_email,
+			wp.partner_hp1,
+			wp.partner_hp2,
+			wp.partner_link,
+			wp.id_no,
+			wp.id_no_fin_yn,
+			wp.acct_fin_yn,
+			wp.partner_type,
+			wp.comp_number,
+			wp.tax_email,
+			wp.bank_code,
+			wp.acct,
+			wp.del_yn,
+			wp.create_no,
+			F_GET_ADMIN_NAME(wp.create_no) create_name,
+			wp.create_date,
+			F_GET_ADMIN_NAME(wp.update_no) update_name,
+			wp.update_date,
+			wc.code_name bank_name
+		FROM
+			w_partner wp
+				left join w_code wc on (wp.bank_code = wc.code_value and wc.code_gb='vacct_bank_code')
+		WHERE 1=1
+		<if test="partner_name != null and partner_name != ''">
+			AND partner_name LIKE concat('%', #{partner_name}, '%')
+		</if>
+		ORDER BY 
+			wp.partner_no 
+		<if test="pageFirst != null and pageFirst != ''">	
+		LIMIT #{pageFirst}, #{pageLast}
+		</if>
+		
+	</select>
+	
+	<select id="listPartnerCnt" resultType="int">
+		
+		/* SQL_ID : partner.listPartnerCnt */
+		SELECT
+			count(1) as totalRecords
+		FROM
+			w_partner wp
+		WHERE
+			1 = 1
+		<if test="partner_name != null and partner_name != ''">
+			AND partner_name LIKE concat('%', #{partner_name}, '%')
+		</if>			
+	</select>
+	
+	<select id="selectPartner" resultType="map">
+		/* SQL_ID : partner.listPartner */
+		SELECT
+			wp.partner_no,
+			wp.partner_name,
+			wp.work_cate1,
+			wp.work_cate2,
+			wp.work_cate3,
+			wp.zip_code,
+			wp.addr1,
+			wp.addr2,
+			wp.manager_name,
+			wp.manager_email,
+			wp.partner_hp1,
+			wp.partner_hp2,
+			wp.partner_link,
+			wp.id_no,
+			wp.id_no_fin_yn,
+			wp.acct_fin_yn,			
+			wp.partner_type,
+			wp.comp_number,
+			wp.tax_email,
+			wp.bank_code,
+			wp.acct,
+			wp.del_yn,
+			wp.create_no,
+			wp.create_date,
+			wp.update_no,
+			wp.update_date
+		FROM
+			w_partner wp
+		WHERE 
+			wp.partner_no = #{partner_no }
+			 
+	</select>
+	
+	<insert id="insertPartner" useGeneratedKeys="true" keyProperty="key_no">
+		/* SQL_ID : partner.insertPartner */
+		INSERT INTO w_partner (
+			partner_name,
+			work_cate1,
+			work_cate2,
+			work_cate3,
+			zip_code,
+			addr1,
+			addr2,
+			manager_name,
+			manager_email,
+			partner_hp1,
+			partner_hp2,
+			partner_link,
+			id_no,
+			id_no_fin_yn,
+			acct_fin_yn,			
+			partner_type,
+			comp_number,
+			tax_email,
+			bank_code,
+			acct,
+			create_no,
+			create_date,
+			update_no,
+			update_date
+		) VALUES (
+			#{partner_name},
+			#{work_cate1},
+			#{work_cate2},
+			#{work_cate3},
+			#{zip_code},
+			#{addr1},
+			#{addr2},
+			#{manager_name},
+			#{manager_email},
+			#{partner_hp1},
+			#{partner_hp2},
+			#{partner_link},
+			#{id_no},
+			#{id_no_fin_yn},
+			#{acct_fin_yn},
+			#{partner_type},
+			#{comp_number},
+			#{tax_email},
+			#{bank_code},
+			#{acct},
+			#{create_no},
+			now(),
+			#{update_no},
+			now()
+		)	
+	</insert>
+	
+	<update id="updatePartner">
+		/* SQL_ID : partner.updatePartner */
+		UPDATE w_partner SET 
+			partner_name = #{partner_name},
+			work_cate1 = #{work_cate1},
+			work_cate2 = #{work_cate2},
+			work_cate3 = #{work_cate3},
+			zip_code = #{zip_code},
+			addr1 = #{addr1},
+			addr2 = #{addr2},
+			manager_name = #{manager_name},
+			manager_email = #{manager_email},
+			partner_hp1 = #{partner_hp1},
+			partner_hp2 = #{partner_hp2},
+			partner_link = #{partner_link},
+			id_no = #{id_no},
+			id_no_fin_yn = #{id_no_fin_yn},
+			acct_fin_yn = #{acct_fin_yn},
+			partner_type = #{partner_type},
+			comp_number = #{comp_number},
+			tax_email = #{tax_email},
+			bank_code = #{bank_code},
+			acct = #{acct},
+			update_no = #{update_no},
+			update_date = now()
+		WHERE
+			partner_no = #{partner_no}
+	</update>
+		
+	<update id="deletePartner">
+		/* SQL_ID : partner.deletePartner */
+		UPDATE w_partner SET 
+		    del_yn = #{del_yn},
+		    update_no = #{update_no},
+		    update_date = now()
+		WHERE
+			partner_no = #{partner_no}
+	</update>
+			
+</mapper>

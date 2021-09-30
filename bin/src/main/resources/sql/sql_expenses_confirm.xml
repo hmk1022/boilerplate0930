@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="expenses_confirm">
+	
+	<insert id="insertExpensesConfirm" useGeneratedKeys="true" keyProperty="key_no">
+		/* SQL_ID : expenses_confirm.insertExpensesConfirm */
+		INSERT INTO w_work_expenses_confirm (
+			exp_no,
+			pay_next_date,
+			pay_price,
+			pay_scope,
+			confirm_admin_no,
+			confirm_date,
+			create_no,
+			create_date,
+			update_no,
+			update_date
+		) VALUES (
+			#{exp_no},
+			#{pay_next_date},
+			#{pay_price},
+			#{pay_scope},
+			#{confirm_admin_no},
+			now(),
+			#{create_no},
+			now(),
+			#{update_no},
+			now()
+		)	
+	</insert>
+				
+</mapper>

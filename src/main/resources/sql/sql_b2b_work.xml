@@ -1,0 +1,1005 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="b2bWork">
+
+	<!-- 작업 조회 -->
+	<select id="selectWork" parameterType="long" resultType="map">
+		<![CDATA[ /* SQL_ID : b2bWork.selectWork */ ]]>
+		SELECT work_no,
+				work_id,
+				member_no,
+				admin_no,
+				category_no,
+				req_path,
+				req_name,
+				work_stat,
+				F_GET_CODE_VALUE('new_work_stat',w.work_stat) as work_stat_name,
+				req_hp,
+				work_zip,
+				work_addr1,
+				work_addr2,
+				work_addr_cd,
+				req_content,
+				req_visit_date,
+				req_visit_date_type,
+				<!-- req_work_date,
+				req_work_date_type, -->
+				create_date,
+				location_name,
+				DATE_FORMAT(F_GET_WORK_VISIT_CONFIRM_DATE(w.work_no),'%Y.%m.%d %H:%i') AS st_visit_confirm_date_str,
+				DATE_FORMAT(F_GET_WORK_WORKING_CONFIRM_DATE(w.work_no),'%Y.%m.%d %H:%i') AS st_working_confirm_date_str,
+				(select group_concat((select code_name from w_code where code_gb = 'work_cate' and code_value = wrc.`cate_cd`) separator ',')
+					from w_work_req_cate wrc
+					where wrc.work_no = w.work_no
+				) as `req_cate_names`,
+				case when easy_pay_yn = 'N' then
+				(select count(*) from w_work_assignment wa where wa.work_no = #{work_no} and assignment_type = '02' and work_type = '02')
+				else
+				(select count(*) from w_work_assignment wa where wa.work_no = #{work_no} and assignment_type = '02' and work_type = '01')
+				end as `worker_cnt`,
+				case when easy_pay_yn = 'N' then
+					(select a.admin_name
+							from w_work_assignment wa , w_admin a
+							where wa.admin_no = a.admin_no
+							and wa.work_no = #{work_no}
+							and assignment_type = '01'
+							and work_type = '02')
+				else
+					(select a.admin_name
+							from w_work_assignment wa , w_admin a
+							where wa.admin_no = a.admin_no
+							and wa.work_no = #{work_no}
+							and assignment_type = '01'
+							and work_type = '01')
+				end as worker_name,
+				case when easy_pay_yn = 'N' then
+					(select a.profile_url
+							from w_work_assignment wa , w_admin a
+							where wa.admin_no = a.admin_no
+							and wa.work_no = #{work_no}
+							and assignment_type = '01'
+							and work_type = '02')
+				else
+					(select a.profile_url
+							from w_work_assignment wa , w_admin a
+							where wa.admin_no = a.admin_no
+							and wa.work_no = #{work_no}
+							and assignment_type = '01'
+							and work_type = '01')
+				end as worker_profile_url,
+				w.easy_pay_yn
+		FROM w_work w
+		WHERE work_no = #{work_no}
+	</select>
+
+	<!-- 작업 요청 리스트 조회 -->
+	<select id="selectWorkList" parameterType="map" resultType="WorkListDataVo">
+		<![CDATA[ /* SQL_ID : b2bWork.selectWorkList */ ]]>
+		select work_no,
+				work_id,
+				member_no,
+				work_stat,
+				work_zip,
+				work_addr1,
+				work_addr2,
+				work_addr_cd,
+				create_date,
+
+		        F_GET_CODE_VALUE('new_work_stat',w.work_stat) as work_stat_name,
+
+				(select file_url from w_work_req_file wr where wr.work_no = w.work_no limit 1) as image_url
+		from w_work w
+		where member_no = #{member_no}
+		AND w.delete_yn != 'Y'
+		order by create_date desc
+		limit ${start_p}, ${end_p}
+	</select>
+
+	<!-- 작업 등록 -->
+	<insert id="insertWork" parameterType="map" useGeneratedKeys="true" keyProperty="work_no" keyColumn="work_no">
+		<![CDATA[ /* SQL_ID : b2bWork.insertWork */ ]]>
+		insert into w_work (
+			work_id,
+			<if test=" null != customer_no and '' != customer_no ">
+			customer_no,
+			</if>
+			<if test=" null != branch_no and '' != branch_no ">
+			branch_no,
+			</if>
+			p_work_no,
+			admin_no,
+			req_path,
+			manager_admin_no,
+			req_name,
+			req_hp,
+			work_addr1,
+			work_addr2,
+			work_addr_cd,
+			req_content,
+			req_visit_date,
+			req_visit_date_type,
+			create_date,
+			location_name,
+			work_target,
+			channel,
+			admin_memo
+			<if test=" null != category_no and '' != category_no ">
+			,category_no
+			</if>
+
+			<if test=" null != work_stat and '' != work_stat ">
+			,work_stat
+			</if>
+		) values (
+			#{work_id},
+			<if test=" null != customer_no and '' != customer_no ">
+			#{customer_no},
+			</if>
+			<if test=" null != branch_no and '' != branch_no ">
+			#{branch_no},
+			</if>
+			#{p_work_no},
+			#{admin_no},
+			'02',
+			#{manager_admin_no},
+			#{req_name},
+			#{req_hp},
+			#{work_addr1},
+			#{work_addr2},
+			#{work_addr_cd},
+			#{req_content},
+			#{req_visit_date},
+			#{req_visit_date_type},
+			now(),
+			#{location_name},
+			#{work_target},
+			#{channel},
+			#{admin_memo}
+			<if test=" null != category_no and '' != category_no ">
+			,#{category_no}
+			</if>
+			<if test=" null != work_stat and '' != work_stat ">
+			,#{work_stat}
+			</if>
+		)
+
+		<selectKey resultType="long" keyProperty="work_no" order="AFTER">
+			select last_insert_id() as work_no
+		</selectKey>
+
+	</insert>
+
+	<!-- 작업 요청 수정  -->
+	<update id="updateWork" parameterType="map">
+		<![CDATA[ /* SQL_ID : b2bWork.updateWork */ ]]>
+		update w_work
+		set update_date = now()
+			<if test="work_id != null and work_id != ''">
+				, work_id = #{work_id}
+			</if>
+			<if test="admin_memo != null and admin_memo != ''">
+				, admin_memo = #{admin_memo}
+			</if>
+			<if test="work_stat != null and work_stat != ''">
+				, work_stat = #{work_stat}
+			</if>
+			<if test="req_visit_date != null and req_visit_date != ''">
+				, req_visit_date = #{req_visit_date}
+			</if>
+			<if test="req_visit_date_type != null and req_visit_date_type != ''">
+				, req_visit_date_type = #{req_visit_date_type}
+			</if>
+			<if test="req_content != null and req_content != ''">
+				, req_content = #{req_content}
+			</if>
+			<if test="location_name != null and location_name != ''">
+				, location_name = #{location_name}
+			</if>
+		where work_no = #{work_no}
+	</update>
+
+	<!-- 작업 요청 수정  -->
+	<update id="cancelWork" parameterType="map">
+		<![CDATA[ /* SQL_ID : b2bWork.cancelWork */ ]]>
+		update w_work
+		set update_date = now()
+			<if test="admin_memo != null and admin_memo != ''">
+				, admin_memo = #{admin_memo}
+			</if>
+			<if test="work_stat != null and work_stat != ''">
+				, work_stat = #{work_stat}
+			</if>
+		where work_no = #{work_no}
+	</update>
+	<!-- 시공사례목록 -->
+	<select id="selectCaseList" parameterType="map" resultType="CaseListDataVo">
+		<![CDATA[ /* SQL_ID : b2bWork.selectCaseList */ ]]>
+		select * from (
+			select
+		    ww.category_no,
+		    ww.work_no,
+		    ww.work_id,
+			ifnull(ifnull(wb.pay_amount, wp.paid_amount),0) as pay_amount,
+			wh.work_hist_detail,
+			date_format(ww.create_date, '%Y-%m-%d %H:%i:%S') as create_date ,
+			date_format(ww.create_date, '%Y-%m-%d') as create_date_dp ,
+			wc.title as title,
+			wc.tag,
+			wc.address,
+			wc.label,
+			wd.code_name as addr_name
+			from w_work ww
+			left join w_work_hist_doc wh on(ww.work_no = wh.work_no)
+			left join w_work_hist_img wi on(wh.hist_no = wi.hist_no)
+			left join w_work_bill wb on(ww.work_no = wb.work_no)
+			left join w_payment wp on(ww.work_no = wp.work_no)
+			left join w_work_content wc on(wc.work_no = ww.work_no)
+			left join w_code wd on(wd.code_value = wc.addr_cd and wd.code_gb = 'addr_cd')
+			where ww.work_stat = '35'
+			and ww.use_yn = 'Y'
+			AND ww.delete_yn != 'Y'
+		    and ww.category_no is not null
+			group by ww.work_no
+			) v
+		where 1=1
+		<if test=" null != create_date and '' != create_date ">
+			<![CDATA[
+			and v.create_date < #{create_date}
+			]]>
+		</if>
+		order by v.create_date desc
+		limit #{page_size}
+	</select>
+
+	<!-- 메인시공사례샘플이미지목록 -->
+	<select id="selectWorkCaseNewList" parameterType="map" resultType="CaseMainListDataVo">
+		<![CDATA[ /* SQL_ID : b2bWork.selectWorkCaseNewList */ ]]>
+		select
+		wc.title,
+		(select file_url from w_work_img where work_no = ww.work_no and img_type = '02' limit 1) as img_url
+		from w_work ww
+		left join w_work_hist_doc whd on(whd.work_no = ww.work_no)
+		left join w_work_content wc on(wc.work_no = ww.work_no)
+		where
+		ww.use_yn = 'Y'
+		AND ww.delete_yn != 'Y'
+		order by ww.create_date desc
+		limit #{size}
+	</select>
+
+	<!-- B2b작업목록 -->
+    <select id="selectB2bWorkList" parameterType="map" resultType="map">
+    	<![CDATA[ /* SQL_ID : b2bWork.selectB2bWorkList */ ]]>
+    	SELECT ww.work_no,
+			   ww.location_name ,
+			   pww.location_name as sub_work_location_name,
+		       ww.work_id,
+		       ww.req_name,
+		       ww.req_path,
+		       ww.req_hp,
+		       ww.work_addr_cd,
+		       ww.req_visit_date,
+		       ww.req_visit_date_type,
+		       ww.work_target,
+		       ww.work_addr1,
+		       ww.work_addr2,
+		       ww.req_content,
+		       ww.admin_memo,
+		       ww.manager_admin_no,
+		       wasg.manager_admin_name,
+		       ww.work_stat,
+		       wc.customer_name,
+		       wc.manager_name,
+      		   wcb.branch_name,
+		       wve.total_unit_price,
+      		   DATE_FORMAT(wve.apply_date,'%Y-%m-%d') AS apply_date,
+		       wasg.st_working_date,
+		       wasg.ed_working_date,
+       		   waasg.supervisor_admin_name,
+       		   waasg.workerman_admin_name,
+       		   F_GET_EXCUTE_PRICE(ww.work_no) AS excute_price,
+      		   wap.paid_amount
+		FROM w_work ww
+		LEFT OUTER JOIN w_customer wc ON wc.customer_no = ww.customer_no
+		LEFT OUTER JOIN w_customer_branch wcb ON wcb.branch_no = ww.branch_no
+		LEFT OUTER JOIN (SELECT ifnull(ww.p_work_no,ww.work_no) AS work_no
+				  		,GROUP_CONCAT(DISTINCT F_GET_ADMIN_NAME(ww.manager_admin_no)) AS manager_admin_name
+						,GROUP_concat(ww.location_name ORDER BY ww.work_no) AS location_name
+						,MIN(str_to_Date(st_date_ymd,'%Y%m%d')) AS st_working_date
+						,MAX(str_to_Date(ed_date_ymd,'%Y%m%d')) AS ed_working_date
+					FROM w_work ww
+					LEFT OUTER JOIN w_abc_admin_schedule waas ON waas.work_no = ww.work_no AND waas.schedule_type IN ('31','32','33') AND ww.delete_yn != 'Y'
+					GROUP BY (ifnull(ww.p_work_no,ww.work_no))) wasg ON wasg.work_no = ww.work_no
+		LEFT OUTER JOIN (SELECT IFNULL( ww.p_work_no, ww.work_no ) AS work_no,
+					       swve.estimate_no,
+					       swve.version_no ,
+					       swve.apply_date ,
+					       SUM(swver.resource_count*swver.unit_price) AS total_unit_price,
+					       SUM(swver.est_resource_count*swver.est_unit_price) AS total_est_unit_price
+					FROM w_version_estimate swve
+					INNER JOIN w_version_estimate_resource swver ON swve.estimate_no = swver.estimate_no
+					INNER JOIN w_work ww ON ww.work_no = swve.work_no AND ww.delete_yn != 'Y'
+                    WHERE apply_date IS NOT NULL
+                    AND   swver.del_yn != 'Y'
+					GROUP BY IFNULL( ww.p_work_no, ww.work_no )
+					) wve ON wve.work_no = ww.work_no
+		LEFT OUTER JOIN (SELECT p_work_no
+						,GROUP_concat(location_name) AS location_name
+					FROM w_work
+					WHERE p_work_no IS NOT NULL
+					AND delete_yn != 'Y'
+					GROUP BY p_work_no) pww ON pww.p_work_no = ww.work_no
+	    LEFT OUTER JOIN (SELECT IFNULL(ww.p_work_no,ww.work_no) AS work_no,
+						       GROUP_CONCAT(DISTINCT IF (waas.schedule_type = '32',F_GET_ABC_ADMIN_NAME (waas.admin_no,waas.workerman_type),NULL) ORDER BY waas.workerman_type,waas.admin_no) AS workerman_admin_name,
+						       GROUP_CONCAT(DISTINCT IF (waas.schedule_type = '33',F_GET_ABC_ADMIN_NAME (waas.admin_no,waas.workerman_type),NULL)) AS supervisor_admin_name
+						FROM w_work ww
+						INNER JOIN w_abc_admin_schedule_group waasg ON waasg.work_no = ww.work_no AND waasg.schedule_stat <![CDATA[<> ]]> '99' AND ww.delete_yn != 'Y'
+						INNER JOIN w_abc_admin_schedule waas ON waas.schedule_group_no = waasg.schedule_group_no
+						GROUP BY IFNULL(ww.p_work_no,ww.work_no)) waasg ON waasg.work_no = ww.work_no
+		LEFT OUTER JOIN (SELECT wap.work_no
+				, sum(wap.total_pay_price) AS total_pay_price
+				, sum(wap.paid_amount) AS paid_amount
+			FROM w_abc_payment wap
+			WHERE wap.del_yn != 'Y'
+			GROUP BY work_no) wap ON wap.work_no = ww.work_no
+		WHERE ww.p_work_no IS NULL
+		AND ww.delete_yn != 'Y'
+		<if test='req_name != null and req_name != "" '>
+		AND CONCAT(ifnull(ww.req_name,''),'|',ifnull(wc.customer_name,''),'|',ifnull(wcb.branch_name,'')) LIKE CONCAT('%',#{req_name},'%')
+		</if>
+		<if test='admin_name != null and admin_name != "" '>
+			AND (	wasg.manager_admin_name LIKE CONCAT('%',#{admin_name},'%')
+					OR waasg.supervisor_admin_name LIKE CONCAT('%',#{admin_name},'%')
+					OR waasg.workerman_admin_name LIKE CONCAT('%',#{admin_name},'%') 	)
+		</if>
+		<if test='estimate_apply_yn != null and estimate_apply_yn == "Y" '>
+			AND wve.total_unit_price IS NOT NULL
+		</if>
+		<if test='estimate_apply_yn != null and estimate_apply_yn == "N" '>
+			AND wve.total_unit_price IS NULL
+		</if>
+		<if test='customer_type != null and customer_type == "P" '>
+		AND ww.customer_no IS NULL
+		</if>
+		<if test='customer_type != null and customer_type == "C" '>
+		AND ww.customer_no IS NOT NULL
+		</if>
+		<if test='channel != null and channel != "" '>
+		AND ww.channel = #{channel}
+		</if>
+		<if test='addr != null and addr != "" '>
+		AND CONCAT(ww.work_addr1,ww.work_addr2) LIKE CONCAT('%',#{addr},'%')
+		</if>
+		<if test='branch_no != null and branch_no != "" '>
+		AND wcb.branch_no = #{branch_no}
+		</if>
+		<if test='customer_no != null and customer_no != "" '>
+		AND wc.customer_no = #{customer_no}</if>
+		<if test='location_name != null and location_name != "" '>
+		AND ww.work_no IN (SELECT IFNULL(p_work_no,work_no) FROM w_work ww WHERE ww.location_name LIKE CONCAT('%', #{location_name},'%')) AND ww.delete_yn != 'Y'
+		</if>
+		<if test='work_id != null and work_id != "" '>
+		AND ww.work_id LIKE CONCAT('%',#{work_id},'%')
+		</if>
+		<if test='work_target != null and work_target != "" '>
+		AND ww.work_target = #{work_target}
+		</if>
+		<if test='start_dt != null and start_dt != "" '>
+			<if test='date_type != null and date_type == "req_dt" '>
+			AND ww.create_date >= #{start_dt}
+			</if>
+			<if test='date_type != null and date_type == "assign_dt" '>
+			AND wasg.ed_working_date >= #{start_dt}
+			</if>
+		</if>
+		<if test='end_dt != null and end_dt != "" '>
+			<if test='date_type != null and date_type == "req_dt" '>
+			AND ww.create_date <![CDATA[ <= ]]> #{end_dt}
+			</if>
+			<if test='date_type != null and date_type == "assign_dt" '>
+			AND wasg.st_working_date <![CDATA[ <= ]]> #{end_dt}
+			</if>
+		</if>
+		<if test='work_id != null and work_id != "" '>
+		AND ww.work_id LIKE CONCAT('%',#{work_id},'%')
+		</if>
+		ORDER BY ww.create_date DESC
+		<if test='pageLast != null and pageLast != "" '>
+		limit #{pageFirst},#{pageLast}
+		</if>
+    </select>
+    <!-- B2b작업목록cnt -->
+    <select id="selectB2bWorkListCnt" parameterType="map" resultType="int">
+    	<![CDATA[ /* SQL_ID : b2bWork.selectB2bWorkListCnt */ ]]>
+    	SELECT count(*)
+		FROM w_work ww
+		LEFT OUTER JOIN w_customer wc ON wc.customer_no = ww.customer_no
+		LEFT OUTER JOIN w_customer_branch wcb ON wcb.branch_no = ww.branch_no
+		LEFT OUTER JOIN (SELECT ifnull(ww.p_work_no,ww.work_no) AS work_no
+				  		,GROUP_CONCAT(DISTINCT F_GET_ADMIN_NAME(ww.manager_admin_no)) AS manager_admin_name
+						,GROUP_concat(ww.location_name ORDER BY ww.work_no) AS location_name
+						,MIN(str_to_Date(st_date_ymd,'%Y%m%d')) AS st_working_date
+						,MAX(str_to_Date(ed_date_ymd,'%Y%m%d')) AS ed_working_date
+					FROM w_work ww
+					LEFT OUTER JOIN w_abc_admin_schedule waas ON waas.work_no = ww.work_no AND waas.schedule_type IN ('31','32','33') AND ww.delete_yn != 'Y'
+					GROUP BY (ifnull(ww.p_work_no,ww.work_no))) wasg ON wasg.work_no = ww.work_no
+		LEFT OUTER JOIN (SELECT IFNULL( ww.p_work_no, ww.work_no ) AS work_no,
+					       swve.estimate_no,
+					       swve.version_no ,
+					       swve.apply_date ,
+					       SUM(swver.resource_count*swver.unit_price) AS total_unit_price,
+					       SUM(swver.est_resource_count*swver.est_unit_price) AS total_est_unit_price
+					FROM w_version_estimate swve
+					INNER JOIN w_version_estimate_resource swver ON swve.estimate_no = swver.estimate_no
+					INNER JOIN w_work ww ON ww.work_no = swve.work_no AND ww.delete_yn != 'Y'
+                    WHERE apply_date IS NOT NULL
+                    AND   swver.del_yn != 'Y'
+					GROUP BY IFNULL( ww.p_work_no, ww.work_no )
+					) wve ON wve.work_no = ww.work_no
+		LEFT OUTER JOIN (SELECT p_work_no
+						,GROUP_concat(location_name) AS location_name
+					FROM w_work
+					WHERE p_work_no IS NOT NULL
+					AND delete_yn != 'Y'
+					GROUP BY p_work_no) pww ON pww.p_work_no = ww.work_no
+	    LEFT OUTER JOIN (SELECT IFNULL(ww.p_work_no,ww.work_no) AS work_no,
+						       GROUP_CONCAT(DISTINCT IF (waas.schedule_type = '32',F_GET_ABC_ADMIN_NAME (waas.admin_no,waas.workerman_type),NULL) ORDER BY waas.workerman_type,waas.admin_no) AS workerman_admin_name,
+						       GROUP_CONCAT(DISTINCT IF (waas.schedule_type = '33',F_GET_ABC_ADMIN_NAME (waas.admin_no,waas.workerman_type),NULL)) AS supervisor_admin_name
+						FROM w_work ww
+						INNER JOIN w_abc_admin_schedule_group waasg ON waasg.work_no = ww.work_no AND waasg.schedule_stat <![CDATA[<> ]]> '99' AND ww.delete_yn != 'Y'
+						INNER JOIN w_abc_admin_schedule waas ON waas.schedule_group_no = waasg.schedule_group_no
+						GROUP BY IFNULL(ww.p_work_no,ww.work_no)) waasg ON waasg.work_no = ww.work_no
+		LEFT OUTER JOIN (SELECT wap.work_no
+				, sum(wap.total_pay_price) AS total_pay_price
+				, sum(wap.paid_amount) AS paid_amount
+			FROM w_abc_payment wap
+			WHERE wap.del_yn != 'Y'
+			GROUP BY work_no) wap ON wap.work_no = ww.work_no
+		WHERE ww.p_work_no IS NULL
+		AND ww.delete_yn != 'Y'
+		<if test='req_name != null and req_name != "" '>
+		AND CONCAT(ifnull(ww.req_name,''),'|',ifnull(wc.customer_name,''),'|',ifnull(wcb.branch_name,'')) LIKE CONCAT('%',#{req_name},'%')
+		</if>
+		<if test='admin_name != null and admin_name != "" '>
+			AND (	wasg.manager_admin_name LIKE CONCAT('%',#{admin_name},'%')
+					OR waasg.supervisor_admin_name LIKE CONCAT('%',#{admin_name},'%')
+					OR waasg.workerman_admin_name LIKE CONCAT('%',#{admin_name},'%') 	)
+		</if>
+		<if test='estimate_apply_yn != null and estimate_apply_yn == "Y" '>
+			AND wve.total_unit_price IS NOT NULL
+		</if>
+		<if test='estimate_apply_yn != null and estimate_apply_yn == "N" '>
+			AND wve.total_unit_price IS NULL
+		</if>
+		<if test='customer_type != null and customer_type == "P" '>
+		AND ww.customer_no IS NULL
+		</if>
+		<if test='customer_type != null and customer_type == "C" '>
+		AND ww.customer_no IS NOT NULL
+		</if>
+		<if test='channel != null and channel != "" '>
+		AND ww.channel = #{channel}
+		</if>
+		<if test='addr != null and addr != "" '>
+		AND CONCAT(ww.work_addr1,ww.work_addr2) LIKE CONCAT('%',#{addr},'%')
+		</if>
+		<if test='branch_no != null and branch_no != "" '>
+		AND wcb.branch_no = #{branch_no}
+		</if>
+		<if test='customer_no != null and customer_no != "" '>
+		AND wc.customer_no = #{customer_no}</if>
+		<if test='location_name != null and location_name != "" '>
+		AND ww.work_no IN (SELECT IFNULL(p_work_no,work_no) FROM w_work ww WHERE ww.location_name LIKE CONCAT('%', #{location_name},'%')) AND ww.delete_yn != 'Y'
+		</if>
+		<if test='work_id != null and work_id != "" '>
+		AND ww.work_id LIKE CONCAT('%',#{work_id},'%')
+		</if>
+		<if test='work_target != null and work_target != "" '>
+		AND ww.work_target = #{work_target}
+		</if>
+		<if test='start_dt != null and start_dt != "" '>
+			<if test='date_type != null and date_type == "req_dt" '>
+			AND ww.create_date >= #{start_dt}
+			</if>
+			<if test='date_type != null and date_type == "assign_dt" '>
+			AND wasg.ed_working_date >= #{start_dt}
+			</if>
+		</if>
+		<if test='end_dt != null and end_dt != "" '>
+			<if test='date_type != null and date_type == "req_dt" '>
+			AND ww.create_date <![CDATA[ <= ]]> #{end_dt}
+			</if>
+			<if test='date_type != null and date_type == "assign_dt" '>
+			AND wasg.st_working_date <![CDATA[ <= ]]> #{end_dt}
+			</if>
+		</if>
+		<if test='work_id != null and work_id != "" '>
+		AND ww.work_id LIKE CONCAT('%',#{work_id},'%')
+		</if>
+    </select>
+	<!-- B2b작업 -->
+    <select id="selectB2bWork" parameterType="map" resultType="map">
+    	<![CDATA[ /* SQL_ID : b2bWork.selectB2bWork */
+    	SELECT
+			ww.work_no
+			, ww.work_id
+			, ww.req_name
+			, ww.req_path
+			, ww.req_hp
+			, ww.work_stat
+			, ww.work_addr_cd
+			, ww.req_visit_date
+			, ww.req_visit_date_type
+			, ww.work_target
+			, ww.location_name
+			, ww.work_addr1
+			, ww.work_addr2
+			, ww.req_content
+			, ww.admin_memo
+			, ww.manager_admin_no
+			, ww.customer_no
+			, ww.branch_no
+			, F_GET_ADMIN_NAME(ww.manager_admin_no) as manager_admin_name
+			, wc.customer_name
+			, wc.manager_name
+			, wc.manager_hp
+			, wcb.comp_number
+			, wcb.tax_email
+       		, wcb.branch_name
+       		, wcb.manager_name AS branch_manager_name
+       		, wcb.manager_hp1 AS branch_manager_hp
+			, wve.total_unit_price
+			, wve.total_est_unit_price
+			, wasg.st_working_date
+			, wasg.ed_working_date
+	        , wwr.reject_cd
+	        , wwr.reject_content
+       		, waasg.workerman_admin_name
+       		, waasg.supervisor_admin_name
+  	 		, wve.version_no
+  	 		, DATE_FORMAT(wve.apply_date,'%Y-%m-%d') AS apply_date
+  	 		, wap.paid_amount
+  	 		, wap.total_pay_price
+  	 		, F_GET_EXCUTE_PRICE(ww.work_no) AS excute_price
+		FROM w_work ww
+		LEFT OUTER JOIN w_customer wc ON wc.customer_no = ww.customer_no
+  		LEFT OUTER JOIN w_customer_branch wcb ON wcb.branch_no = ww.branch_no
+		LEFT OUTER JOIN (SELECT ifnull(ww.p_work_no,ww.work_no) AS work_no,
+		                          GROUP_CONCAT(ww.location_name ORDER BY ww.work_no) AS location_name,
+		                          MIN(str_to_Date (st_date_ymd,'%Y%m%d')) AS st_working_date,
+		                          MAX(str_to_Date (ed_date_ymd,'%Y%m%d')) AS ed_working_date
+		                   FROM w_work ww
+		                   LEFT OUTER JOIN w_abc_admin_schedule waas ON waas.work_no = ww.work_no AND waas.schedule_type IN ('31', '32', '33')
+		                   GROUP BY (ifnull (ww.p_work_no,ww.work_no))
+		                 ) wasg ON wasg.work_no = ww.work_no
+		LEFT OUTER JOIN (SELECT IFNULL( ww.p_work_no, ww.work_no ) AS work_no,
+					       swve.estimate_no,
+					       swve.version_no ,
+					       swve.apply_date ,
+					       SUM(swver.resource_count*swver.unit_price) AS total_unit_price,
+					       SUM(swver.est_resource_count*swver.est_unit_price) AS total_est_unit_price
+					FROM w_version_estimate swve
+					INNER JOIN w_version_estimate_resource swver ON swve.estimate_no = swver.estimate_no
+					INNER JOIN w_work ww ON ww.work_no = swve.work_no
+                    WHERE apply_date IS NOT NULL
+                    AND swver.del_yn != 'Y'
+					GROUP BY IFNULL( ww.p_work_no, ww.work_no )
+					) wve ON wve.work_no = ww.work_no
+   		LEFT OUTER JOIN w_work_reject wwr ON wwr.work_no = ww.work_no
+  		LEFT OUTER JOIN (SELECT IFNULL(ww.p_work_no,ww.work_no) AS work_no,
+						       GROUP_CONCAT(DISTINCT IF (waas.schedule_type = '32',F_GET_ABC_ADMIN_NAME (waas.admin_no,waas.workerman_type),NULL) ORDER BY waasg.workerman_type,waasg.admin_no) AS workerman_admin_name,
+						       GROUP_CONCAT(DISTINCT IF (waas.schedule_type = '33',F_GET_ABC_ADMIN_NAME (waas.admin_no,waas.workerman_type),NULL)) AS supervisor_admin_name
+						FROM w_work ww
+						INNER JOIN w_abc_admin_schedule_group waasg ON waasg.work_no = ww.work_no AND waasg.schedule_stat <> '99'
+						INNER JOIN w_abc_admin_schedule waas ON waas.schedule_group_no = waasg.schedule_group_no
+						GROUP BY IFNULL(ww.p_work_no,ww.work_no)
+		) waasg ON waasg.work_no = ww.work_no
+   		LEFT OUTER JOIN ( 	SELECT work_no
+   								, sum(paid_amount) AS paid_amount
+								, sum(total_pay_price) AS total_pay_price
+							FROM w_abc_payment wap
+							WHERE work_no = #{work_no}
+							AND wap.del_yn != 'Y'
+							GROUP BY work_no
+						) wap ON wap.work_no = ww.work_no
+		WHERE ww.work_no = #{work_no}
+		]]>
+    </select>
+
+
+	<!-- B2b작업목록 -->
+    <select id="selectB2bSubWorkList" parameterType="map" resultType="map">
+    	<![CDATA[ /* SQL_ID : b2bWork.selectB2bSubWorkList */ ]]>
+    	SELECT ww.work_no,
+		       ww.work_id,
+		       ww.req_name,
+		       ww.admin_memo,
+		       ww.location_name,
+		       ww.req_content,
+		       ww.member_no,
+		       ww.work_stat,
+		       ww.work_zip,
+		       ww.work_addr1,
+		       ww.work_addr2,
+		       ww.work_addr_cd,
+		       ww.create_date
+		FROM w_work ww
+		WHERE IFNULL(ww.p_work_no,ww.work_no) = #{p_work_no}
+		AND ww.delete_yn != 'Y'
+		ORDER BY ww.work_no
+		<if test='pageLast != null and pageLast != "" '>
+		limit #{pageFirst},#{pageLast}
+		</if>
+    </select>
+
+	<!-- B2b작업일수 -->
+    <select id="selectDailyReportList" parameterType="map" resultType="map">
+    	<![CDATA[ /* SQL_ID : b2bWork.selectDailyReportList */ ]]>
+    	SELECT DATE_FORMAT(waas.st_date_ymd,'%Y-%m-%d') AS st_date_ymd
+    		,SUBSTR( _UTF8'일월화수목금토', DAYOFWEEK( waas.st_date_ymd ), 1 ) AS day_of_week
+			,wwdr.schedule_memo
+			,wwdr.next_schedule_memo
+			,F_GET_ADMIN_NAME(wwdr.update_no) AS admin_name
+			,wwdr.daily_report_no
+       		, F_GET_DAILY_EXCUTE_PRICE(ifnull(ww.p_work_no,ww.work_no) ,waas.st_date_ymd) AS excute_price
+		FROM w_work ww
+		INNER JOIN w_abc_admin_schedule waas ON waas.work_no = ww.work_no AND waas.schedule_type IN ('31', '32', '33')
+		LEFT OUTER JOIN w_work_daily_report wwdr ON wwdr.report_date = waas.st_date_ymd AND wwdr.work_no = #{work_no}
+		WHERE ifnull(ww.p_work_no,ww.work_no) = #{work_no}
+		AND ww.delete_yn != 'Y'
+		GROUP BY st_date_ymd
+    </select>
+
+	<!-- 공샤요약별 일수  -->
+    <select id="selectDailyWorkList" parameterType="map" resultType="map">
+    	<![CDATA[ /* SQL_ID : b2bWork.selectDailyWorkList */ ]]>
+    	SELECT DATE_FORMAT(waas.st_date_ymd,'%Y-%m-%d') AS st_date_ymd
+    		,SUBSTR( _UTF8'일월화수목금토', DAYOFWEEK( waas.st_date_ymd ), 1 ) AS day_of_week
+			,wwdr.schedule_memo
+			,wwdr.next_schedule_memo
+			,F_GET_ADMIN_NAME(wwdr.update_no) AS admin_name
+			,wwdr.daily_report_no
+       		, F_GET_DAILY_EXCUTE_PRICE(ifnull(ww.p_work_no,ww.work_no) ,waas.st_date_ymd) AS excute_price
+			,ww.location_name
+		FROM w_work ww
+		INNER JOIN w_abc_admin_schedule waas ON waas.work_no = ww.work_no AND waas.schedule_type IN ('31', '32', '33')
+		LEFT OUTER JOIN w_work_daily_report wwdr ON wwdr.report_date = waas.st_date_ymd AND wwdr.work_no = #{work_no}
+		WHERE ifnull(ww.p_work_no,ww.work_no) = #{work_no}
+		AND ww.delete_yn != 'Y'
+		GROUP BY st_date_ymd
+    </select>
+
+	<!-- B2b작업건별 일수 -->
+    <select id="selectWorkDayList" parameterType="map" resultType="map">
+    	 /* SQL_ID : b2bWork.selectWorkDayList*/
+		SELECT ww.work_no
+			, waas.st_date_ymd AS day_ymd
+			, DATE_FORMAT(waas.st_date_ymd,'%Y-%m-%d') AS st_date_ymd
+       		, SUBSTR(_UTF8 '일월화수목금토',DAYOFWEEK (waas.st_date_ymd),1) AS day_of_week
+		FROM w_work ww
+		  INNER JOIN w_abc_admin_schedule waas
+		          ON waas.work_no = ww.work_no
+		         AND waas.schedule_type IN ('31', '32', '33')
+		WHERE ifnull(ww.p_work_no,ww.work_no) = #{work_no}
+		AND ww.delete_yn != 'Y'
+		GROUP BY work_no,st_date_ymd
+    </select>
+
+	<!-- 작업일지 -->
+    <select id="selectDailyReport" parameterType="map" resultType="map">
+    	SELECT wwdr.schedule_memo,
+			wwdr.next_schedule_memo,
+			wwdr.daily_report_no
+		FROM w_work_daily_report wwdr
+		WHERE wwdr.work_no = #{work_no}
+		AND wwdr.report_date = #{report_date}
+
+    </select>
+
+	<insert id="insertDailyReport" parameterType="map"  useGeneratedKeys="true" keyProperty="key_no">
+		/* b2bWork.insertDailyReport */
+		insert into w_work_daily_report (
+			work_no,
+			schedule_memo,
+			next_schedule_memo,
+			report_date,
+			del_yn,
+			create_no,
+			create_date,
+			update_no,
+			update_date
+		)
+		values (
+			#{work_no},
+			#{schedule_memo},
+			#{next_schedule_memo},
+			#{report_date},
+			#{del_yn},
+			#{admin_no},
+			now(),
+			#{admin_no},
+			now()
+		)
+	</insert>
+
+	<update id="updateDailyReport" parameterType="map">
+		/* b2bWork.updateDailyReport */
+		update w_work_daily_report
+		set update_date = now()
+			<if test=" null != schedule_memo and '' != schedule_memo ">
+			,schedule_memo = #{schedule_memo}
+			</if>
+			<if test=" null != next_schedule_memo and '' != next_schedule_memo ">
+			,next_schedule_memo = #{next_schedule_memo}
+			</if>
+			<if test=" null != del_yn and '' != del_yn ">
+			,del_yn = #{del_yn}
+			</if>
+			<if test=" null != admin_no and '' != admin_no ">
+			,update_no = #{admin_no}
+			</if>
+		where work_no = #{work_no}
+		and report_date = #{report_date}
+		<selectKey  keyProperty="key_no" order="AFTER" resultType="long">
+			SELECT daily_report_no FROM w_work_daily_report WHERE work_no = #{work_no} AND report_date = #{report_date}
+		</selectKey>
+	</update>
+
+	<!-- B2b 작업일지 비용 조회 -->
+    <select id="selectExpenseList" parameterType="map" resultType="map">
+   	<![CDATA[ /* SQL_ID : b2bWork.selectExpenseList */ ]]>
+		SELECT '비용등록' AS exp_category
+				, wwe.exp_id
+				, wwe.exp_usage
+				, wwe.exp_type
+				, wwe.exp_target
+				, wv.vendor_name
+				, wp.partner_name
+				, wwe.exp_price
+				, wwe.exp_price * wwe.exp_cnt AS price
+				, wwe.exp_cnt
+       			, wwe.exp_stat as stat
+       			,'' AS material_name
+		FROM w_work_expenses wwe
+		INNER JOIN w_work ww ON ww.work_no = wwe.work_no AND ww.delete_yn != 'Y'
+		LEFT OUTER JOIN w_vendor wv ON wv.vendor_no = wwe.vendor_no
+		LEFT OUTER JOIN w_partner wp ON wp.partner_no = wwe.partner_no
+		WHERE IFNULL(ww.p_work_no,ww.work_no) = #{work_no}
+		<if test=" null != report_date and '' != report_date ">
+		AND wwe.st_date <![CDATA[ = ]]> #{report_date}
+		</if>
+		UNION ALL
+		SELECT  '지출결의' AS exp_category,
+			 	wd.disb_id AS exp_id,
+		       	wd.disb_usage AS exp_usage,
+		       	'04' AS exp_type,
+		       	wd.disb_target AS disb_target,
+		       	'' AS vendor_name,
+		       	'' AS partner_name,
+		       	wd.disb_amt AS exp_price,
+		       	wd.disb_amt AS price,
+		       	'0' AS exp_cnt,
+			    wd.disb_stat  AS stat,
+				   '' AS material_name
+		FROM w_disbursement wd
+		LEFT JOIN w_work ww ON (wd.work_no = ww.work_no AND ww.delete_yn != 'Y')
+		WHERE IFNULL(ww.p_work_no,ww.work_no) = #{work_no}
+		<if test=" null != report_date and '' != report_date ">
+		AND wd.disb_date = #{report_date}
+		</if>
+		UNION ALL
+		SELECT
+				'자재요청' AS exp_category,
+				wmd.material_doc_id AS exp_id,
+				wmd.req_usage AS exp_usage,
+				'03' AS exp_type,
+				'' AS exp_target,
+		    	'' AS vendor_name,
+		    	'' AS partner_name,
+		    	wmr.purchased_price AS exp_price,
+      			IFNULL(wmr.purchased_price*wmr.material_cnt,0) AS price,
+		    	wmr.material_cnt AS exp_cnt,
+		    	wmd.doc_stat AS stat,
+		    	wmr.material_name
+		FROM w_material_doc wmd
+		INNER JOIN w_work ww ON (wmd.work_no = ww.work_no AND ww.delete_yn != 'Y')
+		INNER JOIN w_material_req wmr ON (wmr.material_doc_no = wmd.material_doc_no)
+		WHERE IFNULL(ww.p_work_no,ww.work_no) = #{work_no}
+		<if test=" null != report_date and '' != report_date ">
+		AND   wmd.use_date = #{report_date}
+		</if>
+	</select>
+	<!-- 작업일지 -->
+    <select id="selectDailyReportUsedAmount" parameterType="map" resultType="map">
+	    SELECT sum(used_amount) AS used_amount FROM (
+			SELECT wwe.exp_price*wwe.exp_cnt AS used_amount
+			FROM w_work_expenses wwe
+			  INNER JOIN w_work ww ON ww.work_no = wwe.work_no AND ww.delete_yn != 'Y'
+			  LEFT OUTER JOIN w_vendor wv ON wv.vendor_no = wwe.vendor_no
+			WHERE IFNULL(ww.p_work_no,ww.work_no) = #{work_no}
+			-- AND   wwe.ed_date >= #{report_date}
+			UNION ALL
+			SELECT disb_amt AS used_amount
+			FROM w_disbursement wd
+			INNER JOIN w_work ww ON (wd.work_no = ww.work_no AND ww.delete_yn != 'Y')
+			WHERE IFNULL(ww.p_work_no,ww.work_no) = #{work_no}
+		) t
+    </select>
+    <!-- B2b 실행가 목록 조회 -->
+    <select id="selectExcutePriceList" parameterType="map" resultType="map">
+   	<![CDATA[ /* SQL_ID : b2bWork.selectExcutePriceList */ ]]>
+		SELECT '비용등록' AS exp_category <!-- 구분 -->
+				, '01' AS exp_cate_code
+				, wwe.exp_id	<!--  문서번호 -->
+				, wwe.exp_usage	<!--  비용 -->
+				, wwe.exp_type	<!-- 비용분류 -->
+				, wwe.exp_target <!--  공과잡비사용처 -->
+				, wwe.exp_price <!--  단가 -->
+				, wwe.exp_cnt <!--  수량 -->
+				, wwe.st_date
+				, wwe.ed_date
+				, wwe.exp_stat
+       			, wwe.pay_req_date
+				, wp.partner_name <!-- 외주용역 -->
+				, wwe.update_date
+       			, wv.vendor_name
+				, F_GET_ADMIN_NAME(wwe.update_no) AS update_name
+				, IFNULL( (SELECT max(wwec.confirm_date) FROM w_work_expenses_confirm wwec WHERE exp_no = wwe.exp_no ), wwe.pay_req_date ) AS pay_date
+       			, wwe.exp_price * wwe.exp_cnt AS price
+		FROM w_work_expenses wwe
+		INNER JOIN w_work ww ON ww.work_no = wwe.work_no AND ww.delete_yn != 'Y'
+		LEFT OUTER JOIN w_partner wp ON wp.partner_no = wwe.partner_no
+		LEFT OUTER JOIN w_vendor wv ON wv.vendor_no = wwe.vendor_no
+		WHERE IFNULL(ww.p_work_no,ww.work_no) = #{work_no}
+		UNION ALL
+		SELECT '지출결의' AS exp_category,
+				'02' AS exp_cate_code,
+		       wd.disb_id AS exp_id,
+		       (SELECT code_name FROM w_code WHERE code_gb =  'disb_usage' AND code_value = wd.disb_usage )  AS exp_usage,
+		       '04' AS exp_type,
+		       wd.disb_target AS exp_target,
+		       wd.disb_amt AS exp_price,
+		       0 AS exp_cnt,
+		       wd.disb_date AS st_date,
+		       '' AS ed_date,
+		       wd.disb_stat AS exp_stat,
+		       wd.disb_date AS pay_req_date,
+		       '' AS partner_name,
+		       wd.update_date,
+		       '' AS vendor_name,
+		       F_GET_ADMIN_NAME(wd.update_no) AS update_name,
+		       wd.disb_date AS pay_date,
+		       wd.disb_amt AS price
+		FROM w_disbursement wd
+		  LEFT JOIN w_work ww ON (wd.work_no = ww.work_no AND ww.delete_yn != 'Y')
+		WHERE IFNULL(ww.p_work_no,ww.work_no) = #{work_no}
+		UNION ALL
+		SELECT
+		'자재요청' AS exp_category,
+		'03' AS exp_cate_code,
+		wmd.material_doc_id AS exp_id,
+		wmd.req_usage AS exp_usage,
+		'03' AS exp_type,
+		'' AS exp_target,
+		'' AS exp_price,
+		'' AS exp_cnt,
+		wmd.use_date  AS st_date,
+		'' AS ed_date,
+		wmd.doc_stat        AS exp_stat,
+		wmd.create_date        AS pay_req_date,
+		'' AS  partner_name,
+		wmd.update_date        AS update_date,
+		'' AS vendor_name,
+		F_GET_ADMIN_NAME(wmd.update_no) AS update_name,
+		date_format(wmd.confirm_date, '%Y-%m-%d') AS pay_date,
+		sum(wmr.purchased_price * wmr.material_cnt) AS price
+		FROM w_material_doc wmd
+		INNER JOIN w_work ww ON (wmd.work_no = ww.work_no AND ww.delete_yn != 'Y')
+		INNER JOIN w_material_req wmr ON (wmr.material_doc_no = wmd.material_doc_no)
+		WHERE 1 = 1
+		AND   IFNULL(ww.p_work_no,ww.work_no) = #{work_no}
+		GROUP BY wmd.material_doc_id
+		,wmd.req_usage
+		,wmd.use_date
+		,wmd.doc_stat
+		,wmd.create_date
+		,wmd.update_date
+		,wmd.update_no
+		,wmd.confirm_date
+	</select>
+
+    <select id="selectMaterialDocList" parameterType="map" resultType="map">
+    	 /* SQL_ID : b2bWork.selectMaterialDocList */
+			SELECT wmd.material_doc_no,
+			       wmd.material_doc_id,
+			       wmd.material_no,
+			       wmd.work_no,
+			       wmd.manager_no,
+			       F_GET_ADMIN_NAME(wmd.manager_no) manager_name,
+			       date_format(wmd.use_date, '%Y-%m-%d') AS use_date,
+			       wmd.use_hh,
+			       wmd.use_mm,
+			       wmd.receive_type,
+			       wmd.doc_stat,
+			       wmd.material_cnt,
+			       wmd.doc_admin_no,
+			       F_GET_ADMIN_NAME(wmd.doc_admin_no) doc_admin_name,
+			       wmd.doc_date,
+			       wmd.remarks,
+			       wmd.confirm_admin_no,
+			       wmd.confirm_date,
+			       wmd.delivery_name,
+			       wmd.del_yn,
+			       wmd.create_no,
+			       date_format(wmd.create_date, '%Y-%m-%d') AS create_date,
+			       wmd.update_no,
+			       date_format(wmd.update_date, '%Y-%m-%d') AS update_date,
+			       ww.req_name,
+			       ww.manager_admin_no,
+			       ww.work_id,
+			       ww.work_zip,
+			       ww.work_addr1,
+			       ww.work_addr2,
+			       wm.material_name,
+			       ww.req_name,
+			       wmr.cnt
+			FROM w_material_doc wmd
+			  INNER JOIN w_work ww ON (wmd.work_no = ww.work_no AND ww.delete_yn != 'Y')
+			  LEFT OUTER JOIN (SELECT material_doc_no
+							,max(material_no) AS material_no
+							,count(*) AS cnt
+						FROM w_material_req
+						GROUP BY material_doc_no ) wmr ON wmr.material_doc_no = wmd.material_doc_no
+			  LEFT OUTER JOIN w_material wm ON (wm.material_no = wmr.material_no)
+			WHERE 1 = 1
+			AND IFNULL(ww.p_work_no ,ww.work_no) = #{work_no}
+			ORDER BY wmd.material_doc_no DESC
+    </select>
+
+    <select id="selectMaterialReqList" parameterType="map" resultType="map">
+    	 /* SQL_ID : b2bWork.selectMaterialReqList */
+			SELECT wmd.material_doc_no,
+			       wmd.material_doc_id,
+   				   wm.material_id ,
+			       wmd.doc_stat,
+			       wmr.req_stat,
+			       IFNULL(wm.material_name,wmr.material_name) AS material_name ,
+			       date_format(wmd.use_date, '%Y-%m-%d') AS use_date,
+			       wmr.material_cnt,
+			       wmr.purchased_price ,
+			       wm.workerman_price ,
+			       F_GET_ADMIN_NAME(wmr.create_no) reg_admin_name,
+			       date_format(wmr.create_date, '%Y-%m-%d') AS create_date
+			FROM w_material_doc wmd
+			  INNER JOIN w_work ww ON (wmd.work_no = ww.work_no AND ww.delete_yn != 'Y')
+			  INNER JOIN w_material_req wmr ON (wmr.material_doc_no = wmd.material_doc_no)
+			  LEFT OUTER JOIN w_material wm ON (wm.material_no = wmr.material_no)
+			WHERE 1 = 1
+			AND IFNULL(ww.p_work_no ,ww.work_no) = #{work_no}
+			ORDER BY wmd.material_doc_no DESC
+    </select>
+
+	<insert id="insertWorkReject" parameterType="map">
+		/* b2bWork.insertWorkReject */
+		INSERT INTO w_work_reject
+		(
+		  work_no,
+		  reject_type,
+		  reject_cd,
+		  reject_content,
+		  create_date,
+		  reject_gb
+		)
+		values (
+			#{work_no},
+			#{reject_type},
+			#{reject_cd},
+			#{reject_content},
+			NOW(),
+			#{reject_gb}
+		)
+	</insert>
+</mapper>
+
+

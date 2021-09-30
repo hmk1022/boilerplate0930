@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>워커맨 Admin</title>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+    <meta content="" name="description">
+    <meta content="" name="author">
+    <link href="/assets/css/vendor.min.css" rel="stylesheet">
+    <link href="/assets/css/workman_admin.css" rel="stylesheet">
+    <link href="/assets/css/datepicker.css" rel="stylesheet">
+    <link href="/assets/css/jquery.gritter.css" rel="stylesheet">
+    <script src="/assets/js/vendor.min.js" type="text/javascript"></script>
+    <script src="/assets/js/app.min.js" type="text/javascript"></script>
+    <script src="/assets/js/moment.min.js" type="text/javascript"></script>
+    <script src="/assets/js/datepicker.js" type="text/javascript"></script>
+    <script>
+    $(document).ready(function() {
+        $('#reg_date_from,#reg_date_from2,#reg_date_to').val(moment().format('YYYY. MM. DD'));
+        $('#reg_date_from,#reg_date_from2,#reg_date_to').datepicker({
+           format: 'YYYY. MM. DD',
+           autoHide: true,
+        }); 
+    }); 
+    </script>
+</head>
+
+<body class="p-3">
+    <div class="card">
+        <div class="card-header">
+            <h3>완료보고서 작성 - 고객 전송용<span class="text-muted small d-block">고객 전송용 완료보고서를 작성할 수 있습니다</span></h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                        <label class="form-label">고객(사) 및 지점명</label>
+                        <input type="text" class="form-control" value="WeWork / 선릉점" disabled>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <label class="form-label">수신인 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" value="홍길동">
+                    </div>
+                </div>
+                <div class="col-12 mt-3">
+                    <div class="form-group">
+                        <label class="form-label">현장주소</label>
+                        <input type="text" class="form-control" value="서울시 강남구 테헤란로 123 WeWork 빌딩 15층" disabled>
+                    </div>
+                </div>
+                <div class="col-12 mt-3">
+                    <div class="form-group">
+                        <label class="form-label">공사명 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" value="WeWork 선릉점 14-110호(13인실) 인테리어 공사">
+                    </div>
+                </div>
+                <div class="col-6 mt-3">
+                    <div class="form-group">
+                        <label class="form-label mb-2">현장책임자 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" value="양호익">
+                    </div>
+                </div>
+                <div class="col-6 mt-3">
+                    <div class="form-group">
+                        <label class="form-label mb-2">시공담당자 <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" value="이경진, 민병욱, 박은성">
+                    </div>
+                </div>
+                <div class="col-12 mt-3">
+                    <div class="form-group">
+                        <label class="form-label">공사기간</label>
+                        <input type="text" class="form-control" value="2021-05-12 ~ 2021-05-16" readonly>
+                    </div>
+                </div>
+                <div class="col-12 mt-3">
+                    <div class="form-group">
+                        <label class="form-label">공사내역 <span class="text-danger">*</span></label>
+                        <textarea class="form-control" rows="6"></textarea>
+                    </div>
+                </div>
+                <div class="col-12 mt-3">
+                    <div class="form-group">
+                        <label class="form-label">공사전 사진 <span class="text-danger">*</span></label>
+                        <form id="fileupload" action="#" method="POST" enctype="multipart/form-data" class="">
+                            <div class="row fileupload-buttonbar">
+                                <div class="col-12">
+                                    <span class="btn btn-success fileinput-button">
+                                        <i class="fa fa-plus"></i>
+                                        <span>사진첨부</span>
+                                        <input type="file" name="files[]" >
+                                    </span>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="border p-3 my-3">
+                            <ul class="registered-users-list clearfix">
+                                <li>
+                                    <a href="javascript:;"><img src="./assets/images/user-5.jpg" alt=""></a>
+                                </li>
+                                <li>
+                                    <a href="javascript:;"><img src="./assets/images/user-3.jpg" alt=""></a>
+                                </li>
+                                <li>
+                                    <a href="javascript:;"><img src="./assets/images/user-1.jpg" alt=""></a>
+                                </li>
+                                <li>
+                                    <a href="javascript:;"><img src="./assets/images/user-8.jpg" alt=""></a>
+                                </li>
+                                <li>
+                                    <a href="javascript:;"><img src="./assets/images/user-2.jpg" alt=""></a>
+                                </li>
+                                <li>
+                                    <a href="javascript:;"><img src="./assets/images/user-6.jpg" alt=""></a>
+                                </li>
+                                <li>
+                                    <a href="javascript:;"><img src="./assets/images/user-4.jpg" alt=""></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-12 mt-3">
+                    <div class="form-group">
+                        <label class="form-label">공사중 사진 <span class="text-danger">*</span></label>
+                        <form id="fileupload" action="#" method="POST" enctype="multipart/form-data" class="">
+                            <div class="row fileupload-buttonbar">
+                                <div class="col-12">
+                                    <span class="btn btn-success fileinput-button">
+                                        <i class="fa fa-plus"></i>
+                                        <span>사진첨부</span>
+                                        <input type="file" name="files[]" >
+                                    </span>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="border p-3 my-3">
+                            <ul class="registered-users-list clearfix">
+                                <li>
+                                    <a href="javascript:;"><img src="./assets/images/user-5.jpg" alt=""></a>
+                                </li>
+                                <li>
+                                    <a href="javascript:;"><img src="./assets/images/user-3.jpg" alt=""></a>
+                                </li>
+                                <li>
+                                    <a href="javascript:;"><img src="./assets/images/user-1.jpg" alt=""></a>
+                                </li>
+                                <li>
+                                    <a href="javascript:;"><img src="./assets/images/user-8.jpg" alt=""></a>
+                                </li>
+                                <li>
+                                    <a href="javascript:;"><img src="./assets/images/user-2.jpg" alt=""></a>
+                                </li>
+                                <li>
+                                    <a href="javascript:;"><img src="./assets/images/user-6.jpg" alt=""></a>
+                                </li>
+                                <li>
+                                    <a href="javascript:;"><img src="./assets/images/user-4.jpg" alt=""></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-12 mt-3">
+                    <div class="form-group">
+                        <label class="form-label">공사후 사진 <span class="text-danger">*</span></label>
+                        <form id="fileupload" action="#" method="POST" enctype="multipart/form-data" class="">
+                            <div class="row fileupload-buttonbar">
+                                <div class="col-12">
+                                    <span class="btn btn-success fileinput-button">
+                                        <i class="fa fa-plus"></i>
+                                        <span>사진첨부</span>
+                                        <input type="file" name="files[]" >
+                                    </span>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="border p-3 my-3">
+                            <ul class="registered-users-list clearfix">
+                                <li>
+                                    <a href="javascript:;"><img src="./assets/images/user-5.jpg" alt=""></a>
+                                </li>
+                                <li>
+                                    <a href="javascript:;"><img src="./assets/images/user-3.jpg" alt=""></a>
+                                </li>
+                                <li>
+                                    <a href="javascript:;"><img src="./assets/images/user-1.jpg" alt=""></a>
+                                </li>
+                                <li>
+                                    <a href="javascript:;"><img src="./assets/images/user-8.jpg" alt=""></a>
+                                </li>
+                                <li>
+                                    <a href="javascript:;"><img src="./assets/images/user-2.jpg" alt=""></a>
+                                </li>
+                                <li>
+                                    <a href="javascript:;"><img src="./assets/images/user-6.jpg" alt=""></a>
+                                </li>
+                                <li>
+                                    <a href="javascript:;"><img src="./assets/images/user-4.jpg" alt=""></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-primary btn-block">등록</button>
+        </div>
+    </div>
+</body>
+
+</html>

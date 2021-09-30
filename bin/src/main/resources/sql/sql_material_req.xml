@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="material_req">
+
+	<select id="listMaterialReq" resultType="map">
+		
+		/* SQL_ID : material_req.listMaterialReq */
+		SELECT
+			wmr.material_req_no,
+			wmr.material_doc_no,
+			wmr.material_no,
+			wmr.material_cnt,
+			wmr.del_yn,
+			wmr.create_no,
+			wmr.create_date,
+			wmr.update_no,
+			wmr.update_date,
+			CASE WHEN wmr.material_no is not null THEN wm.material_name ELSE wmr.material_name END material_name,
+			CASE WHEN wmr.material_no is not null THEN wm.purchased_price ELSE wmr.purchased_price END purchased_price,
+			CASE WHEN wmr.material_no is not null THEN wm.workerman_price ELSE 0 END workerman_price,
+			CASE WHEN wmr.material_no is not null THEN wm.unit_cd ELSE wmr.unit_cd END unit_cd,
+			CASE WHEN wmr.material_no is not null THEN wm.model_name ELSE wmr.model_name END model_name,
+			CASE WHEN wmr.material_no is not null THEN wm.material_link ELSE wmr.material_link END material_link,
+			wmr.req_stat,
+			wmr.receipt_date,
+			wmr.receipt_no,
+			wm.material_id,
+			wm.house_cnt,
+			wm.sba_cnt,
+			wm.vehicle_cnt,
+			wb.brand_name,
+			(
+				SELECT wmb.material_bound_no 
+				FROM 
+					w_material_bound wmb 
+					inner join w_material_bound_inout wmi on (wmi.material_bound_no = wmb.material_bound_no)
+				WHERE 
+					wmb.material_doc_no = wmr.material_doc_no 
+					AND wmi.material_no = wm.material_no
+					LIMIT 1
+			) material_bound_no,
+			(
+				SELECT material_bound_id 
+				FROM 
+					w_material_bound wmb 
+					inner join w_material_bound_inout wmi on (wmi.material_bound_no = wmb.material_bound_no)
+				WHERE 
+					wmb.material_doc_no = wmr.material_doc_no 
+					AND wmi.material_no = wm.material_no
+					LIMIT 1
+			) material_bound_id
+		FROM
+			w_material_req wmr 
+				left join w_material wm on (wmr.material_no = wm.material_no)
+				left join w_material_doc wmd on (wmr.material_doc_no = wmd.material_doc_no)
+				left join w_brand wb on (wb.brand_no = (CASE WHEN wmr.material_no is not null THEN wm.brand_no ELSE wmr.brand_no END))
+		WHERE 
+			wmr.material_doc_no = #{material_doc_no}
+		AND wmr.del_yn = 'N'	
+		ORDER BY 
+			wmr.material_req_no 
+		
+	</select>
+	
+	
+	<select id="selectMaterialReq" resultType="map">
+		
+		/* SQL_ID : material_req.selectMaterialReq */
+		SELECT
+			wmr.material_req_no,
+			wmr.material_doc_no,
+			wmr.material_no,
+			wmr.material_cnt,
+			wmr.del_yn,
+			wmr.create_no,
+			wmr.create_date,
+			wmr.update_no,
+			wmr.update_date,
+			CASE WHEN wmr.material_no is not null THEN wm.material_name ELSE wmr.material_name END material_name,
+			CASE WHEN wmr.material_no is not null THEN wm.purchased_price ELSE wmr.purchased_price END purchased_price,
+			CASE WHEN wmr.material_no is not null THEN wm.workerman_price ELSE 0 END workerman_price,
+			CASE WHEN wmr.material_no is not null THEN wm.unit_cd ELSE wmr.unit_cd END unit_cd,
+			wmr.material_link,
+			wmr.req_stat,
+			wmr.receipt_date,
+			wmr.receipt_no,
+			wm.material_id,
+			wm.house_cnt,
+			wm.sba_cnt,
+			wm.vehicle_cnt,
+			wb.brand_name,
+			wmb.material_bound_id,
+			wmd.work_no,
+			wmd.receive_type
+		FROM
+			w_material_req wmr 
+				left join w_material wm on (wmr.material_no = wm.material_no)
+				left join w_material_doc wmd on (wmr.material_doc_no = wmd.material_doc_no)
+				left join w_brand wb on (wb.brand_no = wmr.brand_no)
+				left join w_material_bound wmb on (wmb.material_doc_no = wmr.material_doc_no)
+		WHERE 
+			wmr.material_req_no = #{material_req_no} 
+		LIMIT 1
+	</select>	
+	
+	<insert id="insertMaterialReq" useGeneratedKeys="true" keyProperty="key_no">
+		
+		/* SQL_ID : material_req.insertMaterialReq */
+		INSERT INTO w_material_req (
+			material_doc_no,
+			material_no,
+			material_cnt,
+			material_name,
+			brand_no,
+			model_name,
+			unit_cd,
+			purchased_price,
+			material_link,
+			req_stat,
+			receipt_date,
+			receipt_no,
+			category_no,
+			del_yn,
+			create_no,
+			create_date,
+			update_no,
+			update_date
+		) VALUES (
+			#{material_doc_no},
+			#{material_no},
+			#{material_cnt},
+			#{material_name},
+			#{brand_no},
+			#{model_name},
+			#{unit_cd},
+			#{purchased_price},
+			#{material_link},
+			#{req_stat},
+			#{receipt_date},
+			#{receipt_no},
+			#{category_no},
+			#{del_yn},
+			#{create_no},
+			now(),
+			#{update_no},
+			now()
+		)
+	</insert>
+	
+	<update id="deleteMaterialReq">
+		/* SQL_ID : material_req.deleteMaterialReq */
+		DELETE FROM w_material_req 
+		WHERE
+			material_req_no = #{material_req_no}
+	</update>
+
+	<update id="updateMaterialReqStat">
+		/* SQL_ID : material_req.updateMaterialReqStat */
+		update w_material_req
+			SET req_stat =#{req_stat},
+			update_no = #{update_no},
+			update_date = now()
+		WHERE
+			material_req_no = #{material_req_no}
+	</update>
+
+
+	<update id="updateMaterialReqNo">
+		/* SQL_ID : material_req.updateMaterialReqNo */
+		update w_material_req
+			SET material_no =#{material_no},
+			update_no = #{update_no},
+			update_date = now()
+		WHERE
+			material_req_no = #{material_req_no}
+	</update>
+		
+</mapper>

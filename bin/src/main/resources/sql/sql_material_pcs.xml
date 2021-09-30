@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="material_pcs">
+
+	<select id="listMaterialPcs" resultType="map">
+		/* SQL_ID : material_pcs.listMaterialPcs */
+
+		SELECT
+			T.*,
+			(SELECT
+				DATE_FORMAT(confirm_date,'%Y-%m-%d')
+			 FROM
+			 	w_work_expenses_confirm wwec
+			WHERE exp_no = T.exp_no
+				ORDER BY confirm_no DESC limit 1) confirm_date,
+			(SELECT
+				F_GET_ADMIN_NAME(confirm_admin_no)
+			 FROM
+			 	w_work_expenses_confirm wwec
+			WHERE exp_no = T.exp_no
+				ORDER BY confirm_no DESC limit 1) confirm_admin_name,
+			(
+				SELECT SUM(item_cnt)-1 FROM w_material_pcs_item wmpi WHERE material_pcs_no = T.material_pcs_no
+			) item_cnt,
+			(
+				SELECT wm.material_name
+				FROM w_material_pcs_item wmpi
+					inner join w_material wm on (wmpi.material_no = wm.material_no)
+				WHERE material_pcs_no = T.material_pcs_no
+				ORDER BY wmpi.material_pcs_item_no LIMIT 1
+			) material_name,
+			F_GET_ADMIN_NAME(T.create_no) create_name
+		FROM (
+			SELECT
+				wmp.material_pcs_no,
+				wmp.material_pcs_id,
+				wmp.pcs_reason,
+				wmp.material_doc_no,
+				wmp.material_doc_admin_no,
+				F_GET_ADMIN_NAME(wmp.material_doc_admin_no) material_doc_admin_name,
+				wmp.vendor_no,
+				wv.vendor_name,
+				wmp.bank_code,
+				wmp.acct,
+				wmp.evidence,
+				wmp.vat_yn,
+				wmp.pay_req_date,
+				wmp.etc_remarks,
+				wmp.remarks,
+				wmp.pcs_stat,
+				wmp.pcs_sum_price,
+				wmp.del_yn,
+				wmp.create_no,
+				wmp.create_date,
+				wmp.update_no,
+				wmp.update_date,
+				(
+				SELECT
+					SUM(wm.purchased_price * wmpi.item_cnt)
+				FROM
+					w_material_pcs_item wmpi
+						INNER JOIN w_material wm on(wmpi.material_no=wm.material_no)
+				WHERE wmpi.material_pcs_no = wmp.material_pcs_no
+				) * (CASE WHEN wmp.vat_yn='Y' THEN 1.1 ELSE 1 END) sum_item_amt,
+				wwe.exp_stat,
+				wwe.exp_no,
+				wmd.doc_admin_no
+			FROM
+				w_material_pcs wmp
+					left join w_vendor wv on (wv.vendor_no = wmp.vendor_no)
+					left join w_work_expenses wwe on (wmp.material_pcs_no = wwe.material_pcs_no AND wwe.exp_stat ='03')
+					left join w_material_doc wmd on (wmd.material_doc_no = wmp.material_doc_no)
+			WHERE 1=1
+			<if test="s_material_pcs_id != null and s_material_pcs_id != ''">
+				AND wmp.material_pcs_id LIKE concat('%', #{s_material_pcs_id}, '%')
+			</if>
+			<if test="s_material_doc_admin_name != null and s_material_doc_admin_name != ''">
+				AND F_GET_ADMIN_NAME(wmp.material_doc_admin_no) LIKE concat('%', #{s_material_doc_admin_name}, '%')
+			</if>
+			<if test="s_pcs_reason != null and s_pcs_reason != ''">
+				AND wmp.pcs_reason = #{s_pcs_reason}
+			</if>
+			<if test="s_pcs_stat != null and s_pcs_stat != ''">
+				AND wmp.pcs_stat = #{s_pcs_stat}
+			</if>
+			ORDER BY wmp.material_pcs_no DESC
+			<if test="pageFirst != null and pageFirst != ''">
+			LIMIT #{pageFirst}, #{pageLast}
+			</if>
+		) T
+	</select>
+
+	<select id="listMaterialPcsCnt" resultType="int">
+
+		/* SQL_ID : material_pcs.listMaterialPcsCnt */
+		SELECT
+			count(1) as totalRecords
+		FROM
+			w_material_pcs wmp
+		WHERE
+			1 = 1
+		<if test="s_material_pcs_id != null and s_material_pcs_id != ''">
+			AND wmp.material_pcs_id LIKE concat('%', #{s_material_pcs_id}, '%')
+		</if>
+		<if test="s_material_doc_admin_name != null and s_material_doc_admin_name != ''">
+			AND F_GET_ADMIN_NAME(wmp.material_doc_admin_no) LIKE concat('%', #{s_material_doc_admin_name}, '%')
+		</if>
+		<if test="s_pcs_reason != null and s_pcs_reason != ''">
+			AND wmp.pcs_reason = #{s_pcs_reason}
+		</if>
+		<if test="s_pcs_stat != null and s_pcs_stat != ''">
+			AND wmp.pcs_stat = #{s_pcs_stat}
+		</if>
+	</select>
+
+	<select id="selectMaterialPcs" resultType="map">
+		/* SQL_ID : material_pcs.selectMaterialPcs */
+		SELECT
+			wmp.material_pcs_no,
+			wmp.material_pcs_id,
+			wmp.pcs_reason,
+			wmp.material_doc_admin_no,
+			F_GET_ADMIN_NAME(wmp.material_doc_admin_no) material_doc_admin_name,
+			wmp.vendor_no,
+			wmp.bank_code,
+			wmp.acct,
+			wmp.evidence,
+			wmp.vat_yn,
+			wmp.pay_req_date,
+			wmp.etc_remarks,
+			wmp.remarks,
+			wmp.pcs_stat,
+			wmp.pcs_sum_price,
+			wmp.del_yn,
+			wmp.create_no,
+			wmp.create_date,
+			wmp.update_no,
+			wmp.update_date,
+			wv.vendor_name,
+			wv.vendor_hp1,
+			wv.bank_code ,
+			wv.acct,
+			ww.work_id,
+			ww.req_name,
+			(
+				SELECT SUM(item_cnt) FROM w_material_pcs_item wmpi
+				WHERE wmpi.material_pcs_no = wmp.material_pcs_no
+			) item_cnt,
+			(
+				SELECT
+					SUM(wm.purchased_price)
+				FROM
+					w_material_pcs_item wmpi INNER JOIN w_material wm on(wmpi.material_no = wm.material_no)
+				WHERE wmpi.material_pcs_no = wmp.material_pcs_no
+			) item_amt,
+			wmp.work_no,
+			wmd.material_doc_id,
+			F_GET_ADMIN_NAME(wmd.doc_admin_no) doc_admin_name
+		FROM
+			w_material_pcs wmp
+				left join w_vendor wv on (wmp.vendor_no = wv.vendor_no)
+				left join w_material_doc wmd on (wmd.material_doc_no = wmp.material_doc_no)
+				left join w_work ww on (wmp.work_no = ww.work_no AND ww.delete_yn != 'Y')
+		WHERE
+			wmp.material_pcs_no = #{material_pcs_no }
+
+	</select>
+
+	<select id="getMaterialPcsId" resultType="string">
+		/* SQL_ID : vendor.getMaterialPcsId */
+		SELECT
+			CONCAT('PCS_', date_format(now(), '%y%m'), '_', LPAD(IFNULL(MAX(material_pcs_no), 0)+1, 3, '0')) material_pcs_id
+		FROM
+			w_material_pcs wm
+		FOR UPDATE
+	</select>
+
+	<insert id="insertMaterialPcs" useGeneratedKeys="true" keyProperty="key_no">
+		/* SQL_ID : material_pcs.insertMaterialPcs */
+		INSERT INTO w_material_pcs (
+			material_pcs_id,
+			pcs_reason,
+			material_doc_no,
+			material_doc_admin_no,
+			vendor_no,
+			work_no,
+			bank_code,
+			acct,
+			evidence,
+			vat_yn,
+			pay_req_date,
+			etc_remarks,
+			remarks,
+			pcs_stat,
+			pcs_sum_price,
+			create_no,
+			create_date,
+			update_no,
+			update_date
+		) VALUES (
+			#{material_pcs_id},
+			#{pcs_reason},
+			#{material_doc_no},
+			#{material_doc_admin_no},
+			#{vendor_no},
+			#{work_no},
+			#{bank_code},
+			#{acct},
+			#{evidence},
+			#{vat_yn},
+			#{pay_req_date},
+			#{etc_remarks},
+			#{remarks},
+			#{pcs_stat},
+			#{pcs_sum_price},
+			#{create_no},
+			now(),
+			#{update_no},
+			now()
+		)
+	</insert>
+
+	<update id="updateMaterialPcs">
+		/* SQL_ID : material_pcs.updateMaterialPcs */
+		UPDATE w_material_pcs SET
+			pcs_reason = #{pcs_reason},
+			vendor_no = #{vendor_no},
+			bank_code = #{bank_code},
+			acct = #{acct},
+			evidence = #{evidence},
+			vat_yn = #{vat_yn},
+			pay_req_date = #{pay_req_date},
+			remarks = #{remarks},
+			etc_remarks = #{etc_remarks},
+			pcs_stat = #{pcs_stat},
+			update_no = #{update_no},
+			update_date = now()
+		WHERE
+			material_pcs_no = #{material_pcs_no}
+	</update>
+
+	<update id="deleteMaterialPcs">
+		/* SQL_ID : material_pcs.deleteMaterialPcs */
+		UPDATE w_material_pcs SET
+		    del_yn = #{del_yn},
+		    update_no = #{update_no},
+		    update_date = now()
+		WHERE
+			material_pcs_no = #{material_pcs_no}
+	</update>
+
+
+	<update id="updateMaterialPcsStat">
+		/* SQL_ID : material_pcs.updateMaterialPcsStat */
+		UPDATE w_material_pcs SET
+			pcs_stat = #{pcs_stat},
+			update_no = #{update_no},
+			update_date = now()
+		WHERE
+			material_pcs_no = #{material_pcs_no}
+	</update>
+
+	<update id="updateMaterialPcsSumPrice">
+		/* SQL_ID : material_pcs.updateMaterialPcsSumPrice */
+		UPDATE w_material_pcs SET
+			pcs_sum_price = (
+				SELECT
+				SUM(a.item_cnt * b.purchased_price )
+				FROM
+					w_material_pcs_item a INNER JOIN w_material b ON (a.material_no = b.material_no )
+				WHERE
+					material_pcs_no = #{material_pcs_no}
+			),
+			update_no = #{update_no},
+			update_date = now()
+		WHERE
+			material_pcs_no = #{material_pcs_no}
+	</update>
+
+</mapper>

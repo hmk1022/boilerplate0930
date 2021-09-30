@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>워커맨 Admin</title>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
+    <meta content="" name="description">
+    <meta content="" name="author">
+    <link href="/assets/css/vendor.min.css" rel="stylesheet">
+    <link href="/assets/css/workman_admin.css" rel="stylesheet">
+    <link href="/assets/css/datepicker.css" rel="stylesheet">
+    <link href="/assets/css/jquery.gritter.css" rel="stylesheet">
+    <script src="/assets/js/vendor.min.js" type="text/javascript"></script>
+    <script src="/assets/js/app.min.js" type="text/javascript"></script>
+    <script src="/assets/js/moment.min.js" type="text/javascript"></script>
+    <script src="/assets/js/datepicker.js" type="text/javascript"></script>
+    <script>
+    $(document).ready(function() {
+        $('#reg_date_from,#reg_date_from2,#reg_date_to').val(moment().format('YYYY. MM. DD'));
+        $('#reg_date_from,#reg_date_from2,#reg_date_to').datepicker({
+           format: 'YYYY. MM. DD',
+           autoHide: true,
+        }); 
+    }); 
+    </script>
+</head>
+
+<body class="p-3">
+    <div class="card">
+        <div class="card-header">
+            <h3>결제 생성<span class="text-muted small d-block">총 결제금액을 기준으로 결제를 나누어 생성할 수 있습니다</span></h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-6">
+                    <div class="form-group">
+                        <label class="form-label">결제종류 <span class="text-danger">*</span></label>
+                        <select class="form-select">
+                            <option value="">선택</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="form-group">
+                        <label class="form-label">사용일(수령일) <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="reg_date_from" placeholder="연도. 월. 일.">
+                    </div>
+                </div>
+                <div class="col-6 mt-3">
+                    <div class="form-group">
+                        <label class="form-label">입력가능금액</label>
+                        <input type="text" class="form-control" placeholder="100자 이내">
+                    </div>
+                </div>
+                <div class="col-6 mt-3">
+                    <div class="form-group">
+                        <label class="form-label">결제대상금액 <span class="text-danger">*</span></label>
+                        <div class="input-group align-items-center">
+                            <input type="text" class="form-control" placeholder="100자 이내">
+                            <div class="form-check form-check-inline ms-3">
+                                <input class="form-check-input" type="checkbox" id="checkbox1" name="checkbox">
+                                <label class="form-check-label" for="checkbox1">입력가능금액 전액</label>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                <div class="col-6 mt-3">
+                    <label class="form-label mb-2">결제수단 <span class="text-danger">*</span></label>
+                    <!--<div class="is-invalid">-->
+                    <div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="inlineRadio1" name="inlineRadio">
+                            <label class="form-check-label" for="inlineRadio1">계좌입금</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="inlineRadio2" name="inlineRadio">
+                            <label class="form-check-label" for="inlineRadio2">신용카드</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="inlineRadio3" name="inlineRadio">
+                            <label class="form-check-label" for="inlineRadio3">현금</label>
+                        </div>
+                    </div>
+                    <div class="invalid-feedback">유효성체크 문구 자리</div>
+                </div>
+                <div class="col-6 mt-3">
+                    <label class="form-label mb-2">지출증빙 <span class="text-danger">*</span></label>
+                    <!--<div class="is-invalid">-->
+                    <div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="radio1" name="inlineRadio">
+                            <label class="form-check-label" for="radio1">세금계산서</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="radio2" name="inlineRadio">
+                            <label class="form-check-label" for="radio2">현금영수증(고객)</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" id="radio3" name="inlineRadio">
+                            <label class="form-check-label" for="radio3">미발행</label>
+                        </div>
+                    </div>
+                    <div class="invalid-feedback">유효성체크 문구 자리</div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <button class="btn btn-primary btn-block">등록</button>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="personal">
+
+	<!-- 약관목록 -->
+   	<select id="selectPersonalList" resultType="TermsDataVo">
+   		<![CDATA[ /* SQL_ID : personal.selectPersonalList */ ]]>
+		select
+			p.p_no,
+			date_format(g_date,'%Y년 %m월 %d일') as g_date_str,
+			date_format(s_date,'%Y년 %m월 %d일') as s_date_str
+		from
+			w_personal p
+		where
+			1 = 1
+		order by
+			p.p_no desc
+	</select>
+	
+	<!-- 약관정보 -->
+	<select id="selectPersonal" resultType="TermsDataVo" parameterType="map">
+		<![CDATA[ /* SQL_ID : personal.selectPersonal */ ]]>
+		select
+			p.p_no,
+			p.content,
+			date_format(g_date,'%Y년 %m월 %d일') as g_date_str,
+			date_format(s_date,'%Y년 %m월 %d일') as s_date_str
+		from
+			w_personal p
+		where
+			1 = 1
+			<if test=" null != p_no and '' != p_no ">
+			and p_no = #{p_no}
+			</if>
+			
+		order by
+			p.p_no desc
+			limit 1
+	</select>
+</mapper>
+
+

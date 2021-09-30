@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="roleAdmin">
+    <!-- 권한관리자목록 -->
+    <select id="selectRoleAdminList" parameterType="map" resultType="map">
+    	<![CDATA[ /* SQL_ID : roleAdmin.selectRoleAdminList */ ]]>
+    	select wra.* ,
+    	wa0.admin_id as admin_id,
+    	wa0.admin_name as admin_name,
+    	wa1.admin_id as create_id,
+		wa1.admin_name as create_nm,
+		wa2.admin_id as update_id,
+		wa2.admin_name as update_nm
+		from w_role_admin wra
+		join w_admin wa0 on(wra.admin_no = wa0.admin_no)
+		join w_admin wa1 on(wra.create_no = wa1.admin_no)
+		left join w_admin wa2 on(wra.update_no = wa2.admin_no)
+		where 1=1
+		and role_no = #{role_no}
+		<if test='role_admin_keyword != null and role_admin_keyword != "" '>
+		AND wa0.admin_name = #{role_admin_keyword}
+		</if>
+		order by wra.create_date desc
+    </select>
+
+	<!-- abc권한관리자목록 -->
+    <select id="selectRoleAbcAdminList" parameterType="map" resultType="map">
+    	<![CDATA[ /* SQL_ID : roleAdmin.selectRoleAbcAdminList */ ]]>
+    	select wra.* ,
+    	wa0.admin_id as admin_id,
+    	wa0.admin_name as admin_name,
+    	wa1.admin_id as create_id,
+		wa1.admin_name as create_nm,
+		wa2.admin_id as update_id,
+		wa2.admin_name as update_nm
+		from w_abc_role_admin wra
+		join w_admin wa0 on(wra.admin_no = wa0.admin_no)
+		join w_admin wa1 on(wra.create_no = wa1.admin_no)
+		left join w_admin wa2 on(wra.update_no = wa2.admin_no)
+		where 1=1
+		and role_no = #{role_no}
+		<if test='role_admin_keyword != null and role_admin_keyword != "" '>
+		AND wa0.admin_name = #{role_admin_keyword}
+		</if>
+		order by wra.create_date desc
+    </select>
+	
+	<!-- abc 권한관리자목록 cnt -->
+    <select id="selectRoleAbcAdminListCnt" parameterType="map" resultType="int">
+    	<![CDATA[ /* SQL_ID : roleAdmin.selectRoleAdminList */ ]]>
+    	select count(*)
+		from w_abc_role_admin wra
+		join w_admin wa0 on(wra.admin_no = wa0.admin_no)
+		join w_admin wa1 on(wra.create_no = wa1.admin_no)
+		left join w_admin wa2 on(wra.update_no = wa2.admin_no)
+		where 1=1
+		and role_no = #{role_no}
+
+		<if test='role_admin_keyword != null and role_admin_keyword != "" '>
+		AND wa0.admin_name = #{role_admin_keyword}
+		</if>
+    </select>
+	
+	<!-- 권한관리자목록 -->
+    <select id="selectRoleAdminListCnt" parameterType="map" resultType="int">
+    	<![CDATA[ /* SQL_ID : roleAdmin.selectRoleAdminList */ ]]>
+    	select count(*)
+		from w_role_admin wra
+		join w_admin wa0 on(wra.admin_no = wa0.admin_no)
+		join w_admin wa1 on(wra.create_no = wa1.admin_no)
+		left join w_admin wa2 on(wra.update_no = wa2.admin_no)
+		where 1=1
+		and role_no = #{role_no}
+
+		<if test='role_admin_keyword != null and role_admin_keyword != "" '>
+		AND wa0.admin_name = #{role_admin_keyword}
+		</if>
+    </select>
+
+	<!-- 권한관리자삭제 -->
+    <delete id="deleteRoleAdmin" parameterType="map">
+    	<![CDATA[ /* SQL_ID : roleAdmin.deleteRoleAdmin */ ]]>
+    	delete from w_abc_role_admin where role_no = #{role_no}
+    	<if test='admin_no != null and admin_no != "" '>
+    	and admin_no = #{admin_no}
+    	</if>
+    </delete>
+</mapper>
+
+
+
+
+
